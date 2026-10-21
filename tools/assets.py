@@ -105,7 +105,7 @@ Image.merge("RGB", (n.point(lambda v: 4 + v // 5), n.point(lambda v: 5 + v // 4)
 STF = {"worlds": 88.7, "systems": 91.4, "agents": 93.9, "studio": 96.6, "networks": 99.2, "benchmarks": 102.5, "decisions": 105.8}
 HOPS = [("decisions", "benchmarks", "2026-10", "2026-01"), ("benchmarks", "networks", "2026-10", "2025-09"), ("networks", "studio", "2026-10", "2025-09"),
         ("studio", "agents", "2026-10", "2025-12"), ("agents", "systems", "2026-10", "2024"), ("systems", "worlds", "2019", "2014")]
-jobs = [(f"{TMP}/wf-d.png", "mode=full&w=870&h=725"), (f"{TMP}/wf-m.png", "mode=full&w=480&h=560"), (f"{TMP}/og-wf.png", "mode=full&w=560&h=630")]
+jobs = [(f"{TMP}/wf-d.png", "mode=full&w=870&h=725"), (f"{TMP}/wf-m.png", "mode=full&w=480&h=480"), (f"{TMP}/og-wf.png", "mode=full&w=560&h=630")]
 for a, b, r0, r1 in HOPS:
     f0, f1 = sorted([STF[a], STF[b]]); f0 -= 0.9; f1 += 0.9
     jobs.append((f"{TMP}/hop-{a}-{b}.png", f"mode=crop&w=520&h=150&f0={f0}&f1={f1}&r0={r0}&r1={r1}&st={a},{b}"))
@@ -114,7 +114,7 @@ for k in ("d", "m"):
     im = Image.open(f"{TMP}/wf-{k}.png").convert("RGB"); im.save(f"{TMP}/wf-{k}-rgb.png")
     avif(f"{TMP}/wf-{k}-rgb.png", f"{IMG}/wf-{k}.avif", 38)
     im.save(f"{IMG}/wf-{k}.webp", "WEBP", quality=70, method=6)
-manifest["wf"] = {"base": "wf", "mw": 480, "mh": 560, "dw": 870, "dh": 725}
+manifest["wf"] = {"base": "wf", "mw": 480, "mh": 480, "dw": 870, "dh": 725}
 for a, b, _, _ in HOPS:
     im = Image.open(f"{TMP}/hop-{a}-{b}.png").convert("RGB")
     im.save(f"{IMG}/hop-{a}-{b}.webp", "WEBP", quality=72, method=6)

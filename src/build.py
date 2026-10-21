@@ -9,6 +9,7 @@ sys.path.insert(0, SRC)
 from content import T, STATIONS, CARDS, HOPS, LOGBOOK, WORKS, EMAIL, X_URL, GH_URL, HF_URL, ASOF, FLAG, FLAG_DE  # noqa: E402
 
 BASE_URL = os.environ.get("SITE_URL", "https://productivity-boost.app.mintapis.com")
+BUILD_ID = os.environ.get("BUILD_ID", "dev")
 BAND = json.load(open(os.path.join(SRC, "data", "band.json")))
 ASSETS = json.load(open(os.path.join(SRC, "data", "assets.json"))) if os.path.exists(os.path.join(SRC, "data", "assets.json")) else {}
 ST = {s["id"]: s for s in STATIONS}
@@ -178,6 +179,7 @@ def head(lang, title, desc, path, alt_path, og="og", extra=""):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="build" content="{BUILD_ID}">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
 <link rel="canonical" href="{url}">
@@ -269,11 +271,11 @@ def ruler_svg():
             f'<g fill="currentColor" font-family="ui-monospace,monospace" font-size="9" opacity=".7">{"".join(labels)}</g></svg>')
 
 ANN = [  # in-plot labels: key, station, time, label offset (dx, dy in % of the plot), shown on phones
- ("reax", "networks", 2026 + 9.5 / 12, (-3, 13), True, "end"),
+ ("reax", "networks", 2026 + 9.5 / 12, (-3, 9), True, "end"),
  ("ralph", "agents", 2026 + 0.5 / 12, (3, 6), True, "start"),
  ("rdvr", "worlds", 2017.5, (1.5, -8), True, "start"),
  ("dax", "systems", 2015.0, (3, 3), False, "start"),
- ("jev", "benchmarks", 2026 + 9.5 / 12, (-3, 7), True, "end"),
+ ("jev", "benchmarks", 2026 + 9.5 / 12, (-2.5, 22), True, "end"),
  ("bh", "benchmarks", 2026 + 6.5 / 12, (3, 9), False, "start"),
  ("lgbm", "decisions", 2018.5, (-3, 4), False, "end"),
  ("games", "worlds", 1994.0, (3, 0), True, "start"),
@@ -298,7 +300,7 @@ def instrument(lang):
     band_order = sorted(BAND["stations"], key=lambda s: s["freq"])
     for s in band_order:
         sid = s["id"]; nm = st_plain(sid, lang)
-        short = nm.split(" ")[0] if sid == "studio" else nm
+        short = nm
         st_links.append(f'<a class="st x-{sid}" href="#{sid}" data-st="{sid}" data-tune="{sid}"><span aria-hidden="true">{freq_txt(str(s["freq"]), lang)}</span><i aria-hidden="true">{esc(short)}</i><span class="sr">{freq_txt(str(s["freq"]), lang)} {T[lang]["mhz"]}, {esc(nm)}</span></a>')
         hits.append(f'<a class="hit x-{sid}" href="#{sid}" data-tune="{sid}" tabindex="-1" aria-hidden="true"></a>')
     yt, _ = year_ticks(lang)
@@ -315,7 +317,7 @@ def instrument(lang):
     return f"""<figure class="inst locked" data-st="decisions" aria-label="{t["inst_title"]}" aria-describedby="inst-cap">
 <div class="inst-head"><b class="ttl">{t["inst_title"]}</b><span class="kind">{t["inst_kind"]}</span><span class="kind-m">{t["tap"]} ↓</span><button class="pause" type="button" data-pause aria-pressed="false" aria-label="{t["pause"]}" data-l-pause="{t["pause"]}" data-l-play="{t["play"]}">{ICON["pause"]}</button></div>
 <div class="ruler">{ruler_svg()}<nav aria-label="{t["nav_inst"]}">{"".join(st_links)}</nav><input class="needle-range" type="range" min="0" max="6" step="1" value="6" aria-label="{t["pick"]}" aria-valuetext="{freq_txt(str(first["freq"]), lang)} {t["mhz"]}, {st_plain(first["id"], lang)}"></div>
-<div class="readout locked">{numerals("105.8", lang, cls="rnum num", label=False)}<span class="rtxt" aria-live="polite"><span class="rname">{esc(st_plain("decisions", lang))} <em>{esc(fl["decisions"])}</em></span><span class="rsub">{esc(ST["decisions"]["read"][lang])}</span></span><a href="#decisions" data-go aria-label="{t["go_short"].rstrip(" ↓")}, {t["readout_go"].rstrip(" ↓").lower()}: {esc(st_plain("decisions", lang))}"><span class="gl">{t["readout_go"]}</span><span class="gs" aria-hidden="true">{t["go_short"]}</span></a></div>
+<div class="readout locked">{numerals("105.8", lang, cls="rnum num", label=False)}<span class="rtxt" aria-live="polite"><span class="rname">{esc(st_plain("decisions", lang))} <em>{esc(fl["decisions"])}</em></span><span class="rsub">{esc(ST["decisions"]["read"][lang])}</span></span><a href="#decisions" data-go aria-label="{t["go_short"].rstrip(" ↓")} – {t["readout_go"].rstrip(" ↓")}: {esc(st_plain("decisions", lang))}"><span class="gl">{t["readout_go"]}</span><span class="gs" aria-hidden="true">{t["go_short"]}</span></a></div>
 <div class="plotwrap"><div class="years" aria-hidden="true">{yt}</div>
 <div class="plot">{wf_img}<i class="floor"></i><canvas aria-hidden="true"></canvas><i class="static"></i><i class="yours" aria-hidden="true"></i>{"".join(hits)}{ann}</div></div>
 <div class="plotfoot"><span>{freq_txt("87.5", lang)} · {t["since87"]}</span><a href="#contact">{t["yourproj"]} · {freq_txt("108.0", lang)} →</a></div>

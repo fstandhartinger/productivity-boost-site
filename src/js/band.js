@@ -116,7 +116,8 @@ export function spectra(band, w, opts = {}) {
           v = L * (0.95 * g(d, S * 0.05) + 0.16 * g(d, S * 0.14));
         } else if (e.scope === 2) {
           // AM-like: carrier + two sidebands + a soft skirt
-          v = L * (0.9 * g(d, S * 0.028) + 0.42 * g(d - S * 0.1, S * 0.03) + 0.42 * g(d + S * 0.1, S * 0.03) + 0.1 * g(d, S * 0.15));
+          const cw = e.level >= 1.5 ? 0.06 : 0.028; // the most-starred burn wide and white
+          v = L * (0.95 * g(d, S * cw) + 0.42 * g(d - S * 0.12, S * 0.03) + 0.42 * g(d + S * 0.12, S * 0.03) + 0.1 * g(d, S * 0.16));
         } else {
           const hw = S * 0.1;
           const ad = Math.abs(d);
