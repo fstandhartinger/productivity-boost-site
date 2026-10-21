@@ -1,0 +1,95 @@
+"""Build-time asset pipeline: responsive AVIF/WebP, the VR loop, waterfall images, hop slices, dot plot, OG images.
+Usage: python3 -I tools/assets.py <job-media-dir>   (writes site/img + src/data/assets.json)"""
+import json, os, subprocess, sys, random, math
+from PIL import Image
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MEDIA = sys.argv[1]
+IMG = os.path.join(ROOT, "site", "img"); os.makedirs(IMG, exist_ok=True)
+TMP = "/tmp/pbsite"; os.makedirs(TMP, exist_ok=True)
+manifest = {"_v": "1"}
+
+def avif(src_png, dst, crf=34):
+    subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", src_png, "-c:v", "libaom-av1", "-still-picture", "1",
+                    "-crf", str(crf), "-b:v", "0", "-cpu-used", "4", "-pix_fmt", "yuv420p", dst], check=True)
+
+def responsive(name, im, widths, crf=34, q=78):
+    base = name
+    for w in widths:
+        h = round(im.height * w / im.width)
+        r = im.resize((w, h), Image.LANCZOS).convert("RGB")
+        p = f"{TMP}/{base}-{w}.png"; r.save(p)
+        avif(p, f"{IMG}/{base}-{w}.avif", crf)
+        r.save(f"{IMG}/{base}-{w}.webp", "WEBP", quality=q, method=6)
+    manifest[name] = {"base": base, "widths": widths, "w": im.width, "h": im.height}
+
+# --- portrait (Florian's own photo from his old site) ---
+pt = Image.open(os.path.join(MEDIA, "orig", "150daa_335ae049b7564c96ab065fd64489ea45~mv2.jpg"))
+responsive("portrait", pt.crop((1200, 100, 2300, 1475)), [320, 480, 640], crf=36)
+responsive("portrait-sq", pt.crop((1080, 160, 2340, 1420)), [104, 156], crf=36)
+# --- Rewind Recorder (own product mock-up) ---
+rw = Image.open(os.path.join(MEDIA, "orig", "150daa_b4a13be7a747483b87229adc4be48315~mv2.png"))
+responsive("rwrec", rw, [480, 800], crf=34)
+# --- Room Designer VR: poster + 6 s silent loop from its own Steam trailer ---
+steam = "/home/flori/jobs/productivity-boost-website-20261021/workers/research/media/steam"
+ss2 = Image.open(os.path.join(steam, "ss2.jpg"))
+responsive("rdvr", ss2, [480, 800, 1200], crf=34)
+tr = os.path.join(steam, "trailer_720p.mp4")
+if os.path.exists(tr):
+    # two shots from Florian's own trailer: draw the floor plan (26 s), then stand in the furnished room (155 s)
+    fc = ("[0:v]trim=start=26:end=29.5,setpts=PTS-STARTPTS,scale=640:-2,fps=24[a];"
+          "[0:v]trim=start=155:end=158.5,setpts=PTS-STARTPTS,scale=640:-2,fps=24[b];[a][b]concat=n=2:v=1:a=0[v]")
+    subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", tr, "-filter_complex", fc, "-map", "[v]", "-an",
+                    "-c:v", "libx264", "-profile:v", "main", "-crf", "30", "-preset", "slow", "-movflags", "+faststart", "-pix_fmt", "yuv420p", f"{IMG}/rdvr-loop.mp4"], check=True)
+    subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", tr, "-filter_complex", fc, "-map", "[v]", "-an",
+                    "-c:v", "libvpx-vp9", "-crf", "40", "-b:v", "0", "-row-mt", "1", f"{IMG}/rdvr-loop.webm"], check=True)
+    subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", "156", "-i", tr, "-frames:v", "1", "-vf", "scale=640:-2", f"{TMP}/poster.png"], check=True)
+    pim = Image.open(f"{TMP}/poster.png"); pim.convert("RGB").save(f"{IMG}/rdvr-poster.webp", "WEBP", quality=72, method=6)
+    manifest["rdvr_loop"] = {"mp4": "rdvr-loop.mp4", "webm": "rdvr-loop.webm", "poster": "rdvr-poster.webp", "w": pim.width, "h": pim.height}
+
+# --- noise tile ---
+rnd = random.Random(7); n = Image.new("L", (96, 96))
+n.putdata([int(10 + 46 * rnd.random() ** 2) for _ in range(96 * 96)])
+Image.merge("RGB", (n.point(lambda v: v // 3), n.point(lambda v: v // 3), n.point(lambda v: min(255, v // 2 + 20)))).save(f"{IMG}/noise.png", optimize=True)
+
+# --- waterfall: final frame (desktop + phone), hop slices ---
+STF = {"worlds": 88.7, "systems": 91.4, "agents": 93.9, "studio": 96.6, "networks": 99.2, "benchmarks": 102.5, "decisions": 105.8}
+HOPS = [("decisions", "benchmarks", "2026-10", "2026-01"), ("benchmarks", "networks", "2026-10", "2025-09"), ("networks", "studio", "2026-10", "2025-09"),
+        ("studio", "agents", "2026-10", "2025-12"), ("agents", "systems", "2026-10", "2024"), ("systems", "worlds", "2019", "2014")]
+jobs = [(f"{TMP}/wf-d.png", "mode=full&w=870&h=725"), (f"{TMP}/wf-m.png", "mode=full&w=480&h=400"), (f"{TMP}/og-wf.png", "mode=full&w=560&h=630")]
+for a, b, r0, r1 in HOPS:
+    f0, f1 = sorted([STF[a], STF[b]]); f0 -= 0.9; f1 += 0.9
+    jobs.append((f"{TMP}/hop-{a}-{b}.png", f"mode=crop&w=520&h=150&f0={f0}&f1={f1}&r0={r0}&r1={r1}&st={a},{b}"))
+subprocess.run([sys.executable, "-I", os.path.join(ROOT, "tools", "render.py"), ROOT, json.dumps(jobs)], check=True)
+for k in ("d", "m"):
+    im = Image.open(f"{TMP}/wf-{k}.png").convert("RGB"); im.save(f"{TMP}/wf-{k}-rgb.png")
+    avif(f"{TMP}/wf-{k}-rgb.png", f"{IMG}/wf-{k}.avif", 38)
+    im.save(f"{IMG}/wf-{k}.webp", "WEBP", quality=70, method=6)
+manifest["wf"] = {"base": "wf", "mw": 480, "mh": 400}
+for a, b, _, _ in HOPS:
+    im = Image.open(f"{TMP}/hop-{a}-{b}.png").convert("RGB")
+    im.save(f"{IMG}/hop-{a}-{b}.webp", "WEBP", quality=72, method=6)
+    manifest[f"hop-{a}-{b}"] = {"file": f"hop-{a}-{b}.webp", "w": im.width, "h": im.height}
+
+# --- JevBench dot plot (public board, 21 Oct 2026), inline SVG ---
+rows = json.load(open(os.path.join(ROOT, "src", "data", "jevbench_intel.json")))
+import re as _re
+pairs = sorted((float(_re.match(r"[0-9.]+", r[1]).group(0)), "below" in r[1]) for r in rows if _re.match(r"[0-9.]+", r[1]))
+vals = [v for v, _ in pairs]
+lo, hi = 0, 100
+bins = {}
+dots = []
+for v, below in pairs:
+    b = int((v - lo) / (hi - lo) * 68)
+    k = bins.get(b, 0); bins[b] = k + 1
+    x = 14 + (v - lo) / (hi - lo) * 272
+    y = 112 - k * 4.6
+    dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="1.9"' + (' fill="none" stroke="currentColor" stroke-width=".7" opacity=".6"/>' if below else '/>'))
+axis = "".join(f'<text x="{14 + t / 100 * 272:.1f}" y="128" text-anchor="middle">{t}</text>' for t in (0, 25, 50, 75, 100))
+svg = (f'<svg class="dots" viewBox="0 0 300 134" aria-hidden="true"><line x1="14" y1="116" x2="286" y2="116" stroke="#8E97A8" stroke-width=".6"/>'
+       f'<g fill="currentColor" fill-opacity=".9">{"".join(dots)}</g><g font-family="ui-monospace,monospace" font-size="7" fill="#8E97A8">{axis}</g></svg>')
+manifest["jevdots"] = {"svg": svg, "n": len(vals), "max": max(vals), "min": min(vals)}
+print("jevbench n", len(vals), "range", min(vals), max(vals), "tallest bin", max(bins.values()))
+
+json.dump(manifest, open(os.path.join(ROOT, "src", "data", "assets.json"), "w"), indent=1)
+print("assets ok")

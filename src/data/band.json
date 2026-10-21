@@ -1,0 +1,409 @@
+{
+ "asof": "2026-10-21",
+ "rows": {
+  "yearly": [
+   1987,
+   2024
+  ],
+  "monthly": [
+   "2025-01",
+   "2026-10"
+  ],
+  "weights": [
+   {
+    "from": 1987,
+    "to": 2002,
+    "w": 0.42
+   },
+   {
+    "from": 2003,
+    "to": 2016,
+    "w": 0.62
+   },
+   {
+    "from": 2017,
+    "to": 2024,
+    "w": 1.0
+   }
+  ]
+ },
+ "stations": [
+  {
+   "id": "worlds",
+   "freq": 88.7,
+   "en": "Worlds",
+   "de": "Welten"
+  },
+  {
+   "id": "systems",
+   "freq": 91.4,
+   "en": "Systems",
+   "de": "Systeme"
+  },
+  {
+   "id": "agents",
+   "freq": 93.9,
+   "en": "Agents",
+   "de": "Agenten"
+  },
+  {
+   "id": "studio",
+   "freq": 96.6,
+   "en": "Studio",
+   "de": "Studio"
+  },
+  {
+   "id": "networks",
+   "freq": 99.2,
+   "en": "Networks",
+   "de": "Netze"
+  },
+  {
+   "id": "benchmarks",
+   "freq": 102.5,
+   "en": "Benchmarks",
+   "de": "Benchmarks"
+  },
+  {
+   "id": "decisions",
+   "freq": 105.8,
+   "en": "Decisions",
+   "de": "Entscheidungen"
+  }
+ ],
+ "entries": [
+  {
+   "st": "systems",
+   "kind": "signal",
+   "from": 2003,
+   "to": 2005,
+   "scope": 1,
+   "level": 0.5,
+   "closed": true,
+   "en": "In-house software and IT for a wholesaler (Troiber)",
+   "src": "https://www.florianstandhartinger.com/ (Experience 2003–2006)"
+  },
+  {
+   "st": "systems",
+   "kind": "signal",
+   "from": 2006,
+   "to": 2006,
+   "scope": 2,
+   "level": 0.56,
+   "closed": true,
+   "en": "Incident manager for an ASP.NET system on more than 60 web servers",
+   "src": "https://www.florianstandhartinger.com/ (Experience 2006–2007)"
+  },
+  {
+   "st": "systems",
+   "kind": "signal",
+   "from": 2007,
+   "to": 2011,
+   "scope": 2,
+   "level": 0.56,
+   "closed": true,
+   "en": "The leading ERM solution for the media industry, C# (DAP GmbH)",
+   "src": "https://www.florianstandhartinger.com/ (Experience 2007–2012)"
+  },
+  {
+   "st": "systems",
+   "kind": "signal",
+   "from": 2012,
+   "to": 2013,
+   "scope": 1,
+   "level": 0.52,
+   "closed": true,
+   "en": "Solution architect and .NET lecturer at msg systems ag",
+   "src": "https://www.florianstandhartinger.com/ (Experience 2012–2014)"
+  },
+  {
+   "st": "worlds",
+   "kind": "carrier",
+   "from": 1987,
+   "to": 2006,
+   "level": 0.55,
+   "en": "Games and apps written for fun, from age six",
+   "src": "https://www.florianstandhartinger.com/ (Experience: hobby programmer 1987–2006)"
+  },
+  {
+   "st": "systems",
+   "kind": "carrier",
+   "from": 2003,
+   "to": "2026-10",
+   "level": 0.6,
+   "en": "Software other people run their business on: wholesaler IT, 60 web servers, a media ERM, msg systems, a real-time risk system for a DAX insurer",
+   "src": "https://www.florianstandhartinger.com/ (Experience 2003–now); job brief (msg systems ag today)"
+  },
+  {
+   "st": "systems",
+   "kind": "signal",
+   "from": 2014,
+   "to": 2021,
+   "scope": 3,
+   "level": 0.72,
+   "closed": true,
+   "en": "Real-time risk and geo system for a DAX insurer (lead developer and architect)",
+   "src": "https://www.florianstandhartinger.com/portfolio (Business Monitoring and Geoinformation System)"
+  },
+  {
+   "st": "worlds",
+   "kind": "signal",
+   "from": 2017,
+   "to": 2017,
+   "scope": 2,
+   "level": 0.8,
+   "en": "Room Designer VR, on Steam since 28 Feb 2017",
+   "src": "https://store.steampowered.com/app/601620/Room_Designer_VR/"
+  },
+  {
+   "st": "worlds",
+   "kind": "signal",
+   "from": 2017,
+   "to": 2017,
+   "scope": 1,
+   "level": 0.66,
+   "side": "systems",
+   "en": "Non Convex Mesh Collider, Unity Asset Store, 8 May 2017",
+   "src": "https://assetstore.unity.com/packages/tools/physics/non-convex-mesh-collider-84867"
+  },
+  {
+   "st": "decisions",
+   "kind": "signal",
+   "from": 2018,
+   "to": 2018,
+   "scope": 1,
+   "level": 0.62,
+   "en": "LightGbmDotNet: gradient-boosted decision trees for .NET",
+   "src": "https://github.com/fstandhartinger/LightGbmDotNet"
+  },
+  {
+   "st": "studio",
+   "kind": "signal",
+   "from": 2019,
+   "to": 2020,
+   "scope": 2,
+   "level": 0.66,
+   "side": "worlds",
+   "approx": true,
+   "en": "Subtitles and Rewind Recorder for Vuzix AR glasses (live captions; save the last seconds as video)",
+   "src": "https://www.florianstandhartinger.com/portfolio; https://www.vuzix.com/appstore/app/subtitles"
+  },
+  {
+   "st": "agents",
+   "kind": "signal",
+   "from": "2025-01",
+   "to": "2025-02",
+   "scope": 1,
+   "level": 0.8,
+   "en": "Generative Chat UI (139 GitHub stars)",
+   "src": "https://github.com/fstandhartinger/generative-chat-ui"
+  },
+  {
+   "st": "agents",
+   "kind": "signal",
+   "from": "2025-03",
+   "to": "2025-05",
+   "scope": 2,
+   "level": 0.6,
+   "side": "systems",
+   "en": "Smooth Operator: AI agents that drive Windows desktops, client libraries for .NET, Python, TypeScript",
+   "src": "https://github.com/fstandhartinger/smooth-operator-client-csharp"
+  },
+  {
+   "st": "networks",
+   "kind": "carrier",
+   "from": "2025-09",
+   "to": "2026-10",
+   "level": 0.5,
+   "en": "Building on and for Chutes, Bittensor subnet 64",
+   "src": "https://github.com/fstandhartinger/chutes-emission-simulator; chutes-bench-runner; ui-patterns-showcase"
+  },
+  {
+   "st": "networks",
+   "kind": "signal",
+   "from": "2025-11",
+   "to": "2025-11",
+   "scope": 1,
+   "level": 0.55,
+   "en": "Chutes emission simulator",
+   "src": "https://github.com/fstandhartinger/chutes-emission-simulator"
+  },
+  {
+   "st": "benchmarks",
+   "kind": "signal",
+   "from": "2025-12",
+   "to": "2025-12",
+   "scope": 1,
+   "level": 0.55,
+   "side": "networks",
+   "en": "Chutes bench runner: one-click benchmarks for Chutes-hosted models",
+   "src": "https://github.com/fstandhartinger/chutes-bench-runner"
+  },
+  {
+   "st": "studio",
+   "kind": "signal",
+   "from": "2026-01",
+   "to": "2026-01",
+   "scope": 1,
+   "level": 0.58,
+   "side": "networks",
+   "en": "LTX video studio on Chutes",
+   "src": "https://github.com/fstandhartinger/chutes-ltx-video-studio"
+  },
+  {
+   "st": "agents",
+   "kind": "signal",
+   "from": "2026-01",
+   "to": "2026-01",
+   "scope": 2,
+   "level": 1.0,
+   "en": "Ralph Wiggum: autonomous, spec-driven coding loop (306 GitHub stars)",
+   "src": "https://github.com/fstandhartinger/ralph-wiggum"
+  },
+  {
+   "st": "studio",
+   "kind": "signal",
+   "from": "2026-02",
+   "to": "2026-02",
+   "scope": 1,
+   "level": 0.56,
+   "en": "Storyteller: one prompt to story, pictures and narration",
+   "src": "https://github.com/fstandhartinger/chutes-storyteller"
+  },
+  {
+   "st": "studio",
+   "kind": "signal",
+   "from": "2026-03",
+   "to": "2026-03",
+   "scope": 1,
+   "level": 0.58,
+   "side": "agents",
+   "en": "Mindority Report: talk to your codebase",
+   "src": "https://github.com/fstandhartinger/mindority-report"
+  },
+  {
+   "st": "benchmarks",
+   "kind": "signal",
+   "from": "2026-06",
+   "to": "2026-10",
+   "scope": 3,
+   "level": 0.86,
+   "en": "Benchmark Heaven: AI models by capability and price",
+   "src": "https://benchmarkheaven.com"
+  },
+  {
+   "st": "studio",
+   "kind": "signal",
+   "from": "2026-08",
+   "to": "2026-08",
+   "scope": 1,
+   "level": 0.6,
+   "en": "H3 Studio: AI video with synced sound on our own GPU",
+   "src": "https://github.com/fstandhartinger/h3-studio"
+  },
+  {
+   "st": "systems",
+   "kind": "signal",
+   "from": "2026-08",
+   "to": "2026-09",
+   "scope": 2,
+   "level": 0.6,
+   "en": "PDFMint, DocMint, MailMint: small developer APIs",
+   "src": "https://github.com/fstandhartinger/pdfmint"
+  },
+  {
+   "st": "agents",
+   "kind": "signal",
+   "from": "2026-09",
+   "to": "2026-09",
+   "scope": 1,
+   "level": 0.8,
+   "en": "Chat Seek for VS Code (67 GitHub stars)",
+   "src": "https://github.com/fstandhartinger/chat-seek-vscode"
+  },
+  {
+   "st": "agents",
+   "kind": "signal",
+   "from": "2026-09",
+   "to": "2026-10",
+   "scope": 1,
+   "level": 0.66,
+   "en": "Agent message board, auto model router, agent timeline",
+   "src": "https://github.com/fstandhartinger/agent-message-board"
+  },
+  {
+   "st": "studio",
+   "kind": "signal",
+   "from": "2026-09",
+   "to": "2026-09",
+   "scope": 1,
+   "level": 0.55,
+   "en": "Who is right? A live fact-check party game",
+   "src": "https://github.com/fstandhartinger/who-is-right"
+  },
+  {
+   "st": "decisions",
+   "kind": "signal",
+   "from": "2026-09",
+   "to": "2026-09",
+   "scope": 1,
+   "level": 0.58,
+   "side": "agents",
+   "en": "Weiche: a 395M decision model that routes LLM requests",
+   "src": "https://huggingface.co/benchmarkheaven/weiche-395m"
+  },
+  {
+   "st": "benchmarks",
+   "kind": "signal",
+   "from": "2026-09",
+   "to": "2026-10",
+   "scope": 3,
+   "level": 1.0,
+   "side": "decisions",
+   "en": "JevBench: 194 open-weights decision systems measured (298 GitHub stars)",
+   "src": "https://benchmarkheaven.com/jev-models; https://github.com/fstandhartinger/jevbench"
+  },
+  {
+   "st": "networks",
+   "kind": "signal",
+   "from": "2026-09",
+   "to": "2026-10",
+   "scope": 2,
+   "level": 0.62,
+   "en": "Bonsai Swarm: a 27B model in volunteer browser tabs",
+   "src": "https://github.com/fstandhartinger/bonsai-swarm"
+  },
+  {
+   "st": "decisions",
+   "kind": "signal",
+   "from": "2026-09",
+   "to": "2026-10",
+   "scope": 3,
+   "level": 0.95,
+   "en": "Decision Models: a Jev-compatible decision API with an EU tier",
+   "src": "https://decisionmodels.io"
+  },
+  {
+   "st": "networks",
+   "kind": "signal",
+   "from": "2026-10",
+   "to": "2026-10",
+   "scope": 3,
+   "level": 0.95,
+   "side": "benchmarks",
+   "en": "REAX, Bittensor subnet 92: live since 14 Oct 2026",
+   "src": "https://reax.co; https://mine.decisionmodels.io"
+  },
+  {
+   "st": "decisions",
+   "kind": "signal",
+   "from": "2026-10",
+   "to": "2026-10",
+   "scope": 2,
+   "level": 0.85,
+   "side": "networks",
+   "en": "REAX 1: open 27B decision model, Apache-2.0",
+   "src": "https://huggingface.co/decisionmodels/reax-1"
+  }
+ ]
+}

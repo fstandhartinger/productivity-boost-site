@@ -1,0 +1,25 @@
+<!doctype html><meta charset="utf-8"><body style="margin:0;background:#08090D"><canvas id="c"></canvas>
+<script type="module">
+import {spectra, paintRows, rowLayout, buildRows, freqX} from '../src/js/band.js';
+const q = new URLSearchParams(location.search);
+const band = await (await fetch('../src/data/band.json')).json();
+const W = +q.get('w'), H = +q.get('h');
+const c = document.getElementById('c'); c.width = W; c.height = H; const ctx = c.getContext('2d');
+if (q.get('mode') === 'full') {
+  const sp = spectra(band, W); paintRows(ctx, sp, {w: W, h: H}, 0, sp.rows.length);
+} else {
+  // crop: frequency range f0..f1, rows r0..r1 (keys), only the given stations
+  const f0 = +q.get('f0'), f1 = +q.get('f1'); const keep = q.get('st').split(',');
+  const Wf = Math.round(W / ((f1 - f0) / 20.5));
+  const b2 = {...band, entries: band.entries.filter(e => keep.includes(e.st) && (!e.side || keep.includes(e.side)))};
+  const rows = buildRows(band); const i0 = rows.findIndex(r => r.key === q.get('r0')), i1 = rows.findIndex(r => r.key === q.get('r1')) + 1;
+  const sumW = rows.slice(i0, i1).reduce((a, r) => a + r.w, 0), totW = rows.reduce((a, r) => a + r.w, 0);
+  const Hf = Math.round(H * totW / sumW);
+  const off = document.createElement('canvas'); off.width = Wf; off.height = Hf; const octx = off.getContext('2d');
+  const sp = spectra(b2, Wf); const lay = {w: Wf, h: Hf}; paintRows(octx, sp, lay, i0, i1);
+  const x0 = Math.round(freqX(f0, Wf)), y0 = Math.round(lay.rows.tops[i0]);
+  ctx.drawImage(off, x0, y0, W, H, 0, 0, W, H);
+}
+document.title = 'done';
+window.__png = c.toDataURL('image/png');
+</script>
