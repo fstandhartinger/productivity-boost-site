@@ -46,3 +46,4 @@ footer a{color:var(--muted);margin-left:18px}
 .legal{padding:64px 0;max-width:780px}
 .legal h1{font-size:40px}.legal h2{font-size:22px;margin-top:36px}.legal p,.legal li{color:#30343c}
 @media (max-width:720px){nav a:not(.lang){display:none}.timeline li{grid-template-columns:1fr;gap:4px}.small-list{columns:1}.hero{padding:64px 0 48px}.contact{padding:32px}}
+.grid.two{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}@media (min-width:900px){.grid.two{grid-template-columns:1fr 1fr}}
