@@ -16,7 +16,7 @@ if (q.get('mode') === 'full') {
   const sumW = rows.slice(i0, i1).reduce((a, r) => a + r.w, 0), totW = rows.reduce((a, r) => a + r.w, 0);
   const Hf = Math.round(H * totW / sumW);
   const off = document.createElement('canvas'); off.width = Wf; off.height = Hf; const octx = off.getContext('2d');
-  const sp = spectra(b2, Wf); const lay = {w: Wf, h: Hf}; paintRows(octx, sp, lay, i0, i1);
+  const sp = spectra(b2, Wf, {sidebands: true}); const lay = {w: Wf, h: Hf}; paintRows(octx, sp, lay, i0, i1);
   const x0 = Math.round(freqX(f0, Wf)), y0 = Math.round(lay.rows.tops[i0]);
   ctx.drawImage(off, x0, y0, W, H, 0, 0, W, H);
 }

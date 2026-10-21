@@ -232,7 +232,7 @@ function initInstrument(inst) {
     };
     raf = requestAnimationFrame(step);
   }
-  function done() { revealed = true; plot.classList.add('live'); if (!inst.classList.contains('locked')) lock('decisions', false); shimmer(); }
+  function done() { revealed = true; plot.classList.add('live', 'done'); if (!inst.classList.contains('locked')) lock('decisions', false); shimmer(); }
   let tShim = 0, lastShim = 0;
   let shimT = 0;
   function shimmer() {
@@ -265,7 +265,7 @@ function initInstrument(inst) {
   plot.addEventListener('pointerdown', skip, { once: true });
 
   async function boot() {
-    try { band = await (await fetch('/js/band.json')).json(); } catch (e) { return; }
+    try { band = await (await fetch('/js/band.json')).json(); } catch (e) { root.classList.remove('motion'); return; } // static image + labels
     if (!root.classList.contains('motion')) { revealed = true; lock('decisions', false); return; } // the static image is the final frame
     size();
     // start when the panel is in view (it usually is on load)

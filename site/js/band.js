@@ -120,9 +120,9 @@ export function spectra(band, w, opts = {}) {
           const hw = S * 0.1;
           const ad = Math.abs(d);
           const top = ad < hw ? 1 : g(ad - hw, S * 0.035);
-          v = L * (0.62 * top * (0.8 + 0.2 * Math.sin(x * 1.3 + ei)) + 0.12 * g(d, S * 0.22));
+          v = L * (0.62 * top * (0.8 + 0.2 * Math.sin(x * 1.3 + ei)) + 0.08 * g(d, S * 0.14));
         }
-        if (nx !== null && ri === firstRow) {
+        if (nx !== null && opts.sidebands && ri === firstRow) {
           // sideband toward the neighbour station: a faint ridge + a small pilot at the neighbour
           const lo = Math.min(cx, nx), hi = Math.max(cx, nx);
           if (x > lo && x < hi) v += L * 0.22 * Math.sin(Math.PI * (x - lo) / (hi - lo)) ** 0.6;

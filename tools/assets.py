@@ -35,19 +35,20 @@ def sstv_image(src, w, h, seed=36):
     im = src.resize((w, h), Image.LANCZOS).convert("YCbCr")
     Y, Cb, Cr = im.split()
     # chroma at quarter resolution, smeared horizontally (SSTV sends colour at lower resolution)
-    Cb = Cb.resize((w // 4, h // 2), Image.BILINEAR).resize((w, h), Image.BILINEAR).filter(ImageFilter.BoxBlur(1))
-    Cr = Cr.resize((w // 4, h // 2), Image.BILINEAR).resize((w, h), Image.BILINEAR).filter(ImageFilter.BoxBlur(1))
+    from PIL import ImageChops
+    Cb = ImageChops.offset(Cb.resize((w // 5, h // 2), Image.BILINEAR).resize((w, h), Image.BILINEAR).filter(ImageFilter.BoxBlur(1)), 3, 0)
+    Cr = ImageChops.offset(Cr.resize((w // 5, h // 2), Image.BILINEAR).resize((w, h), Image.BILINEAR).filter(ImageFilter.BoxBlur(1)), -2, 0)
     rgb = Image.merge("YCbCr", (Y, Cb, Cr)).convert("RGB")
     out = Image.new("RGB", (w, h), (8, 9, 13))
     px = rgb.load(); po = out.load()
     for y in range(h):
-        shift = y * 0.018 + (rnd.random() - 0.5) * (1.4 if rnd.random() < 0.08 else 0.5)  # slight slant + jitter
-        bright = 0.93 + 0.07 * rnd.random()
+        shift = y * 0.05 + (rnd.random() - 0.5) * (5 if rnd.random() < 0.06 else 1.2)  # visible slant + line jitter
+        bright = (0.8 if y % 2 else 1.0) * (0.92 + 0.08 * rnd.random())  # scan lines
         for x in range(w):
             sx = int(x - shift)
             if 0 <= sx < w:
                 r, g, b = px[sx, y]
-                n = (rnd.random() - 0.5) * 18
+                n = (rnd.random() - 0.5) * 30
                 po[x, y] = (max(0, min(255, int(r * bright + n))), max(0, min(255, int(g * bright + n))), max(0, min(255, int(b * bright + n))))
     # the last lines arrive noisy (signal fading out), like a real reception
     for y in range(int(h * 0.955), h):
@@ -55,12 +56,12 @@ def sstv_image(src, w, h, seed=36):
             v = int(rnd.random() * 70)
             po[x, y] = (v // 2, v, v // 2 + 10)
     d = ImageDraw.Draw(out)
-    d.rectangle([0, 0, w, int(h * 0.055)], fill=(8, 9, 13))
+    d.rectangle([0, 0, w, int(h * 0.075)], fill=(8, 9, 13))
     try:
-        f = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", max(9, w // 30))
+        f = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", max(10, w // 22))
     except Exception:
         f = None
-    d.text((6, 2), "RX ROBOT36  21.10.2026  JN68", fill=(196, 234, 78), font=f)
+    d.text((6, 3), "RX ROBOT36 21.10.26 JN68", fill=(214, 246, 96), font=f)
     return out
 
 pt_crop = pt.crop((1200, 100, 2300, 1475))
@@ -99,7 +100,7 @@ Image.merge("RGB", (n.point(lambda v: v // 3), n.point(lambda v: v // 3), n.poin
 STF = {"worlds": 88.7, "systems": 91.4, "agents": 93.9, "studio": 96.6, "networks": 99.2, "benchmarks": 102.5, "decisions": 105.8}
 HOPS = [("decisions", "benchmarks", "2026-10", "2026-01"), ("benchmarks", "networks", "2026-10", "2025-09"), ("networks", "studio", "2026-10", "2025-09"),
         ("studio", "agents", "2026-10", "2025-12"), ("agents", "systems", "2026-10", "2024"), ("systems", "worlds", "2019", "2014")]
-jobs = [(f"{TMP}/wf-d.png", "mode=full&w=870&h=725"), (f"{TMP}/wf-m.png", "mode=full&w=480&h=360"), (f"{TMP}/og-wf.png", "mode=full&w=560&h=630")]
+jobs = [(f"{TMP}/wf-d.png", "mode=full&w=870&h=725"), (f"{TMP}/wf-m.png", "mode=full&w=480&h=560"), (f"{TMP}/og-wf.png", "mode=full&w=560&h=630")]
 for a, b, r0, r1 in HOPS:
     f0, f1 = sorted([STF[a], STF[b]]); f0 -= 0.9; f1 += 0.9
     jobs.append((f"{TMP}/hop-{a}-{b}.png", f"mode=crop&w=520&h=150&f0={f0}&f1={f1}&r0={r0}&r1={r1}&st={a},{b}"))
@@ -108,7 +109,7 @@ for k in ("d", "m"):
     im = Image.open(f"{TMP}/wf-{k}.png").convert("RGB"); im.save(f"{TMP}/wf-{k}-rgb.png")
     avif(f"{TMP}/wf-{k}-rgb.png", f"{IMG}/wf-{k}.avif", 38)
     im.save(f"{IMG}/wf-{k}.webp", "WEBP", quality=70, method=6)
-manifest["wf"] = {"base": "wf", "mw": 480, "mh": 360}
+manifest["wf"] = {"base": "wf", "mw": 480, "mh": 560, "dw": 870, "dh": 725}
 for a, b, _, _ in HOPS:
     im = Image.open(f"{TMP}/hop-{a}-{b}.png").convert("RGB")
     im.save(f"{IMG}/hop-{a}-{b}.webp", "WEBP", quality=72, method=6)
