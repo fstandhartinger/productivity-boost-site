@@ -98,6 +98,8 @@ export function spectra(band, w, opts = {}) {
     const a = toT(e.from, false), b = toT(e.to, true);
     const cx = freqX(st[e.st].freq, w);
     const nx = e.side ? freqX(st[e.side].freq, w) : null;
+    let firstRow = -1;
+    rows.forEach((row, ri) => { if (Math.min(b, row.t1) - Math.max(a, row.t0) > 0) firstRow = ri; }); // newest-first: last match = oldest row
     rows.forEach((row, ri) => {
       const overlap = Math.min(b, row.t1) - Math.max(a, row.t0);
       if (overlap <= 0) return;
@@ -120,10 +122,10 @@ export function spectra(band, w, opts = {}) {
           const top = ad < hw ? 1 : g(ad - hw, S * 0.035);
           v = L * (0.62 * top * (0.8 + 0.2 * Math.sin(x * 1.3 + ei)) + 0.12 * g(d, S * 0.22));
         }
-        if (nx !== null) {
+        if (nx !== null && ri === firstRow) {
           // sideband toward the neighbour station: a faint ridge + a small pilot at the neighbour
           const lo = Math.min(cx, nx), hi = Math.max(cx, nx);
-          if (x > lo && x < hi) v += L * 0.16 * Math.sin(Math.PI * (x - lo) / (hi - lo)) ** 0.6;
+          if (x > lo && x < hi) v += L * 0.22 * Math.sin(Math.PI * (x - lo) / (hi - lo)) ** 0.6;
           v += L * 0.42 * g(x - nx, S * 0.03);
         }
         spec[x] += v;

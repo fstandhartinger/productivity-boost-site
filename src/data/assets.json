@@ -19,6 +19,16 @@
   "w": 1260,
   "h": 1260
  },
+ "sstv": {
+  "base": "sstv",
+  "widths": [
+   240,
+   320,
+   480
+  ],
+  "w": 480,
+  "h": 600
+ },
  "rwrec": {
   "base": "rwrec",
   "widths": [
@@ -48,7 +58,7 @@
  "wf": {
   "base": "wf",
   "mw": 480,
-  "mh": 400
+  "mh": 360
  },
  "hop-decisions-benchmarks": {
   "file": "hop-decisions-benchmarks.webp",

@@ -27,6 +27,49 @@ def responsive(name, im, widths, crf=34, q=78):
 pt = Image.open(os.path.join(MEDIA, "orig", "150daa_335ae049b7564c96ab065fd64489ea45~mv2.jpg"))
 responsive("portrait", pt.crop((1200, 100, 2300, 1475)), [320, 480, 640], crf=36)
 responsive("portrait-sq", pt.crop((1080, 160, 2340, 1420)), [104, 156], crf=36)
+# --- the portrait as a received SSTV picture (Robot-36-like): slant, line jitter, chroma smear, noise, header bar ---
+def sstv_image(src, w, h, seed=36):
+    import random as _r
+    from PIL import ImageFilter, ImageDraw, ImageFont
+    rnd = _r.Random(seed)
+    im = src.resize((w, h), Image.LANCZOS).convert("YCbCr")
+    Y, Cb, Cr = im.split()
+    # chroma at quarter resolution, smeared horizontally (SSTV sends colour at lower resolution)
+    Cb = Cb.resize((w // 4, h // 2), Image.BILINEAR).resize((w, h), Image.BILINEAR).filter(ImageFilter.BoxBlur(1))
+    Cr = Cr.resize((w // 4, h // 2), Image.BILINEAR).resize((w, h), Image.BILINEAR).filter(ImageFilter.BoxBlur(1))
+    rgb = Image.merge("YCbCr", (Y, Cb, Cr)).convert("RGB")
+    out = Image.new("RGB", (w, h), (8, 9, 13))
+    px = rgb.load(); po = out.load()
+    for y in range(h):
+        shift = y * 0.018 + (rnd.random() - 0.5) * (1.4 if rnd.random() < 0.08 else 0.5)  # slight slant + jitter
+        bright = 0.93 + 0.07 * rnd.random()
+        for x in range(w):
+            sx = int(x - shift)
+            if 0 <= sx < w:
+                r, g, b = px[sx, y]
+                n = (rnd.random() - 0.5) * 18
+                po[x, y] = (max(0, min(255, int(r * bright + n))), max(0, min(255, int(g * bright + n))), max(0, min(255, int(b * bright + n))))
+    # the last lines arrive noisy (signal fading out), like a real reception
+    for y in range(int(h * 0.955), h):
+        for x in range(w):
+            v = int(rnd.random() * 70)
+            po[x, y] = (v // 2, v, v // 2 + 10)
+    d = ImageDraw.Draw(out)
+    d.rectangle([0, 0, w, int(h * 0.055)], fill=(8, 9, 13))
+    try:
+        f = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", max(9, w // 30))
+    except Exception:
+        f = None
+    d.text((6, 2), "RX ROBOT36  21.10.2026  JN68", fill=(196, 234, 78), font=f)
+    return out
+
+pt_crop = pt.crop((1200, 100, 2300, 1475))
+for wpx in (240, 320, 480):
+    im = sstv_image(pt_crop, wpx, round(wpx * 1.25))
+    im.save(f"{TMP}/sstv-{wpx}.png"); avif(f"{TMP}/sstv-{wpx}.png", f"{IMG}/sstv-{wpx}.avif", 30)
+    im.save(f"{IMG}/sstv-{wpx}.webp", "WEBP", quality=82, method=6)
+manifest["sstv"] = {"base": "sstv", "widths": [240, 320, 480], "w": 480, "h": 600}
+
 # --- Rewind Recorder (own product mock-up) ---
 rw = Image.open(os.path.join(MEDIA, "orig", "150daa_b4a13be7a747483b87229adc4be48315~mv2.png"))
 responsive("rwrec", rw, [480, 800], crf=34)
@@ -56,7 +99,7 @@ Image.merge("RGB", (n.point(lambda v: v // 3), n.point(lambda v: v // 3), n.poin
 STF = {"worlds": 88.7, "systems": 91.4, "agents": 93.9, "studio": 96.6, "networks": 99.2, "benchmarks": 102.5, "decisions": 105.8}
 HOPS = [("decisions", "benchmarks", "2026-10", "2026-01"), ("benchmarks", "networks", "2026-10", "2025-09"), ("networks", "studio", "2026-10", "2025-09"),
         ("studio", "agents", "2026-10", "2025-12"), ("agents", "systems", "2026-10", "2024"), ("systems", "worlds", "2019", "2014")]
-jobs = [(f"{TMP}/wf-d.png", "mode=full&w=870&h=725"), (f"{TMP}/wf-m.png", "mode=full&w=480&h=400"), (f"{TMP}/og-wf.png", "mode=full&w=560&h=630")]
+jobs = [(f"{TMP}/wf-d.png", "mode=full&w=870&h=725"), (f"{TMP}/wf-m.png", "mode=full&w=480&h=360"), (f"{TMP}/og-wf.png", "mode=full&w=560&h=630")]
 for a, b, r0, r1 in HOPS:
     f0, f1 = sorted([STF[a], STF[b]]); f0 -= 0.9; f1 += 0.9
     jobs.append((f"{TMP}/hop-{a}-{b}.png", f"mode=crop&w=520&h=150&f0={f0}&f1={f1}&r0={r0}&r1={r1}&st={a},{b}"))
@@ -65,7 +108,7 @@ for k in ("d", "m"):
     im = Image.open(f"{TMP}/wf-{k}.png").convert("RGB"); im.save(f"{TMP}/wf-{k}-rgb.png")
     avif(f"{TMP}/wf-{k}-rgb.png", f"{IMG}/wf-{k}.avif", 38)
     im.save(f"{IMG}/wf-{k}.webp", "WEBP", quality=70, method=6)
-manifest["wf"] = {"base": "wf", "mw": 480, "mh": 400}
+manifest["wf"] = {"base": "wf", "mw": 480, "mh": 360}
 for a, b, _, _ in HOPS:
     im = Image.open(f"{TMP}/hop-{a}-{b}.png").convert("RGB")
     im.save(f"{IMG}/hop-{a}-{b}.webp", "WEBP", quality=72, method=6)

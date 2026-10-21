@@ -6,7 +6,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src")
 OUT = os.path.join(ROOT, "site")
 sys.path.insert(0, SRC)
-from content import T, STATIONS, CARDS, HOPS, LOGBOOK, WORKS, EMAIL, X_URL, GH_URL, HF_URL, ASOF  # noqa: E402
+from content import T, STATIONS, CARDS, HOPS, LOGBOOK, WORKS, EMAIL, X_URL, GH_URL, HF_URL, ASOF, FLAG, FLAG_DE  # noqa: E402
 
 BASE_URL = os.environ.get("SITE_URL", "https://productivity-boost.app.mintapis.com")
 BAND = json.load(open(os.path.join(SRC, "data", "band.json")))
@@ -273,6 +273,8 @@ ANN = [  # in-plot labels: key, station, time, label offset (dx, dy in % of the 
  ("ralph", "agents", 2026 + 0.5 / 12, (3, 6), True, "start"),
  ("rdvr", "worlds", 2017.5, (16, -5), True, "start"),
  ("dax", "systems", 2015.0, (3, 3), False, "start"),
+ ("bh", "benchmarks", 2026 + 5.5 / 12, (3, 7), False, "start"),
+ ("lgbm", "decisions", 2018.5, (-3, 4), False, "end"),
  ("games", "worlds", 1994.0, (3, 0), True, "start"),
 ]
 
@@ -306,12 +308,13 @@ def instrument(lang):
         wf_img = (f'<picture><source type="image/avif" media="(min-width:640px)" srcset="/img/{wf["base"]}-d.avif">'
                   f'<source type="image/webp" media="(min-width:640px)" srcset="/img/{wf["base"]}-d.webp">'
                   f'<source type="image/avif" srcset="/img/{wf["base"]}-m.avif"><img src="/img/{wf["base"]}-m.webp" width="{wf["mw"]}" height="{wf["mh"]}" alt="" decoding="async" loading="eager" fetchpriority="high"></picture>')
-    names = json.dumps({s["id"]: {"f": freq_txt(str(s["freq"]), lang), "n": st_plain(s["id"], lang), "r": ST[s["id"]]["read"][lang]} for s in band_order}, ensure_ascii=False)
+    fl = FLAG_DE if lang == "de" else FLAG
+    names = json.dumps({s["id"]: {"f": freq_txt(str(s["freq"]), lang), "n": st_plain(s["id"], lang), "p": fl[s["id"]], "r": ST[s["id"]]["read"][lang]} for s in band_order}, ensure_ascii=False)
     first = band_order[-1]
-    return f"""<figure class="inst" data-st="decisions" aria-labelledby="inst-cap">
+    return f"""<figure class="inst locked" data-st="decisions" aria-labelledby="inst-cap">
 <div class="inst-head"><b class="ttl">{t["inst_title"]}</b><span class="kind">{t["inst_kind"]}</span><span class="kind-m">{t["tap"]} ↓</span><button class="pause" type="button" data-pause aria-pressed="false" aria-label="{t["pause"]}" data-l-pause="{t["pause"]}" data-l-play="{t["play"]}">{ICON["pause"]}</button></div>
 <div class="ruler">{ruler_svg()}<nav aria-label="{t["nav_inst"]}">{"".join(st_links)}</nav><input class="needle-range" type="range" min="0" max="6" step="1" value="6" aria-label="{t["pick"]}" aria-valuetext="{freq_txt(str(first["freq"]), lang)} {t["mhz"]}, {st_plain(first["id"], lang)}"></div>
-<div class="readout"><svg class="rnum num" viewBox="0 0 10 10" aria-hidden="true"></svg><span class="rtxt"><span class="rname">{t["tap"]}</span><span class="rsub">&nbsp;</span></span><a href="#decisions" data-go>{t["readout_go"]}</a></div>
+<div class="readout locked">{numerals("105.8", lang, cls="rnum num", label=False)}<span class="rtxt"><span class="rname">{esc(st_plain("decisions", lang))} <em>{esc(fl["decisions"])}</em></span><span class="rsub">{esc(ST["decisions"]["read"][lang])}</span></span><a href="#decisions" data-go aria-label="{t["readout_go"].rstrip(" ↓")}: {esc(st_plain("decisions", lang))}">{t["readout_go"]}</a></div>
 <div class="plotwrap"><div class="years" aria-hidden="true">{yt}</div>
 <div class="plot">{wf_img}<i class="floor"></i><canvas aria-hidden="true"></canvas><i class="static"></i><i class="yours" aria-hidden="true"></i><i class="lockmark" aria-hidden="true"></i>{"".join(hits)}{ann}</div></div>
 <div class="plotfoot"><span>{freq_txt("87.5", lang)} · {t["since87"]}</span><a href="#contact">{t["yourproj"]} · {freq_txt("108.0", lang)} →</a></div>
@@ -322,14 +325,14 @@ def instrument(lang):
 def hero(lang):
     t = T[lang]
     face = picture("portrait-sq", "Florian Standhartinger", "56px", cls="face", eager=True)
-    portrait = picture("portrait", "Florian Standhartinger", "(min-width:1080px) 15vw, 1px", eager=False)
+    portrait = picture("sstv", "Florian Standhartinger, received as a slow-scan TV picture", "(min-width:1080px) 17vw, 1px", eager=False)
     return f"""<section class="hero" aria-labelledby="h1"><div class="wrap hero-in">
 <div class="hero-txt">
 <div class="idline"><span class="facewrap">{face}</span><div class="who">Florian Standhartinger<span>{t["who_sub"]}</span></div></div>
 <h1 id="h1"><span>{esc(t["h1a"])}</span> <span class="l2">{esc(t["h1b"])}</span></h1>
-<p class="genres">{esc(t["genres"])}</p>
+<p class="genres">{esc(t["genres"])}</p><p class="genres-short">{esc(t["genres_short"])}</p>
 <div class="ctas"><a class="btn inv" href="mailto:{EMAIL}" data-mail>{ICON["mail"]}{t["write"]}</a><a class="btn ghost" href="{t["works"]}">{t["all"]}</a></div>
-<figure class="sstv">{portrait}<i class="scan" aria-hidden="true"></i><figcaption>{t["sstv_cap"]}</figcaption></figure>
+<figure class="sstv">{portrait}<i class="scan" aria-hidden="true"></i></figure>
 </div>
 {instrument(lang)}
 <p class="hero-meta">{t["figures"]} <a href="#logbook" data-open-logbook>{t["logbook_link"]}</a></p>

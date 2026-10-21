@@ -59,7 +59,8 @@ T = {
   "since87": "since ’87", "yourproj": "your project?",
   "nav_top": "Stations", "nav_inst": "Stations on the band", "nav_sheet": "All stations",
   "fig_alt": "Waterfall plot of everything Florian shipped from 1987 to October 2026: games from 1987, enterprise systems from 2003 to today, VR and AR apps from 2017 to 2020, and in 2026 projects on six stations at once — agents, video and voice, networks, benchmarks and decision models.",
-  "ann": {"rdvr": "Room Designer VR · Steam 2017", "ralph": "Ralph Wiggum · 306★", "reax": "REAX live · 14 Oct", "jev": "JevBench · 194 models", "dax": "Risk system · DAX insurer", "games": "Games, from age six"},
+  "ann": {"rdvr": "Room Designer VR · Steam 2017", "ralph": "Ralph Wiggum · 306★", "reax": "REAX live · 14 Oct", "bh": "Benchmark Heaven", "dax": "Risk system · DAX insurer", "games": "Games, from age six", "lgbm": "LightGbmDotNet · 2018"},
+  "genres_short": "Decision models · benchmarks · agents · AI video · VR",
   "vid_pause": "Pause video", "vid_play": "Play video",
  },
  "de": {
@@ -114,7 +115,8 @@ T = {
   "since87": "seit ’87", "yourproj": "dein Projekt?",
   "nav_top": "Sender", "nav_inst": "Sender auf dem Band", "nav_sheet": "Alle Sender",
   "fig_alt": "Wasserfall-Diagramm von allem, was Florian von 1987 bis Oktober 2026 ausgeliefert hat: Spiele ab 1987, Unternehmenssysteme von 2003 bis heute, VR- und AR-Apps von 2017 bis 2020, und 2026 Projekte auf sechs Sendern gleichzeitig – Agenten, Video und Stimme, Netze, Benchmarks und Entscheidungsmodelle.",
-  "ann": {"rdvr": "Room Designer VR · Steam 2017", "ralph": "Ralph Wiggum · 306★", "reax": "REAX live · 14. Okt.", "jev": "JevBench · 194 Modelle", "dax": "Risikosystem · DAX-Versicherer", "games": "Spiele, ab sechs"},
+  "ann": {"rdvr": "Room Designer VR · Steam 2017", "ralph": "Ralph Wiggum · 306★", "reax": "REAX live · 14. Okt.", "bh": "Benchmark Heaven", "dax": "Risikosystem · DAX-Versicherer", "games": "Spiele, ab sechs", "lgbm": "LightGbmDotNet · 2018"},
+  "genres_short": "Entscheidungsmodelle · Benchmarks · Agenten · KI-Video · VR",
   "vid_pause": "Video anhalten", "vid_play": "Video abspielen",
  },
 }
@@ -282,3 +284,6 @@ WORKS = [
  ("worlds", "Non Convex Mesh Collider", "2017", "Collision detection for concave meshes in Unity.", "Kollisionserkennung für konkave Meshes in Unity.", "https://assetstore.unity.com/packages/tools/physics/non-convex-mesh-collider-84867", "Unity Asset Store, 8 May 2017"),
  ("worlds", "Games, from age six", "1987–", "Numerous small games and apps written purely for the joy of it.", "Zahllose kleine Spiele und Programme, einfach aus Freude daran.", "", "Hobby"),
 ]
+
+FLAG = {"decisions": "Decision Models · REAX 1", "benchmarks": "Benchmark Heaven · JevBench", "networks": "REAX · Chutes", "studio": "H3 Studio · Storyteller", "agents": "Ralph Wiggum", "systems": "Risk system · DAX insurer", "worlds": "Room Designer VR"}
+FLAG_DE = {"decisions": "Decision Models · REAX 1", "benchmarks": "Benchmark Heaven · JevBench", "networks": "REAX · Chutes", "studio": "H3 Studio · Storyteller", "agents": "Ralph Wiggum", "systems": "Risikosystem · DAX-Versicherer", "worlds": "Room Designer VR"}

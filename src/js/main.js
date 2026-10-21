@@ -158,8 +158,8 @@ function initInstrument(inst) {
     inst.classList.add('locked');
     $$('.ruler .st', inst).forEach((a) => a.setAttribute('aria-current', a.dataset.st === id ? 'true' : 'false'));
     setNum(n.f);
-    readout.classList.remove('locked'); void readout.offsetWidth; readout.classList.add('locked');
-    rname.textContent = n.n; rsub.textContent = n.r; go.href = '#' + id; go.setAttribute('aria-label', `${go.textContent.replace(/[↓\s]+$/, '')}: ${n.n}`);
+    if (user) { readout.classList.remove('locked'); void readout.offsetWidth; readout.classList.add('locked'); }
+    rname.innerHTML = ''; rname.append(n.n + ' '); const em = d.createElement('em'); em.textContent = n.p || ''; rname.append(em); rsub.textContent = n.r; go.href = '#' + id; go.setAttribute('aria-label', `${go.textContent.replace(/[↓\s]+$/, '')}: ${n.n}`);
     const i = ORDER_BAND.indexOf(id);
     range.value = String(i);
     range.setAttribute('aria-valuetext', `${n.f} ${lang === 'de' ? 'Megahertz' : 'megahertz'}, ${n.n}`);
@@ -185,13 +185,13 @@ function initInstrument(inst) {
   }
   // touch: the first tap previews (read-out shows name + plain sentence); plot columns only ever preview on touch;
   // the ruler label tapped again, or the read-out's ↓, jumps. Mouse clicks and keyboard/screen-reader activation jump at once.
-  let lastPointer = '';
+  let lastPointer = '', previewed = null;
   inst.addEventListener('pointerdown', (e) => { lastPointer = e.pointerType; }, true);
   $$('[data-tune]', inst).forEach((a) => a.addEventListener('click', (e) => {
     const id = a.dataset.tune, touch = (lastPointer === 'touch' || lastPointer === 'pen') && e.detail > 0;
     lastPointer = '';
-    if (touch && (a.classList.contains('hit') || current_lock !== id)) { e.preventDefault(); lock(id, true); return; }
-    tuneTo(id, e);
+    if (touch && (a.classList.contains('hit') || previewed !== id)) { e.preventDefault(); previewed = id; lock(id, true); return; }
+    previewed = null; tuneTo(id, e);
   }));
   go.addEventListener('click', (e) => tuneTo(go.getAttribute('href').slice(1), e));
   $$('.ruler .st, .plot .hit', inst).forEach((a) => {
