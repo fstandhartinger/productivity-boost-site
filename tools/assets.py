@@ -61,7 +61,7 @@ def sstv_image(src, w, h, seed=36):
         f = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", max(11, w // 24))
     except Exception:
         f = None
-    d.text((6, 3), "RX ROBOT36 21.10.26 JN68", fill=(214, 246, 96), font=f)
+    d.text((6, 3), "RX ROBOT36 21.10.26 JN68", fill=(255, 214, 130), font=f)
     return out
 
 pt_crop = pt.crop((900, 200, 2352, 1289))  # 4:3 landscape, face right of centre like the original framing
@@ -99,7 +99,7 @@ if os.path.exists(tr):
 # --- noise tile ---
 rnd = random.Random(7); n = Image.new("L", (96, 96))
 n.putdata([int(10 + 46 * rnd.random() ** 2) for _ in range(96 * 96)])
-Image.merge("RGB", (n.point(lambda v: 4 + v // 5), n.point(lambda v: 5 + v // 4), n.point(lambda v: 9 + v // 3))).save(f"{IMG}/noise.webp", "WEBP", quality=60, method=6)
+Image.merge("RGB", (n.point(lambda v: 5 + v // 4), n.point(lambda v: 5 + v // 5), n.point(lambda v: 9 + v // 4))).save(f"{IMG}/noise.webp", "WEBP", quality=60, method=6)
 
 # --- waterfall: final frame (desktop + phone), hop slices ---
 STF = {"worlds": 88.7, "systems": 91.4, "agents": 93.9, "studio": 96.6, "networks": 99.2, "benchmarks": 102.5, "decisions": 105.8}

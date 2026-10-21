@@ -62,7 +62,7 @@
    "from": 2003,
    "to": 2005,
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "closed": true,
    "en": "In-house software and IT for a wholesaler (Troiber)",
    "src": "https://www.florianstandhartinger.com/ (Experience 2003–2006)"
@@ -73,7 +73,7 @@
    "from": 2006,
    "to": 2006,
    "scope": 2,
-   "level": 0.5,
+   "level": 0.66,
    "closed": true,
    "en": "Incident manager for an ASP.NET system on more than 60 web servers",
    "src": "https://www.florianstandhartinger.com/ (Experience 2006–2007)"
@@ -84,7 +84,7 @@
    "from": 2007,
    "to": 2011,
    "scope": 2,
-   "level": 0.5,
+   "level": 0.66,
    "closed": true,
    "en": "The leading ERM solution for the media industry, C# (DAP GmbH)",
    "src": "https://www.florianstandhartinger.com/ (Experience 2007–2012)"
@@ -95,7 +95,7 @@
    "from": 2012,
    "to": 2013,
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "closed": true,
    "en": "Solution architect and .NET lecturer at msg systems ag",
    "src": "https://www.florianstandhartinger.com/ (Experience 2012–2014)"
@@ -105,7 +105,7 @@
    "kind": "carrier",
    "from": 1987,
    "to": 2006,
-   "level": 0.32,
+   "level": 0.42,
    "en": "Games and apps written for fun, from age six",
    "src": "https://www.florianstandhartinger.com/ (Experience: hobby programmer 1987–2006)"
   },
@@ -114,7 +114,7 @@
    "kind": "carrier",
    "from": 2003,
    "to": "2026-10",
-   "level": 0.32,
+   "level": 0.42,
    "en": "Software other people run their business on: wholesaler IT, 60 web servers, a media ERM, msg systems, a real-time risk system for a DAX insurer",
    "src": "https://www.florianstandhartinger.com/ (Experience 2003–now); job brief (msg systems ag today)"
   },
@@ -145,7 +145,7 @@
    "from": 2017,
    "to": 2017,
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "side": "systems",
    "en": "Non Convex Mesh Collider, Unity Asset Store, 8 May 2017",
    "src": "https://assetstore.unity.com/packages/tools/physics/non-convex-mesh-collider-84867"
@@ -156,7 +156,7 @@
    "from": 2018,
    "to": 2018,
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "en": "LightGbmDotNet: gradient-boosted decision trees for .NET",
    "src": "https://github.com/fstandhartinger/LightGbmDotNet"
   },
@@ -166,7 +166,7 @@
    "from": 2019,
    "to": 2020,
    "scope": 2,
-   "level": 0.5,
+   "level": 0.66,
    "side": "worlds",
    "approx": true,
    "en": "Subtitles and Rewind Recorder for Vuzix AR glasses (live captions; save the last seconds as video)",
@@ -188,7 +188,7 @@
    "from": "2025-03",
    "to": "2025-05",
    "scope": 2,
-   "level": 0.5,
+   "level": 0.66,
    "side": "systems",
    "en": "Smooth Operator: AI agents that drive Windows desktops, client libraries for .NET, Python, TypeScript",
    "src": "https://github.com/fstandhartinger/smooth-operator-client-csharp"
@@ -198,7 +198,7 @@
    "kind": "carrier",
    "from": "2025-09",
    "to": "2026-10",
-   "level": 0.32,
+   "level": 0.42,
    "en": "Building on and for Chutes, Bittensor subnet 64",
    "src": "https://github.com/fstandhartinger/chutes-emission-simulator; chutes-bench-runner; ui-patterns-showcase"
   },
@@ -208,7 +208,7 @@
    "from": "2025-11",
    "to": "2025-11",
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "en": "Chutes emission simulator",
    "src": "https://github.com/fstandhartinger/chutes-emission-simulator"
   },
@@ -218,7 +218,7 @@
    "from": "2025-12",
    "to": "2025-12",
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "side": "networks",
    "en": "Chutes bench runner: one-click benchmarks for Chutes-hosted models",
    "src": "https://github.com/fstandhartinger/chutes-bench-runner"
@@ -229,7 +229,7 @@
    "from": "2026-01",
    "to": "2026-01",
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "side": "networks",
    "en": "LTX video studio on Chutes",
    "src": "https://github.com/fstandhartinger/chutes-ltx-video-studio"
@@ -250,7 +250,7 @@
    "from": "2026-02",
    "to": "2026-02",
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "en": "Storyteller: one prompt to story, pictures and narration",
    "src": "https://github.com/fstandhartinger/chutes-storyteller"
   },
@@ -260,7 +260,7 @@
    "from": "2026-03",
    "to": "2026-03",
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "side": "agents",
    "en": "Mindority Report: talk to your codebase",
    "src": "https://github.com/fstandhartinger/mindority-report"
@@ -281,7 +281,7 @@
    "from": "2026-08",
    "to": "2026-08",
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "en": "H3 Studio: AI video with synced sound on our own GPU",
    "src": "https://github.com/fstandhartinger/h3-studio"
   },
@@ -291,7 +291,7 @@
    "from": "2026-08",
    "to": "2026-09",
    "scope": 2,
-   "level": 0.5,
+   "level": 0.66,
    "en": "PDFMint, DocMint, MailMint: small developer APIs",
    "src": "https://github.com/fstandhartinger/pdfmint"
   },
@@ -311,7 +311,7 @@
    "from": "2026-09",
    "to": "2026-10",
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "en": "Agent message board, auto model router, agent timeline",
    "src": "https://github.com/fstandhartinger/agent-message-board"
   },
@@ -321,7 +321,7 @@
    "from": "2026-09",
    "to": "2026-09",
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "en": "Who is right? A live fact-check party game",
    "src": "https://github.com/fstandhartinger/who-is-right"
   },
@@ -331,7 +331,7 @@
    "from": "2026-09",
    "to": "2026-09",
    "scope": 1,
-   "level": 0.5,
+   "level": 0.66,
    "side": "agents",
    "en": "Weiche: a 395M decision model that routes LLM requests",
    "src": "https://huggingface.co/benchmarkheaven/weiche-395m"
@@ -353,7 +353,7 @@
    "from": "2026-09",
    "to": "2026-10",
    "scope": 2,
-   "level": 0.5,
+   "level": 0.66,
    "en": "Bonsai Swarm: a 27B model in volunteer browser tabs",
    "src": "https://github.com/fstandhartinger/bonsai-swarm"
   },

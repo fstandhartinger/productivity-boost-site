@@ -276,7 +276,7 @@ ANN = [  # in-plot labels: key, station, time, label offset (dx, dy in % of the 
  ("rdvr", "worlds", 2017.5, (1.5, -8), True, "start"),
  ("dax", "systems", 2015.0, (3, 3), False, "start"),
  ("jev", "benchmarks", 2026 + 9.5 / 12, (-2.5, 22), True, "end"),
- ("bh", "benchmarks", 2026 + 6.5 / 12, (3, 9), False, "start"),
+ ("bh", "benchmarks", 2026 + 6.5 / 12, (3, 14), False, "start"),
  ("lgbm", "decisions", 2018.5, (-3, 4), False, "end"),
  ("games", "worlds", 1994.0, (3, 0), True, "start"),
 ]
