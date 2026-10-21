@@ -31,7 +31,7 @@ if (hint && lang === 'en' && /^de\b/i.test(navigator.language || '')) {
 $$('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(b.dataset.copy);
-    const st = (b.closest('[popover]') || d).querySelector('[data-copy-status]');
+    const st = (b.closest('dialog') || d).querySelector('[data-copy-status]');
     if (st) st.textContent = b.dataset.copied;
     const sp = $('span', b); const old = sp.textContent; sp.textContent = b.dataset.copied;
     setTimeout(() => { sp.textContent = old; if (st) st.textContent = ''; }, 2000);
@@ -40,9 +40,18 @@ $$('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
 
 // ---------- write me: small sheet with address, copy, open mail app ----------
 const mail = $('#mail');
-if (mail && mail.showPopover) $$('[data-mail]').forEach((a) => a.addEventListener('click', (e) => {
-  e.preventDefault(); try { $('#sheet')?.hidePopover(); } catch (x) {} mail.showPopover();
-}));
+const sheet = $('#sheet');
+const openDialog = (dlg) => { if (!dlg || !dlg.showModal) return false; d.querySelectorAll('dialog[open]').forEach((x) => x.close()); dlg.showModal(); return true; };
+$$('dialog').forEach((dlg) => dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); })); // backdrop
+$$('[data-mail]').forEach((a) => a.addEventListener('click', (e) => { if (openDialog(mail)) e.preventDefault(); }));
+$$('[data-open-sheet]').forEach((b) => b.addEventListener('click', () => openDialog(sheet)));
+$$('#sheet a').forEach((a) => a.addEventListener('click', () => sheet.close()));
+// after any jump to a station, move focus to its heading (keyboard + screen readers land there too)
+const focusStation = (id) => { const h = d.getElementById(id)?.querySelector('h2'); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } };
+d.addEventListener('click', (e) => {
+  const a = e.target.closest('a[href*="#"]'); if (!a || e.defaultPrevented) return;
+  const id = a.getAttribute('href').split('#')[1]; if (id && d.getElementById(id)?.matches('section.station, section.works-group')) setTimeout(() => focusStation(id), 0);
+});
 
 // ---------- logbook link ----------
 function openLog() { const l = $('#logbook'); if (l) l.open = true; }
@@ -75,7 +84,7 @@ function setCurrent(id, frac) {
   if (id && id !== current) {
     current = id;
     navLinks.forEach((a) => a.setAttribute('aria-current', a.dataset.st === id ? 'true' : 'false'));
-    const cn = $('[data-curname]'); if (cn && NAMES[id]) cn.textContent = NAMES[id].n;
+    const cn = $('[data-curname]'); if (cn && NAMES[id]) cn.textContent = `${NAMES[id].f} · ${NAMES[id].n}`;
     const top = $('.top'); if (top) top.dataset.st = id;
     if (bbar) {
       bbar.dataset.st = id;
@@ -123,7 +132,6 @@ if (sections.length) {
   update();
 }
 // close the sheet after choosing a station
-$$('.sheet a').forEach((a) => a.addEventListener('click', () => { try { $('#sheet').hidePopover(); } catch (e) {} }));
 
 // ---------- the instrument ----------
 const inst = $('.inst');
@@ -132,7 +140,7 @@ if (inst) initInstrument(inst);
 function initInstrument(inst) {
   const plot = $('.plot', inst), canvas = $('canvas', plot), ctx = canvas.getContext('2d', { alpha: false });
   const range = $('.needle-range', inst), readout = $('.readout', inst), rname = $('.rname', readout), rsub = $('.rsub', readout);
-  const rnum = $('.rnum', readout), go = $('a', readout), needle = $('.needle-line', inst), stat = $('.static', plot);
+  const rnum = $('.rnum', readout), go = $('a', readout), stat = $('.static', plot);
   const pauseBtn = $('[data-pause]', inst);
   let band = null, sp = null, layout = null, w = 0, h = 0, revealed = false, raf = 0, lastBurst = 0;
 
@@ -147,13 +155,11 @@ function initInstrument(inst) {
     const n = NAMES[id]; if (!n) return;
     current_lock = id;
     inst.dataset.st = id;
-    $$('.col', plot).forEach((c) => c.classList.toggle('on', c.dataset.col === id));
+    inst.classList.add('locked');
     $$('.ruler .st', inst).forEach((a) => a.setAttribute('aria-current', a.dataset.st === id ? 'true' : 'false'));
     setNum(n.f);
     readout.classList.remove('locked'); void readout.offsetWidth; readout.classList.add('locked');
     rname.textContent = n.n; rsub.textContent = n.r; go.href = '#' + id;
-    needle.style.left = `${pct(FREQ[id]).toFixed(2)}%`;
-    needle.classList.add('on');
     const i = ORDER_BAND.indexOf(id);
     range.value = String(i);
     range.setAttribute('aria-valuetext', `${n.f} ${lang === 'de' ? 'Megahertz' : 'megahertz'}, ${n.n}`);
@@ -177,7 +183,12 @@ function initInstrument(inst) {
     });
     vt.finished.finally(() => { const num = $('.st-num svg', target); if (num) num.style.viewTransitionName = ''; const h = $('h2', target); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } });
   }
-  $$('[data-tune]', inst).forEach((a) => a.addEventListener('click', (e) => tuneTo(a.dataset.tune, e)));
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  $$('[data-tune]', inst).forEach((a) => a.addEventListener('click', (e) => {
+    const id = a.dataset.tune;
+    if (coarse && current_lock !== id) { e.preventDefault(); lock(id, true); rsub.textContent = NAMES[id].r; return; } // preview first
+    tuneTo(id, e);
+  }));
   go.addEventListener('click', (e) => tuneTo(go.getAttribute('href').slice(1), e));
   $$('.ruler .st, .plot .hit', inst).forEach((a) => {
     a.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') lock(a.dataset.tune, true); });
@@ -188,7 +199,7 @@ function initInstrument(inst) {
     if (e.pointerType !== 'mouse') return;
     const r = plot.getBoundingClientRect(); const f = BAND_MIN + ((e.clientX - r.left) / r.width) * (BAND_MAX - BAND_MIN);
     let best = ORDER_BAND[0]; for (const id of ORDER_BAND) if (Math.abs(FREQ[id] - f) < Math.abs(FREQ[best] - f)) best = id;
-    if (inst.dataset.st !== best || !needle.classList.contains('on')) lock(best, true);
+    if (inst.dataset.st !== best || !inst.classList.contains('locked')) lock(best, true);
   });
 
   // ---- waterfall canvas ----
@@ -219,7 +230,7 @@ function initInstrument(inst) {
     };
     raf = requestAnimationFrame(step);
   }
-  function done() { revealed = true; plot.classList.add('live'); if (!$('.needle-line.on', inst)) lock('decisions', false); shimmer(); }
+  function done() { revealed = true; plot.classList.add('live'); if (!inst.classList.contains('locked')) lock('decisions', false); shimmer(); }
   let tShim = 0, lastShim = 0;
   let shimT = 0;
   function shimmer() {

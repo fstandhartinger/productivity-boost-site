@@ -113,12 +113,12 @@ export function spectra(band, w, opts = {}) {
         } else if (e.scope === 1) {
           v = L * (0.95 * g(d, S * 0.05) + 0.16 * g(d, S * 0.14));
         } else if (e.scope === 2) {
-          v = L * (0.78 * g(d - S * 0.065, S * 0.045) + 0.78 * g(d + S * 0.065, S * 0.045) + 0.18 * g(d, S * 0.18));
+          v = L * (0.72 * g(d - S * 0.06, S * 0.04) + 0.72 * g(d + S * 0.06, S * 0.04) + 0.12 * g(d, S * 0.16));
         } else {
-          const hw = S * 0.17;
+          const hw = S * 0.1;
           const ad = Math.abs(d);
-          const top = ad < hw ? 1 : g(ad - hw, S * 0.05);
-          v = L * (0.7 * top * (0.82 + 0.18 * Math.sin(x * 1.3 + ei)) + 0.22 * g(d, S * 0.32));
+          const top = ad < hw ? 1 : g(ad - hw, S * 0.035);
+          v = L * (0.62 * top * (0.8 + 0.2 * Math.sin(x * 1.3 + ei)) + 0.12 * g(d, S * 0.22));
         }
         if (nx !== null) {
           // sideband toward the neighbour station: a faint ridge + a small pilot at the neighbour
