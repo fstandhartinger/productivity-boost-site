@@ -320,7 +320,7 @@ def instrument(lang):
 <div class="readout locked">{numerals("105.8", lang, cls="rnum num", label=False)}<span class="rtxt" aria-live="polite"><span class="rname">{esc(st_plain("decisions", lang))} <em>{esc(fl["decisions"])}</em></span><span class="rsub">{esc(ST["decisions"]["read"][lang])}</span></span><a href="#decisions" data-go aria-label="{t["go_short"].rstrip(" ↓")} – {t["readout_go"].rstrip(" ↓")}: {esc(st_plain("decisions", lang))}"><span class="gl">{t["readout_go"]}</span><span class="gs" aria-hidden="true">{t["go_short"]}</span></a></div>
 <div class="plotwrap"><div class="years" aria-hidden="true">{yt}</div>
 <div class="plot">{wf_img}<i class="floor"></i><canvas aria-hidden="true"></canvas><i class="static"></i><i class="yours" aria-hidden="true"></i>{"".join(hits)}{ann}</div></div>
-<div class="plotfoot"><span>{freq_txt("87.5", lang)} · {t["since87"]}</span><a href="#contact">{t["yourproj"]} · {freq_txt("108.0", lang)} →</a></div>
+<div class="plotfoot"><span>{freq_txt("87.5", lang)} · {t["since87"]}</span><span class="mid" aria-hidden="true"><b>{t["inst_title"]}</b> · {t["inst_kind"]}</span><a href="#contact">{t["yourproj"]} · {freq_txt("108.0", lang)} →</a></div>
 <script type="application/json" id="st-names">{names}</script>
 <figcaption id="inst-cap" class="sr">{esc(t["fig_alt"])}</figcaption>
 </figure>"""
@@ -334,9 +334,9 @@ def hero(lang):
 <h1 id="h1"><span>{esc(t["h1a"])}</span> <span class="l2">{esc(t["h1b"])}</span></h1>
 <p class="genres">{esc(t["genres"])}</p><p class="genres-short">{esc(t["genres_short"])}</p>
 <div class="ctas"><a class="btn inv" href="mailto:{EMAIL}" data-mail>{ICON["mail"]}{t["write"]}</a><a class="btn ghost" href="{t["works"]}">{t["all"]}</a></div>
-<div class="hero-foot"><p class="legend">{t["figures"]} <a href="#logbook" data-open-logbook>{t["logbook_link"]}</a></p>
-<div class="decoder"><div class="sstv" role="img" aria-label="Florian Standhartinger · {t["sstv_title"]}">{picture("sstv", "", "(min-width:1080px) 220px, 1px", eager=False)}</div><span class="dlab" aria-hidden="true">{t["sstv_title"]} · RX 21.10.2026</span></div></div>
+<p class="figline">{t["figures"]} <a href="#logbook" data-open-logbook>{t["logbook_link"]}</a></p>
 </div>
+<div class="decoder"><div class="sstv" role="img" aria-label="Florian Standhartinger · {t["sstv_title"]}">{picture("sstv", "", "(min-width:1080px) 300px, 1px", eager=False)}</div><span class="dlab" aria-hidden="true">{t["sstv_title"]} · RX 21.10.2026</span></div>
 {instrument(lang)}
 <p class="hero-meta">{t["figures"]} <a href="#logbook" data-open-logbook>{t["logbook_link"]}</a></p>
 </div></section>"""

@@ -66,8 +66,8 @@
   "base": "wf",
   "mw": 480,
   "mh": 480,
-  "dw": 870,
-  "dh": 725
+  "dw": 1600,
+  "dh": 520
  },
  "hop-decisions-benchmarks": {
   "file": "hop-decisions-benchmarks.webp",
