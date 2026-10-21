@@ -238,10 +238,10 @@
    "st": "agents",
    "kind": "signal",
    "from": "2026-01",
-   "to": "2026-01",
+   "to": "2026-05",
    "scope": 2,
    "level": 1.7,
-   "en": "Ralph Wiggum: autonomous, spec-driven coding loop (306 GitHub stars)",
+   "en": "Ralph Wiggum: autonomous, spec-driven coding loop, built Jan–May 2026 (306 GitHub stars)",
    "src": "https://github.com/fstandhartinger/ralph-wiggum"
   },
   {
@@ -363,7 +363,7 @@
    "from": "2026-09",
    "to": "2026-10",
    "scope": 3,
-   "level": 1.7,
+   "level": 0.85,
    "en": "Decision Models: a Jev-compatible decision API with an EU tier",
    "src": "https://decisionmodels.io"
   },
