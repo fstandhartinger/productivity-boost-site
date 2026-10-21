@@ -21,7 +21,15 @@ with sync_playwright() as p:
         ctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=(1 if full else 2) if w < 500 else 1, color_scheme=scheme, is_mobile=w < 500, has_touch=w < 500)
         pg = ctx.new_page(); errs = []
         pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("console", lambda m: errs.append(m.text) if m.type in ("error", "warning") else None)
-        pg.goto(base + path, wait_until="load"); pg.wait_for_timeout(3800)
+        marker = os.environ.get("MARKER")
+        for attempt in range(8):
+            resp = pg.goto(base + path, wait_until="load")
+            html = pg.content()
+            if resp and resp.status == 200 and (not marker or marker in html) and "Bad Gateway" not in html: break
+            print(name, "stale or error, retry", attempt, resp.status if resp else None); pg.wait_for_timeout(10000)
+        else:
+            raise SystemExit(f"{name}: page never showed the expected build")
+        pg.wait_for_timeout(3800)
         pg.screenshot(path=f"{out}/{name}-top.png")
         if full:
             # scroll through to trigger in-view states, then full page

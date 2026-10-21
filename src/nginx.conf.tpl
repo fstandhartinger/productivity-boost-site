@@ -4,6 +4,8 @@ server {
   root /usr/share/nginx/html;
   index index.html;
   charset utf-8;
+  absolute_redirect off;
+  port_in_redirect off;
   gzip on; gzip_comp_level 6; gzip_min_length 512;
   gzip_types text/css application/javascript application/json image/svg+xml text/plain;
   add_header X-Content-Type-Options nosniff always;

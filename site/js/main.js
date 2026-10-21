@@ -138,7 +138,7 @@ const inst = $('.inst');
 if (inst) initInstrument(inst);
 
 function initInstrument(inst) {
-  const plot = $('.plot', inst), canvas = $('canvas', plot), ctx = canvas.getContext('2d', { alpha: false });
+  const plot = $('.plot', inst), canvas = $('canvas', plot), ctx = canvas.getContext('2d');
   const range = $('.needle-range', inst), readout = $('.readout', inst), rname = $('.rname', readout), rsub = $('.rsub', readout);
   const rnum = $('.rnum', readout), go = $('a', readout), stat = $('.static', plot);
   const pauseBtn = $('[data-pause]', inst);
@@ -159,7 +159,7 @@ function initInstrument(inst) {
     $$('.ruler .st', inst).forEach((a) => a.setAttribute('aria-current', a.dataset.st === id ? 'true' : 'false'));
     setNum(n.f);
     readout.classList.remove('locked'); void readout.offsetWidth; readout.classList.add('locked');
-    rname.textContent = n.n; rsub.textContent = n.r; go.href = '#' + id;
+    rname.textContent = n.n; rsub.textContent = n.r; go.href = '#' + id; go.setAttribute('aria-label', `${go.textContent.replace(/[↓\s]+$/, '')}: ${n.n}`);
     const i = ORDER_BAND.indexOf(id);
     range.value = String(i);
     range.setAttribute('aria-valuetext', `${n.f} ${lang === 'de' ? 'Megahertz' : 'megahertz'}, ${n.n}`);
@@ -183,10 +183,14 @@ function initInstrument(inst) {
     });
     vt.finished.finally(() => { const num = $('.st-num svg', target); if (num) num.style.viewTransitionName = ''; const h = $('h2', target); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } });
   }
-  const coarse = matchMedia('(pointer: coarse)').matches;
+  // touch: the first tap previews (read-out shows name + plain sentence); plot columns only ever preview on touch;
+  // the ruler label tapped again, or the read-out's ↓, jumps. Mouse clicks and keyboard/screen-reader activation jump at once.
+  let lastPointer = '';
+  inst.addEventListener('pointerdown', (e) => { lastPointer = e.pointerType; }, true);
   $$('[data-tune]', inst).forEach((a) => a.addEventListener('click', (e) => {
-    const id = a.dataset.tune;
-    if (coarse && current_lock !== id) { e.preventDefault(); lock(id, true); rsub.textContent = NAMES[id].r; return; } // preview first
+    const id = a.dataset.tune, touch = (lastPointer === 'touch' || lastPointer === 'pen') && e.detail > 0;
+    lastPointer = '';
+    if (touch && (a.classList.contains('hit') || current_lock !== id)) { e.preventDefault(); lock(id, true); return; }
     tuneTo(id, e);
   }));
   go.addEventListener('click', (e) => tuneTo(go.getAttribute('href').slice(1), e));
@@ -204,7 +208,7 @@ function initInstrument(inst) {
 
   // ---- waterfall canvas ----
   function size() {
-    const r = plot.getBoundingClientRect(); const dpr = Math.min(1.5, devicePixelRatio || 1);
+    const r = plot.getBoundingClientRect(); const dpr = Math.min(1.25, devicePixelRatio || 1);
     w = Math.max(1, Math.round(r.width * dpr)); h = Math.max(1, Math.round(r.height * dpr));
     canvas.width = w; canvas.height = h;
     sp = spectra(band, w); layout = { w, h };
@@ -214,19 +218,17 @@ function initInstrument(inst) {
     const n = sp.rows.length, dur = 2200; let i = n - 1; const t0 = performance.now();
     layout.rows = layout.rows || rowLayout(sp.rows, h);
     // start from the noise floor, then receive 1987 → Oct 2026; new rows enter at the top and push history down
-    const empty = { rows: sp.rows, out: sp.rows.map(() => new Float32Array(w)) };
-    paintRows(ctx, empty, layout, 0, n);
-    plot.classList.add('live');
+    plot.classList.add('live'); // canvas starts transparent over the CSS noise floor
     const step = (now) => {
       if (!motion()) { paintAll(); return done(); }
       const target = Math.min(n, Math.floor(((now - t0) / dur) * n));
       while (n - 1 - i < target && i >= 0) {
         const hh = Math.round(layout.rows.heights[i]);
-        ctx.drawImage(canvas, 0, 0, w, h - hh, 0, hh, w, h - hh);
+        ctx.globalCompositeOperation = 'copy'; ctx.drawImage(canvas, 0, 0, w, h - hh, 0, hh, w, h - hh); ctx.globalCompositeOperation = 'source-over';
         paintRows(ctx, sp, layout, i, i + 1, -Math.round(layout.rows.tops[i]));
         i--;
       }
-      if (i >= 0) raf = requestAnimationFrame(step); else { paintAll(); done(); }
+      if (i >= 0) raf = requestAnimationFrame(step); else done();
     };
     raf = requestAnimationFrame(step);
   }
@@ -273,7 +275,7 @@ function initInstrument(inst) {
   let rs = 0;
   addEventListener('resize', () => { clearTimeout(rs); rs = setTimeout(() => {
     if (!band || !sp) return;
-    const r = plot.getBoundingClientRect(), dpr = Math.min(1.5, devicePixelRatio || 1);
+    const r = plot.getBoundingClientRect(), dpr = Math.min(1.25, devicePixelRatio || 1);
     if (Math.round(r.width * dpr) === w && Math.round(r.height * dpr) === h) return; // e.g. the phone URL bar: nothing to redraw
     size(); paintAll(); if (current_lock) lock(current_lock, false);
   }, 200); });
@@ -288,3 +290,7 @@ $$('[data-vid]').forEach((b) => {
   v.addEventListener('play', sync); v.addEventListener('pause', sync); sync();
   b.addEventListener('click', () => { if (v.paused) v.play().catch(() => {}); else v.pause(); });
 });
+
+// ---------- header: dark while the dark hero is under it ----------
+const topbar = $('.top.on-dark'), heroEl = $('.hero');
+if (topbar && heroEl) new IntersectionObserver(([e]) => topbar.classList.toggle('on-dark', e.isIntersecting), { rootMargin: `-${56}px 0px 0px 0px`, threshold: 0 }).observe(heroEl);

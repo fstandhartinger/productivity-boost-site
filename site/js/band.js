@@ -7,8 +7,8 @@ export const BAND_MAX = 108.0;
 // "BOOST" colour map: indigo -> electric blue -> cyan -> phosphor green -> the old productivity-boost green -> warm white.
 const STOPS = [
   [0.00, [5, 6, 10]],
-  [0.12, [14, 13, 40]],
-  [0.24, [26, 28, 96]],
+  [0.12, [11, 11, 28]],
+  [0.24, [22, 24, 80]],
   [0.37, [28, 74, 168]],
   [0.50, [20, 136, 150]],
   [0.62, [30, 184, 108]],
@@ -168,7 +168,7 @@ export function paintRows(ctx, sp, layout, rowFrom, rowTo, yOffset = 0, t = 0) {
       const n2 = NOISE[(x * 3 + (gy >> 2) * 59) & 8191];
       const fade = 0.78 + 0.44 * NOISE[(gy * 41 + (x >> 3) * 11 + tt) & 8191];
       const sv = spec[x] * (1 - kp - kn) + prev[x] * kp + next[x] * kn;
-      const v = 0.03 + 0.07 * n * n + 0.03 * n2 + sv * flick * fade;
+      const v = 0.012 + 0.05 * n * n * n + 0.012 * n2 + sv * flick * fade;
       const i = (TONE[(v * 400) | 0] ?? 255);
       px[y * w + x] = L[i];
     }

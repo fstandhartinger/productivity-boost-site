@@ -213,7 +213,7 @@ def topbar(lang, alt_path, active=None, home=True):
         links.append(f'<li><a href="{href}" data-st="{sid}"><b aria-hidden="true">{freq_txt(str(s_["freq"]), lang)}</b><span class="nm" aria-hidden="true">{esc(st_plain(sid, lang))}</span><span class="sr">{freq_txt(str(s_["freq"]), lang)} {T[lang]["mhz"]}, {esc(st_plain(sid, lang))}</span></a></li>')
     return f"""<a class="skip" href="#main">{t["skip"]}</a>
 <div class="langhint" id="langhint" hidden><div class="wrap"><span lang="de">{t["hint"]}</span> <a href="{alt_path}" lang="de" hreflang="de">{t["hint_link"]}</a><button type="button" data-close-hint aria-label="{t["hint_close"]}">✕</button></div></div>
-<header class="top"><div class="wrap">
+<header class="top{" on-dark" if home else ""}"><div class="wrap">
 <a class="brand" href="{t["home"]}">{ICON["dial"]}<span>Florian Standhartinger</span></a>
 <nav class="stations-nav" aria-label="{t["nav_top"]}"><span class="curname" aria-hidden="true" data-curname>{freq_txt("105.8", lang)} · {esc(st_plain("decisions", lang))}</span><ol>{"".join(links)}</ol><div class="needle-track" aria-hidden="true"><i class="needle"></i></div></nav>
 <div class="tools">
