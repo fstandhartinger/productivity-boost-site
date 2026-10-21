@@ -19,6 +19,14 @@
   "w": 1260,
   "h": 1260
  },
+ "sstv-face": {
+  "base": "sstv-face",
+  "widths": [
+   120
+  ],
+  "w": 120,
+  "h": 120
+ },
  "sstv": {
   "base": "sstv",
   "widths": [

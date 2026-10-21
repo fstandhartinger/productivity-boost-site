@@ -122,8 +122,9 @@ export function spectra(band, w, opts = {}) {
           const ad = Math.abs(d);
           const top = ad < hw ? 1 : g(ad - hw, S * 0.035);
           // OFDM-like: flat top with a fine comb and a slight tilt
-          v = L * (0.6 * top * (0.78 + 0.22 * Math.abs(Math.sin(d * 0.85 + ei))) * (1 + 0.12 * d / hw) + 0.06 * g(d, S * 0.14));
+          v = L * (0.95 * top * (0.8 + 0.2 * Math.abs(Math.sin(d * 0.85 + ei))) * (1 + 0.1 * d / hw) + 0.06 * g(d, S * 0.14));
         }
+        if (e.level >= 1.5) v += L * 0.16 * (g(d - S * 0.2, S * 0.025) + g(d + S * 0.2, S * 0.025)); // the brightest get visible sidebands
         if (nx !== null && opts.sidebands && ri === firstRow) {
           // sideband toward the neighbour station: a faint ridge + a small pilot at the neighbour
           const lo = Math.min(cx, nx), hi = Math.max(cx, nx);

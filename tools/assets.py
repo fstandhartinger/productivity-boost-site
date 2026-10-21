@@ -67,6 +67,9 @@ def sstv_image(src, w, h, seed=36):
 pt_crop = pt.crop((900, 200, 2352, 1289))  # 4:3 landscape, face right of centre like the original framing
 frame = sstv_image(pt_crop, 320, 240)      # Robot 36 is 320x240
 frame.save(f"{TMP}/sstv-320.png"); avif(f"{TMP}/sstv-320.png", f"{IMG}/sstv-320.avif", 24)
+face = sstv_image(pt.crop((1080, 160, 2340, 1420)), 120, 120, seed=7)  # phone avatar, same reception
+face.save(f"{IMG}/sstv-face-120.webp", "WEBP", quality=85, method=6); face.save(f"{TMP}/sf.png"); avif(f"{TMP}/sf.png", f"{IMG}/sstv-face-120.avif", 28)
+manifest["sstv-face"] = {"base": "sstv-face", "widths": [120], "w": 120, "h": 120}
 frame.save(f"{IMG}/sstv-320.webp", "WEBP", quality=90, method=6)
 big = frame.resize((640, 480), Image.NEAREST)  # the receiver's pixels, doubled
 big.save(f"{TMP}/sstv-640.png"); avif(f"{TMP}/sstv-640.png", f"{IMG}/sstv-640.avif", 26)
@@ -96,7 +99,7 @@ if os.path.exists(tr):
 # --- noise tile ---
 rnd = random.Random(7); n = Image.new("L", (96, 96))
 n.putdata([int(10 + 46 * rnd.random() ** 2) for _ in range(96 * 96)])
-Image.merge("RGB", (n.point(lambda v: v // 3), n.point(lambda v: v // 3), n.point(lambda v: min(255, v // 2 + 20)))).save(f"{IMG}/noise.png", optimize=True)
+Image.merge("RGB", (n.point(lambda v: 4 + v // 5), n.point(lambda v: 5 + v // 4), n.point(lambda v: 9 + v // 3))).save(f"{IMG}/noise.webp", "WEBP", quality=60, method=6)
 
 # --- waterfall: final frame (desktop + phone), hop slices ---
 STF = {"worlds": 88.7, "systems": 91.4, "agents": 93.9, "studio": 96.6, "networks": 99.2, "benchmarks": 102.5, "decisions": 105.8}

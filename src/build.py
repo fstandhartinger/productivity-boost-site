@@ -212,7 +212,7 @@ def topbar(lang, alt_path, active=None, home=True):
         href = f'{t["home"]}#{sid}' if not home else f'#{sid}'
         links.append(f'<li><a href="{href}" data-st="{sid}"><b aria-hidden="true">{freq_txt(str(s_["freq"]), lang)}</b><span class="nm" aria-hidden="true">{esc(st_plain(sid, lang))}</span><span class="sr">{freq_txt(str(s_["freq"]), lang)} {T[lang]["mhz"]}, {esc(st_plain(sid, lang))}</span></a></li>')
     return f"""<a class="skip" href="#main">{t["skip"]}</a>
-<div class="langhint" id="langhint" hidden><div class="wrap"><span lang="de">{t["hint"]}</span> <a href="{alt_path}" lang="de" hreflang="de">{t["hint_link"]}</a><button type="button" data-close-hint aria-label="{t["hint_close"]}">✕</button></div></div>
+<div class="langhint" id="langhint" hidden><div class="wrap"><a href="{alt_path}" lang="de" hreflang="de">{t["hint_link"]} →</a><button type="button" data-close-hint aria-label="{t["hint_close"]}">✕</button></div></div>
 <header class="top{" on-dark" if home else ""}"><div class="wrap">
 <a class="brand" href="{t["home"]}" aria-label="Florian Standhartinger">{ICON["dial"]}<span aria-hidden="true">Florian Standhartinger</span></a>
 <nav class="stations-nav" aria-label="{t["nav_top"]}"><span class="curname" aria-hidden="true" data-curname>{freq_txt("105.8", lang)} · {esc(st_plain("decisions", lang))}</span><ol>{"".join(links)}</ol><div class="needle-track" aria-hidden="true"><i class="needle"></i></div></nav>
@@ -314,7 +314,7 @@ def instrument(lang):
     return f"""<figure class="inst locked" data-st="decisions" aria-labelledby="inst-cap">
 <div class="inst-head"><b class="ttl">{t["inst_title"]}</b><span class="kind">{t["inst_kind"]}</span><span class="kind-m">{t["tap"]} ↓</span><button class="pause" type="button" data-pause aria-pressed="false" aria-label="{t["pause"]}" data-l-pause="{t["pause"]}" data-l-play="{t["play"]}">{ICON["pause"]}</button></div>
 <div class="ruler">{ruler_svg()}<nav aria-label="{t["nav_inst"]}">{"".join(st_links)}</nav><input class="needle-range" type="range" min="0" max="6" step="1" value="6" aria-label="{t["pick"]}" aria-valuetext="{freq_txt(str(first["freq"]), lang)} {t["mhz"]}, {st_plain(first["id"], lang)}"></div>
-<div class="readout locked">{numerals("105.8", lang, cls="rnum num", label=False)}<span class="rtxt" aria-live="polite"><span class="rname">{esc(st_plain("decisions", lang))} <em>{esc(fl["decisions"])}</em></span><span class="rsub">{esc(ST["decisions"]["read"][lang])}</span></span><a href="#decisions" data-go aria-label="{t["readout_go"].rstrip(" ↓")}: {esc(st_plain("decisions", lang))}">{t["readout_go"]}</a></div>
+<div class="readout locked">{numerals("105.8", lang, cls="rnum num", label=False)}<span class="rtxt" aria-live="polite"><span class="rname">{esc(st_plain("decisions", lang))} <em>{esc(fl["decisions"])}</em></span><span class="rsub">{esc(ST["decisions"]["read"][lang])}</span></span><a href="#decisions" data-go aria-label="{t["readout_go"].rstrip(" ↓")}: {esc(st_plain("decisions", lang))}"><span class="gl">{t["readout_go"]}</span><span class="gs" aria-hidden="true">{t["go_short"]}</span></a></div>
 <div class="plotwrap"><div class="years" aria-hidden="true">{yt}</div>
 <div class="plot">{wf_img}<i class="floor"></i><canvas aria-hidden="true"></canvas><i class="static"></i><i class="yours" aria-hidden="true"></i>{"".join(hits)}{ann}</div></div>
 <div class="plotfoot"><span>{freq_txt("87.5", lang)} · {t["since87"]}</span><a href="#contact">{t["yourproj"]} · {freq_txt("108.0", lang)} →</a></div>
@@ -324,8 +324,8 @@ def instrument(lang):
 
 def hero(lang):
     t = T[lang]
-    face = picture("portrait-sq", "Florian Standhartinger", "56px", cls="face", eager=True)
-    portrait = picture("sstv", "Florian Standhartinger, received as a slow-scan TV picture", "(min-width:1080px) 320px, 1px", eager=True)
+    face = picture("sstv-face", "Florian Standhartinger", "40px", cls="face", eager=True)
+    portrait = picture("sstv", "Florian Standhartinger, received as a slow-scan TV picture", "(min-width:1080px) 320px, 1px", eager=False)
     return f"""<section class="hero" aria-labelledby="h1"><div class="wrap hero-in">
 <div class="hero-txt">
 <div class="idline"><span class="facewrap">{face}</span><div class="who">Florian Standhartinger<span>{t["who_sub"]}</span></div></div>
