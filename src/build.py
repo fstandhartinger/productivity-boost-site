@@ -273,7 +273,8 @@ ANN = [  # in-plot labels: key, station, time, label offset (dx, dy in % of the 
  ("ralph", "agents", 2026 + 0.5 / 12, (3, 6), True, "start"),
  ("rdvr", "worlds", 2017.5, (1.5, -8), True, "start"),
  ("dax", "systems", 2015.0, (3, 3), False, "start"),
- ("bh", "benchmarks", 2026 + 5.5 / 12, (3, 7), False, "start"),
+ ("jev", "benchmarks", 2026 + 9.5 / 12, (-3, 7), True, "end"),
+ ("bh", "benchmarks", 2026 + 6.5 / 12, (3, 9), False, "start"),
  ("lgbm", "decisions", 2018.5, (-3, 4), False, "end"),
  ("games", "worlds", 1994.0, (3, 0), True, "start"),
 ]
@@ -314,7 +315,7 @@ def instrument(lang):
     return f"""<figure class="inst locked" data-st="decisions" aria-label="{t["inst_title"]}" aria-describedby="inst-cap">
 <div class="inst-head"><b class="ttl">{t["inst_title"]}</b><span class="kind">{t["inst_kind"]}</span><span class="kind-m">{t["tap"]} ↓</span><button class="pause" type="button" data-pause aria-pressed="false" aria-label="{t["pause"]}" data-l-pause="{t["pause"]}" data-l-play="{t["play"]}">{ICON["pause"]}</button></div>
 <div class="ruler">{ruler_svg()}<nav aria-label="{t["nav_inst"]}">{"".join(st_links)}</nav><input class="needle-range" type="range" min="0" max="6" step="1" value="6" aria-label="{t["pick"]}" aria-valuetext="{freq_txt(str(first["freq"]), lang)} {t["mhz"]}, {st_plain(first["id"], lang)}"></div>
-<div class="readout locked">{numerals("105.8", lang, cls="rnum num", label=False)}<span class="rtxt" aria-live="polite"><span class="rname">{esc(st_plain("decisions", lang))} <em>{esc(fl["decisions"])}</em></span><span class="rsub">{esc(ST["decisions"]["read"][lang])}</span></span><a href="#decisions" data-go aria-label="{t["readout_go"].rstrip(" ↓")}: {esc(st_plain("decisions", lang))}"><span class="gl">{t["readout_go"]}</span><span class="gs" aria-hidden="true">{t["go_short"]}</span></a></div>
+<div class="readout locked">{numerals("105.8", lang, cls="rnum num", label=False)}<span class="rtxt" aria-live="polite"><span class="rname">{esc(st_plain("decisions", lang))} <em>{esc(fl["decisions"])}</em></span><span class="rsub">{esc(ST["decisions"]["read"][lang])}</span></span><a href="#decisions" data-go aria-label="{t["go_short"].rstrip(" ↓")}, {t["readout_go"].rstrip(" ↓").lower()}: {esc(st_plain("decisions", lang))}"><span class="gl">{t["readout_go"]}</span><span class="gs" aria-hidden="true">{t["go_short"]}</span></a></div>
 <div class="plotwrap"><div class="years" aria-hidden="true">{yt}</div>
 <div class="plot">{wf_img}<i class="floor"></i><canvas aria-hidden="true"></canvas><i class="static"></i><i class="yours" aria-hidden="true"></i>{"".join(hits)}{ann}</div></div>
 <div class="plotfoot"><span>{freq_txt("87.5", lang)} · {t["since87"]}</span><a href="#contact">{t["yourproj"]} · {freq_txt("108.0", lang)} →</a></div>
@@ -331,7 +332,7 @@ def hero(lang):
 <h1 id="h1"><span>{esc(t["h1a"])}</span> <span class="l2">{esc(t["h1b"])}</span></h1>
 <p class="genres">{esc(t["genres"])}</p><p class="genres-short">{esc(t["genres_short"])}</p>
 <div class="ctas"><a class="btn inv" href="mailto:{EMAIL}" data-mail>{ICON["mail"]}{t["write"]}</a><a class="btn ghost" href="{t["works"]}">{t["all"]}</a></div>
-<div class="hero-foot"><p class="legend">{t["legend"]}</p><p class="legend">{t["figures"]} <a href="#logbook" data-open-logbook>{t["logbook_link"]}</a></p>
+<div class="hero-foot"><p class="legend">{t["figures"]} <a href="#logbook" data-open-logbook>{t["logbook_link"]}</a></p>
 <div class="decoder"><div class="sstv" role="img" aria-label="Florian Standhartinger · {t["sstv_title"]}">{picture("sstv", "", "(min-width:1080px) 220px, 1px", eager=False)}</div><span class="dlab" aria-hidden="true">{t["sstv_title"]} · RX 21.10.2026</span></div></div>
 </div>
 {instrument(lang)}

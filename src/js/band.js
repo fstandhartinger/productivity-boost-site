@@ -172,7 +172,7 @@ export function paintRows(ctx, sp, layout, rowFrom, rowTo, yOffset = 0, t = 0) {
     const ty = gy + tt * 3;
     for (let x = 0; x < w; x++) {
       const n = NOISE[(base + x * 7) & 8191];
-      const n2 = NOISE[(x * 3 + (gy >> 2) * 59) & 8191];
+      const n2 = NOISE[(x * 3 + gy * 59) & 8191];
       const fade = 0.72 + 0.28 * Math.sin(ty * 0.11 + x * 0.045) * Math.sin(ty * 0.027 + x * 0.011 + 1.7) + 0.18 * n2;
       const spur = (x % 97 === 31 || x % 151 === 88) ? 0.03 : 0; // faint spurs, like on every real receiver
       const speck = n > 0.993 ? 0.22 : 0;

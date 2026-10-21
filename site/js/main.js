@@ -159,7 +159,7 @@ function initInstrument(inst) {
     $$('.ruler .st', inst).forEach((a) => a.setAttribute('aria-current', a.dataset.st === id ? 'true' : 'false'));
     setNum(n.f);
     if (user) { readout.classList.remove('locked'); void readout.offsetWidth; readout.classList.add('locked'); }
-    rname.innerHTML = ''; rname.append(n.n + ' '); const em = d.createElement('em'); em.textContent = n.p || ''; rname.append(em); rsub.textContent = n.r; go.href = '#' + id; go.setAttribute('aria-label', `${($('.gl', go) || go).textContent.replace(/[↓\s]+$/, '')}: ${n.n}`);
+    rname.innerHTML = ''; rname.append(n.n + ' '); const em = d.createElement('em'); em.textContent = n.p || ''; rname.append(em); rsub.textContent = n.r; go.href = '#' + id; go.setAttribute('aria-label', `${($('.gs', go)?.textContent || '').replace(/[↓\s]+$/, '')}, ${($('.gl', go) || go).textContent.replace(/[↓\s]+$/, '').toLowerCase()}: ${n.n}`);
     const i = ORDER_BAND.indexOf(id);
     range.value = String(i);
     range.setAttribute('aria-valuetext', `${n.f} ${lang === 'de' ? 'Megahertz' : 'megahertz'}, ${n.n}`);
@@ -223,7 +223,7 @@ function initInstrument(inst) {
       if (!motion()) { paintAll(); return done(); }
       const target = Math.min(n, Math.floor(((now - t0) / dur) * n));
       while (n - 1 - i < target && i >= 0) {
-        const hh = Math.round(layout.rows.heights[i]);
+        const hh = Math.round(layout.rows.tops[i + 1] ?? h) - Math.round(layout.rows.tops[i]);
         ctx.globalCompositeOperation = 'copy'; ctx.drawImage(canvas, 0, 0, w, h - hh, 0, hh, w, h - hh); ctx.globalCompositeOperation = 'source-over';
         paintRows(ctx, sp, layout, i, i + 1, -Math.round(layout.rows.tops[i]));
         i--;
