@@ -182,7 +182,7 @@ def head(lang, title, desc, path, alt_path, og="og", extra=""):
 <meta property="og:title" content="{esc(title)}">
 <meta property="og:description" content="{esc(desc)}">
 <meta property="og:url" content="{url}">
-<meta property="og:image" content="{BASE_URL}/img/{og}-{lang}.png">
+<meta property="og:image" content="{BASE_URL}/img/{og}-{lang}.jpg">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta property="og:locale" content="{t['locale']}">
 <meta name="twitter:card" content="summary_large_image">

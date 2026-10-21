@@ -91,5 +91,21 @@ svg = (f'<svg class="dots" viewBox="0 0 300 134" aria-hidden="true"><line x1="14
 manifest["jevdots"] = {"svg": svg, "n": len(vals), "max": max(vals), "min": min(vals)}
 print("jevbench n", len(vals), "range", min(vals), max(vals), "tallest bin", max(bins.values()))
 
+# --- OG images (EN/DE) ---
+import shutil, threading, http.server, socketserver, functools, urllib.parse
+from playwright.sync_api import sync_playwright
+shutil.copy(f"{TMP}/og-wf.png", os.path.join(ROOT, "tmp-og-wf.png"))
+class Q(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, *a): pass
+srv = socketserver.TCPServer(("127.0.0.1", 0), functools.partial(Q, directory=ROOT)); threading.Thread(target=srv.serve_forever, daemon=True).start()
+og = {"en": ("Florian Standhartinger · Passau · coding since 1987", "I build AI.", "I just can’t stay on one station.", "Self-portrait, 1987–2026"),
+      "de": ("Florian Standhartinger · Passau · programmiert seit 1987", "Ich baue KI.", "Nur bleibe ich auf keinem Sender lange.", "Selbstporträt, 1987–2026")}
+with sync_playwright() as p:
+    b = p.chromium.launch(); pg = b.new_page(viewport={"width": 1200, "height": 630})
+    for lg, (k, a, bb, t) in og.items():
+        pg.goto(f"http://127.0.0.1:{srv.server_address[1]}/tools/og.html?" + urllib.parse.urlencode({"k": k, "a": a, "b": bb, "t": t})); pg.wait_for_timeout(500)
+        pg.screenshot(path=f"{TMP}/og-{lg}.png"); Image.open(f"{TMP}/og-{lg}.png").convert("RGB").save(f"{IMG}/og-{lg}.jpg", "JPEG", quality=86, optimize=True, progressive=True)
+    b.close()
+srv.shutdown(); os.remove(os.path.join(ROOT, "tmp-og-wf.png"))
 json.dump(manifest, open(os.path.join(ROOT, "src", "data", "assets.json"), "w"), indent=1)
 print("assets ok")

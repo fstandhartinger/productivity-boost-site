@@ -1,0 +1,14 @@
+<!doctype html><meta charset="utf-8"><style>
+@font-face{font-family:Hubot;src:url(/src/fonts/hubot-display.woff2);font-weight:760;font-stretch:75% 125%}
+@font-face{font-family:Plex;src:url(/src/fonts/plex-mono-400.woff2)}
+body{margin:0;width:1200px;height:630px;background:#F2EFE7;color:#0C0D10;display:grid;grid-template-columns:640px 560px;overflow:hidden}
+.l{padding:56px 48px 48px 64px;display:flex;flex-direction:column}
+.k{font:15px Plex;letter-spacing:.06em;text-transform:uppercase;color:#45474F}
+h1{font:760 76px/0.94 Hubot;font-stretch:88%;letter-spacing:-.02em;margin:26px 0 0}
+h1 span{display:block;color:#45474F}
+.f{margin-top:auto;font:16px Plex;color:#45474F;letter-spacing:.03em}
+.r{background:#08090D;position:relative}
+.r img{width:560px;height:630px;display:block}
+.r b{position:absolute;left:18px;top:16px;font:400 13px Plex;letter-spacing:.06em;color:#E6ECE6;text-transform:uppercase}
+</style><div class="l"><div class="k" id="k"></div><h1 id="h"></h1><div class="f">productivity-boost.com</div></div><div class="r"><img src="/tmp-og-wf.png"><b id="t"></b></div>
+<script>const q=new URLSearchParams(location.search);document.getElementById('k').textContent=q.get('k');document.getElementById('h').innerHTML=q.get('a')+' <span>'+q.get('b')+'</span>';document.getElementById('t').textContent=q.get('t');</script>
