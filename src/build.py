@@ -59,37 +59,42 @@ def numerals(text, lang, cls="num", label=True):
 
 # ---------- row layout (mirror of band.js rowLayout) ----------
 def rows_layout():
+    import math
     rows = []
     y, m = map(int, BAND["rows"]["monthly"][1].split("-"))
     y0, m0 = map(int, BAND["rows"]["monthly"][0].split("-"))
     while (y > y0) or (y == y0 and m >= m0):
-        rows.append({"key": f"{y}-{m:02d}", "w": 1.0, "year": y, "month": m})
+        rows.append({"key": f"{y}-{m:02d}", "t0": y + (m - 1) / 12, "t1": y + m / 12, "year": y, "month": m})
         m -= 1
         if m == 0:
             m = 12; y -= 1
     ya, yb = BAND["rows"]["yearly"]
     for yy in range(yb, ya - 1, -1):
-        w = next((q["w"] for q in BAND["rows"].get("weights", []) if q["from"] <= yy <= q["to"]), 1.0)
-        rows.append({"key": str(yy), "w": w, "year": yy})
+        rows.append({"key": str(yy), "t0": yy, "t1": yy + 1, "year": yy})
+    T = rows[0]["t1"]; c = BAND["rows"].get("logC", 0.25)
+    for r in rows:
+        r["w"] = math.log(T - r["t0"] + c) - math.log(T - r["t1"] + c)
     tot = sum(r["w"] for r in rows); acc = 0
     for r in rows:
         r["top"] = acc / tot * 100; acc += r["w"]; r["bot"] = acc / tot * 100
     return rows
 
+def ypct(t):
+    """y position (percent from top) of time t on the log axis."""
+    import math
+    T = ROWS[0]["t1"]; c = BAND["rows"].get("logC", 0.25)
+    tot = math.log(T - ROWS[-1]["t0"] + c) - math.log(c)
+    return (math.log(T - t + c) - math.log(c)) / tot * 100
+
 ROWS = rows_layout()
 
 def year_ticks(lang):
-    def top_of(key):
-        return next(r for r in ROWS if r["key"] == key)["top"]
-    def bot_of(key):
-        return next(r for r in ROWS if r["key"] == key)["bot"]
-    ticks = [(0.0, "10/26" if lang == "en" else "10/26"), (top_of("2026-01"), "2026"), (top_of("2025-01"), "2025"),
-             (top_of("2017"), "2017"), (top_of("2003"), "2003"), (top_of("1987"), "1987")]
-    out = []
-    for i, (p, lab) in enumerate(ticks):
-        out.append(f'<span class="yt{i}">{lab}</span>')
+    mon = {"en": ("Oct 2026", "Jan 2026"), "de": ("Okt. 2026", "Jan. 2026")}[lang]
+    ticks = [(ypct(2026 + 10 / 12), mon[0]), (ypct(2026.0), mon[1]), (ypct(2025.0), "2025"), (ypct(2020.0), "2020"),
+             (ypct(2010.0), "2010"), (ypct(2000.0), "2000"), (ypct(1987.0), "1987")]
+    out = "".join(f'<span class="yt{i}">{lab}</span>' for i, (p, lab) in enumerate(ticks))
     css = "".join(f".yt{i}{{top:{p:.2f}%}}" for i, (p, _) in enumerate(ticks))
-    return "".join(out), css
+    return out, css
 
 # ---------- generated CSS (positions; no inline style attributes because of the CSP) ----------
 def gen_css():
@@ -100,7 +105,10 @@ def gen_css():
         css.append(f".p{p}{{--p:{p/100:.2f}}}")
     _, ycss = year_ticks("en")
     css.append(ycss)
+    _, acss = annotations("en")
+    css.append(acss)
     css.append(".plot{--ar:6/5}")
+    css.append(f".yours{{left:{xpct(107.4):.2f}%}}")
     return "".join(css)
 
 def minify_css(s):
@@ -109,7 +117,6 @@ def minify_css(s):
     s = re.sub(r"\s*([{};:,>])\s*", r"\1", s)
     return s.replace(";}", "}").strip()
 
-CSS = minify_css(open(os.path.join(SRC, "css", "site.css")).read() + gen_css())
 HEAD_JS = ("(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('theme');if(t)d.setAttribute('data-theme',t)}catch(e){}"
            "var c=navigator.connection,m=matchMedia('(prefers-reduced-motion: reduce)').matches||(c&&c.saveData);if(!m)d.classList.add('motion');"
            "setTimeout(function(){if(!window.__fsboot){d.classList.remove('js');d.classList.remove('motion')}},3000)})();")
@@ -150,7 +157,7 @@ def st_name(sid, lang):
 
 def st_plain(sid, lang):
     s = ST[sid]
-    return s["de_plain"] if lang == "de" else s["en"]
+    return s["de_plain"] if lang == "de" else s.get("en_plain", s["en"])
 
 def freq_txt(f, lang):
     return f.replace(".", ",") if lang == "de" else f
@@ -198,19 +205,20 @@ def head(lang, title, desc, path, alt_path, og="og", extra=""):
 def topbar(lang, alt_path, active=None, home=True):
     t = T[lang]
     links = []
-    for s in STATIONS:
-        href = f'{t["home"]}#{s["id"]}' if not home else f'#{s["id"]}'
-        links.append(f'<li><a href="{href}" data-st="{s["id"]}"><b>{freq_txt(s["freq"], lang)}</b><span>{esc(st_plain(s["id"], lang))}</span></a></li>')
-    return f'''<a class="skip" href="#main">{t["skip"]}</a>
+    for s_ in sorted(BAND["stations"], key=lambda q: q["freq"]):
+        sid = s_["id"]
+        href = f'{t["home"]}#{sid}' if not home else f'#{sid}'
+        links.append(f'<li><a href="{href}" data-st="{sid}" data-tune="{sid}"><b>{freq_txt(str(s_["freq"]), lang)}</b><span class="sr"> {T[lang]["mhz"]}, {esc(st_plain(sid, lang))}</span></a></li>')
+    return f"""<a class="skip" href="#main">{t["skip"]}</a>
 <div class="langhint" id="langhint" hidden><div class="wrap"><span lang="de">{t["hint"]}</span> <a href="{alt_path}" lang="de" hreflang="de">{t["hint_link"]}</a><button type="button" data-close-hint aria-label="{t["hint_close"]}">✕</button></div></div>
 <header class="top"><div class="wrap">
-<a class="brand" href="{t["home"]}" aria-label="Florian Standhartinger — {esc(t["home"] == "/" and "home" or "Startseite")}">{ICON["dial"]}<span>Florian Standhartinger</span></a>
-<nav class="stations-nav" aria-label="{t["nav_label"]}"><ol>{"".join(links)}</ol><div class="needle-track" aria-hidden="true"><i class="needle"></i></div></nav>
+<a class="brand" href="{t["home"]}">{ICON["dial"]}<span>Florian Standhartinger</span></a>
+<nav class="stations-nav" aria-label="{t["nav_top"]}"><span class="curname" aria-hidden="true" data-curname>{esc(st_plain("decisions", lang))}</span><ol>{"".join(links)}</ol><div class="needle-track" aria-hidden="true"><i class="needle"></i></div></nav>
 <div class="tools">
 <a class="tbtn" href="{alt_path}" hreflang="{"de" if lang == "en" else "en"}" lang="{"de" if lang == "en" else "en"}"><span aria-hidden="true">{t["other_short"]}</span><span class="sr">{t["other_label"]}</span></a>
 <button class="tbtn" type="button" data-theme-toggle aria-label="{t["theme"]}">{ICON["theme"]}</button>
-<a class="btn write" href="mailto:{EMAIL}">{ICON["mail"]}{t["write"]}</a>
-</div></div></header>'''
+<a class="btn write" href="mailto:{EMAIL}" data-mail>{ICON["mail"]}{t["write"]}</a>
+</div></div></header>"""
 
 def footer(lang):
     t = T[lang]
@@ -222,18 +230,26 @@ def footer(lang):
 <p>{esc(t["rights"])}</p></div>
 </div></footer>'''
 
+def mail_sheet(lang):
+    t = T[lang]
+    return f"""<div class="sheet mailsheet" id="mail" popover role="dialog" aria-labelledby="mail-h"><div class="in">
+<h2 id="mail-h">{t["mail_title"]}</h2><p class="addr">{EMAIL}</p>
+<div class="row"><button class="btn" type="button" data-copy="{EMAIL}" data-copied="{t["copied"]}">{ICON["copy"]}<span>{t["copy"]}</span></button><a class="btn ghost" href="mailto:{EMAIL}">{ICON["mail"]}{t["mail_open"]}</a></div>
+<p class="dim small">{t["mail_note"]}</p><span class="sr" role="status" data-copy-status></span>
+<button class="tbtn close" type="button" popovertarget="mail" popovertargetaction="hide" aria-label="{t["sheet_close"]}">✕</button></div></div>"""
+
 def bottom_bar(lang, home=True):
     t = T[lang]
     items = "".join(
         f'<li><a href="{"" if home else t["home"]}#{s["id"]}" data-st="{s["id"]}"><b>{freq_txt(s["freq"], lang)}</b>{st_name(s["id"], lang)}</a></li>' for s in STATIONS)
-    return f'''<div class="bbar" id="bbar" data-st="decisions" aria-label="{t["nav_label"]}" role="region">
-<button class="cur" type="button" popovertarget="sheet" aria-haspopup="dialog"><b data-cur-f>{freq_txt("105.8", lang)}</b><span data-cur-n>{st_plain("decisions", lang)}</span></button>
-<a class="btn" href="mailto:{EMAIL}">{ICON["mail"]}{t["write"]}</a></div>
+    return f"""<div class="bbar" id="bbar" data-st="decisions" inert>
+<button class="cur" type="button" popovertarget="sheet" aria-haspopup="dialog"><b data-cur-f>{freq_txt("105.8", lang)}</b><span data-cur-n>{esc(st_plain("decisions", lang))}</span></button>
+<a class="btn" href="mailto:{EMAIL}" data-mail>{ICON["mail"]}{t["write"]}</a></div>
 <div class="sheet" id="sheet" popover role="dialog" aria-labelledby="sheet-h"><div class="in">
-<h2 id="sheet-h">{t["sheet_title"]}</h2><ol>{items}</ol>
-<div class="row"><a class="btn ghost" href="{t["works"]}">{t["all"]}</a><a class="btn ghost" href="{t["other_home"]}" hreflang="{"de" if lang == "en" else "en"}">{t["other_label"]}</a><a class="btn" href="mailto:{EMAIL}">{t["write"]}</a></div>
+<h2 id="sheet-h">{t["sheet_title"]}</h2><nav aria-label="{t["nav_sheet"]}"><ol>{items}</ol></nav>
+<div class="row"><a class="btn ghost" href="{t["works"]}">{t["all"]}</a><a class="btn ghost" href="{t["other_home"]}" hreflang="{"de" if lang == "en" else "en"}">{t["other_label"]}</a><a class="btn" href="mailto:{EMAIL}" data-mail>{t["write"]}</a></div>
 <button class="tbtn close" type="button" popovertarget="sheet" popovertargetaction="hide" aria-label="{t["sheet_close"]}">✕</button>
-</div></div>'''
+</div></div>{mail_sheet(lang)}"""
 
 # ---------- hero ----------
 def ruler_svg():
@@ -250,57 +266,69 @@ def ruler_svg():
     return (f'<svg class="scale" aria-hidden="true" focusable="false"><g stroke="currentColor" stroke-width="1" opacity=".55">{"".join(ticks)}</g>'
             f'<g fill="currentColor" font-family="ui-monospace,monospace" font-size="9" opacity=".7">{"".join(labels)}</g></svg>')
 
+ANN = [  # in-plot labels: key, station, time, label offset (dx, dy in % of the plot), shown on phones
+ ("reax", "networks", 2026 + 9.5 / 12, (-3, 13), True, "end"),
+ ("ralph", "agents", 2026 + 0.5 / 12, (3, 6), True, "start"),
+ ("rdvr", "worlds", 2017.5, (3, -6), True, "start"),
+ ("dax", "systems", 2016.0, (3, 4), False, "start"),
+ ("games", "worlds", 1994.0, (3, 0), True, "start"),
+]
+
+def annotations(lang):
+    t = T[lang]
+    out = []; css = []
+    for i, (k, sid, tm, (dx, dy), mob, anchor) in enumerate(ANN):
+        x = xpct(BAND_ST[sid]["freq"]); y = ypct(tm)
+        lx, ly = x + dx, y + dy
+        lab = esc(t["ann"][k]).replace("★", '<span aria-hidden="true">★</span><span class="sr"> GitHub stars</span>')
+        cls = "ann" + ("" if mob else " desk") + (" rt" if anchor == "end" else "")
+        out.append(f'<i class="pt a{i}" aria-hidden="true"></i><span class="{cls} l{i}" aria-hidden="true">{lab}</span>')
+        css.append(f".pt.a{i}{{left:{x:.2f}%;top:{y:.2f}%}}.ann.l{i}{{left:{lx:.2f}%;top:{ly:.2f}%}}")
+        out.append(f'<svg class="leader" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="{x:.2f}" y1="{y:.2f}" x2="{lx:.2f}" y2="{ly:.2f}"/></svg>')
+    return "".join(out), "".join(css)
+
 def instrument(lang):
     t = T[lang]
-    st_links = []
-    hits = []
-    cols = []
+    st_links, hits, cols = [], [], []
     band_order = sorted(BAND["stations"], key=lambda s: s["freq"])
     for s in band_order:
-        sid = s["id"]
-        nm = st_plain(sid, lang)
-        st_links.append(f'<a class="st x-{sid}" href="#{sid}" data-st="{sid}" data-tune="{sid}"><span>{freq_txt(str(s["freq"]), lang)}</span><i>{esc(nm)}</i><span class="sr"> {T[lang]["mhz"]}, {esc(nm)}</span></a>')
+        sid = s["id"]; nm = st_plain(sid, lang)
+        short = nm.split(" ")[0] if sid == "studio" else nm
+        st_links.append(f'<a class="st x-{sid}" href="#{sid}" data-st="{sid}" data-tune="{sid}"><span>{freq_txt(str(s["freq"]), lang)}</span><i>{esc(short)}</i><span class="sr"> {T[lang]["mhz"]}, {esc(nm)}</span></a>')
         hits.append(f'<a class="hit x-{sid}" href="#{sid}" data-tune="{sid}" tabindex="-1" aria-hidden="true"></a>')
         cols.append(f'<i class="col x-{sid}" data-col="{sid}"></i>')
     yt, _ = year_ticks(lang)
+    ann, _ = annotations(lang)
     wf = ASSETS.get("wf")
     wf_img = ""
     if wf:
         wf_img = (f'<picture><source type="image/avif" media="(min-width:640px)" srcset="/img/{wf["base"]}-d.avif">'
                   f'<source type="image/webp" media="(min-width:640px)" srcset="/img/{wf["base"]}-d.webp">'
-                  f'<source type="image/avif" srcset="/img/{wf["base"]}-m.avif"><img src="/img/{wf["base"]}-m.webp" width="{wf["mw"]}" height="{wf["mh"]}" alt="" decoding="async" loading="eager"></picture>')
-    opts = "".join(f'<option value="{i}" label="{freq_txt(str(s["freq"]), lang)}"></option>' for i, s in enumerate(band_order))
+                  f'<source type="image/avif" srcset="/img/{wf["base"]}-m.avif"><img src="/img/{wf["base"]}-m.webp" width="{wf["mw"]}" height="{wf["mh"]}" alt="{esc(t["fig_alt"])}" decoding="async" loading="eager"></picture>')
     names = json.dumps({s["id"]: {"f": freq_txt(str(s["freq"]), lang), "n": st_plain(s["id"], lang), "r": ST[s["id"]]["read"][lang]} for s in band_order}, ensure_ascii=False)
     first = band_order[-1]
-    return f'''<figure class="panel inst" data-st="decisions" aria-labelledby="inst-cap">
-<div class="inst-head"><span><b>{t["inst_title"]}</b></span><span class="kind">{t["inst_kind"]}</span><button class="pause" type="button" data-pause aria-pressed="false" aria-label="{t["pause"]}" data-l-pause="{t["pause"]}" data-l-play="{t["play"]}">{ICON["pause"]}</button></div>
-<div class="ruler">{ruler_svg()}<nav aria-label="{t["nav_label"]}">{"".join(st_links)}</nav></div>
-<input class="needle-range" type="range" min="0" max="6" step="1" value="6" list="tl" aria-label="{t["pick"]}" aria-valuetext="{freq_txt(str(first["freq"]), lang)} {t["mhz"]}, {st_plain(first["id"], lang)}">
-<datalist id="tl">{opts}</datalist>
-<i class="needle-line" aria-hidden="true"></i>
+    face = picture("portrait-sq", "Florian Standhartinger", "64px", cls="sstv-face", eager=True)
+    return f"""<figure class="panel inst" data-st="decisions" aria-labelledby="inst-cap">
+<div class="inst-head"><span class="sstv-wrap">{face}<i class="scan" aria-hidden="true"></i></span><span class="ttl"><b>{t["inst_title"]}</b><span>Florian Standhartinger · Passau</span></span><span class="kind">{t["inst_kind"]}</span><span class="kind-m">{t["tap"]} ↓</span><button class="pause" type="button" data-pause aria-pressed="false" aria-label="{t["pause"]}" data-l-pause="{t["pause"]}" data-l-play="{t["play"]}">{ICON["pause"]}</button></div>
+<div class="ruler">{ruler_svg()}<nav aria-label="{t["nav_inst"]}">{"".join(st_links)}</nav><input class="needle-range" type="range" min="0" max="6" step="1" value="6" aria-label="{t["pick"]}" aria-valuetext="{freq_txt(str(first["freq"]), lang)} {t["mhz"]}, {st_plain(first["id"], lang)}"></div>
+<div class="readout"><svg class="rnum num" viewBox="0 0 10 10" aria-hidden="true"></svg><span class="rtxt"><span class="rname">{t["tap"]}</span><span class="rsub"></span></span><a href="#decisions" data-go>{t["readout_go"]}</a></div>
 <div class="plotwrap"><div class="years" aria-hidden="true">{yt}</div>
-<div class="plot">{wf_img}<i class="floor"></i><canvas aria-hidden="true"></canvas><i class="static"></i>{"".join(cols)}{"".join(hits)}</div></div>
-<div class="readout" aria-hidden="true"><svg class="rnum num" viewBox="0 0 10 10"></svg><span class="rtxt"><span class="rname">{t["tap"]}</span><span class="rsub"></span></span><a href="#decisions" tabindex="-1">{t["readout_go"]}</a></div>
+<div class="plot">{wf_img}<i class="floor"></i><canvas aria-hidden="true"></canvas><i class="static"></i><i class="yours" aria-hidden="true"></i><i class="needle-line" aria-hidden="true"></i>{"".join(cols)}{"".join(hits)}{ann}</div></div>
+<div class="plotfoot"><span>{freq_txt("87.5", lang)} · {t["since87"]}</span><a href="#contact">{t["yourproj"]} · {freq_txt("108.0", lang)} →</a></div>
 <script type="application/json" id="st-names">{names}</script>
-<figcaption id="inst-cap" class="sr">{t["inst_title"]}. {re.sub("<[^>]+>", "", t["legend"])}</figcaption>
-</figure>'''
+<figcaption id="inst-cap" class="sr">{t["inst_title"]}. {esc(t["fig_alt"])}</figcaption>
+</figure>"""
 
 def hero(lang):
     t = T[lang]
-    proof = "".join(f'<li><b>{esc(a).replace("★", "★<span class=sr> GitHub stars</span>" if lang=="en" else "★<span class=sr> GitHub-Sterne</span>")}</b> {esc(b)} · <a href="{u}">{esc(u.split("//")[1].split("/")[0])}</a></li>' for a, b, u in t["proof"])
-    face = picture("portrait-sq", "Florian Standhartinger", "52px", cls="face", eager=True)
-    portrait = picture("portrait", "Florian Standhartinger", "(min-width:1080px) 18vw, 1px", eager=True)
-    return f'''<section class="hero wrap" aria-labelledby="h1">
-<div class="hero-l">
-<div class="idline">{face}<div class="who">Florian Standhartinger<span>{t["who_sub"]}</span></div></div>
+    return f"""<section class="hero wrap" aria-labelledby="h1">
+<div class="idline"><div class="who">Florian Standhartinger<span>{t["who_sub"]}</span></div></div>
 <h1 id="h1"><span>{esc(t["h1a"])}</span> <span class="l2">{esc(t["h1b"])}</span></h1>
 <p class="genres">{esc(t["genres"])}</p>
-<div class="ctas"><a class="btn" href="mailto:{EMAIL}">{ICON["mail"]}{t["write"]}</a><a class="btn ghost" href="{t["works"]}">{t["all"]}</a></div>
-<div class="hero-sub"><figure class="portrait">{portrait}<i class="sstv" aria-hidden="true"></i><figcaption>Passau · 2026</figcaption></figure>
-<ul class="proof">{proof}<li>{t["proof_asof"]} <a href="#logbook" data-open-logbook>{t["logbook_link"]}</a></li></ul></div>
-</div>
-<div class="hero-r">{instrument(lang)}<p class="legend">{t["legend"]}</p></div>
-</section>'''
+<div class="ctas"><a class="btn" href="mailto:{EMAIL}" data-mail>{ICON["mail"]}{t["write"]}</a><a class="btn ghost" href="{t["works"]}">{t["all"]}</a></div>
+<div class="hero-r">{instrument(lang)}</div>
+<div class="legendbox"><p class="legend">{t["legend"]}</p><p class="legend">{t["figures"]} <a href="#logbook" data-open-logbook>{t["logbook_link"]}</a></p></div>
+</section>"""
 
 # ---------- station signal panels ----------
 def sig_decisions(lang):
@@ -403,7 +431,8 @@ def sig_worlds(lang):
     alt = {"en": "Room Designer VR: drawing a floor plan with a VR controller on a blueprint grid.", "de": "Room Designer VR: ein Grundriss wird mit dem VR-Controller auf ein Raster gezeichnet."}[lang]
     if v:
         media = (f'<video class="loop" muted loop playsinline preload="none" width="{v["w"]}" height="{v["h"]}" poster="/img/{v["poster"]}" aria-label="{esc(alt)}">'
-                 f'<source src="/img/{v["webm"]}" type="video/webm"><source src="/img/{v["mp4"]}" type="video/mp4"></video>')
+                 f'<source src="/img/{v["webm"]}" type="video/webm"><source src="/img/{v["mp4"]}" type="video/mp4"></video>'
+                 f'<button class="vbtn" type="button" data-vid aria-pressed="false" aria-label="{t["vid_pause"]}" data-l-pause="{t["vid_pause"]}" data-l-play="{t["vid_play"]}">{ICON["pause"]}</button>')
     else:
         media = picture("rdvr", alt, "(min-width:900px) 40vw, 92vw")
     return f'''<div class="panel sig dark"><div class="sig-cap"><span>Room Designer VR · HTC Vive</span><b>Steam · 2017</b></div>
@@ -417,7 +446,7 @@ def card(sid, lang):
     links = " · ".join(f'<a href="{u}">{esc(l)}</a>' for l, u in c["links"])
     return f'''<article class="card"><span class="qsl" aria-hidden="true">{t["qsl"]} {freq_txt(ST[sid]["freq"], lang)}</span>
 <div><div class="yr">{c["year"]}</div><h3>{esc(c["title"][lang])}</h3></div>
-<dl><div><dt>{t["built"]}</dt><dd>{esc(c["built"][lang])}</dd></div><div><dt>{t["proofl"]}</dt><dd>{esc(c["proof"][lang]).replace("★", "★<span class=sr> GitHub stars</span>")}</dd></div></dl>
+<dl><div><dt>{t["built"]}</dt><dd>{esc(c["built"][lang])}</dd></div><div><dt>{t["proofl"]}</dt><dd>{esc(c["proof"][lang]).replace("★", '<span aria-hidden="true">★</span><span class="sr"> GitHub stars</span>')}</dd></div></dl>
 <p class="note">{esc(c["note"][lang])}</p>{f'<p class="go">{links}</p>' if links else ''}</article>'''
 
 def station(sid, lang, idx):
@@ -493,7 +522,7 @@ def page_works(lang):
             if lang == "de":
                 for a, b in DE_META:
                     m = m.replace(a, b)
-            m = esc(m).replace("★", "★<span class=sr> GitHub stars</span>")
+            m = esc(m).replace("★", '<span aria-hidden="true">★</span><span class="sr"> GitHub stars</span>')
             link = f'<a href="{url}">{esc(url.split("//")[1].rstrip("/"))} →</a>' if url else ""
             cards.append(f'<article class="wcard"><span class="meta">{esc(year)} · {m}</span><h3>{esc(title)}</h3><p>{esc(de if lang == "de" else en)}</p>{link}</article>')
         groups.append(f'<section class="works-group" id="{sid}" data-st="{sid}" aria-labelledby="w-{sid}"><h2 id="w-{sid}">{s["de"] if lang == "de" else s["en"]} <small>{freq_txt(s["freq"], lang)} MHz</small></h2><div class="grid-cards">{"".join(cards)}</div></section>')
@@ -523,6 +552,8 @@ def write(path, s):
     p = os.path.join(OUT, path.lstrip("/"))
     os.makedirs(os.path.dirname(p), exist_ok=True)
     open(p, "w").write(s)
+
+CSS = minify_css(open(os.path.join(SRC, "css", "site.css")).read() + gen_css())
 
 def main():
     os.makedirs(OUT, exist_ok=True)

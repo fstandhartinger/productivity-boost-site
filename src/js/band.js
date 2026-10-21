@@ -6,15 +6,15 @@ export const BAND_MAX = 108.0;
 
 // "BOOST" colour map: indigo -> electric blue -> cyan -> phosphor green -> the old productivity-boost green -> warm white.
 const STOPS = [
-  [0.00, [6, 7, 12]],
-  [0.10, [16, 14, 46]],
-  [0.22, [30, 30, 110]],
-  [0.36, [28, 92, 196]],
-  [0.50, [22, 170, 206]],
-  [0.63, [40, 214, 150]],
-  [0.75, [14, 196, 40]],
-  [0.86, [178, 232, 64]],
-  [0.94, [244, 240, 150]],
+  [0.00, [5, 6, 10]],
+  [0.12, [14, 13, 40]],
+  [0.24, [26, 28, 96]],
+  [0.37, [28, 74, 168]],
+  [0.50, [20, 136, 150]],
+  [0.62, [30, 184, 108]],
+  [0.74, [104, 214, 58]],
+  [0.85, [196, 234, 78]],
+  [0.94, [246, 242, 160]],
   [1.00, [255, 252, 236]],
 ];
 
@@ -53,12 +53,10 @@ export function buildRows(band) {
     m--; if (m === 0) { m = 12; y--; }
   }
   const [ya, yb] = band.rows.yearly;
-  const wts = band.rows.weights || [];
-  for (let yy = yb; yy >= ya; yy--) {
-    const wt = (wts.find((q) => yy >= q.from && yy <= q.to) || { w: 1 }).w;
-    rows.push({ key: String(yy), t0: yy, t1: yy + 1, monthly: false, year: yy, w: wt });
-  }
-  rows.forEach((r) => { if (r.w === undefined) r.w = 1; });
+  for (let yy = yb; yy >= ya; yy--) rows.push({ key: String(yy), t0: yy, t1: yy + 1, monthly: false, year: yy });
+  // one declared logarithmic time axis: the closer to today, the more room
+  const T = rows[0].t1, c = band.rows.logC || 0.25;
+  rows.forEach((r) => { r.w = Math.log(T - r.t0 + c) - Math.log(T - r.t1 + c); });
   return rows;
 }
 

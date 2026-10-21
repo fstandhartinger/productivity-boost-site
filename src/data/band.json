@@ -9,23 +9,7 @@
    "2025-01",
    "2026-10"
   ],
-  "weights": [
-   {
-    "from": 1987,
-    "to": 2002,
-    "w": 0.42
-   },
-   {
-    "from": 2003,
-    "to": 2016,
-    "w": 0.62
-   },
-   {
-    "from": 2017,
-    "to": 2024,
-    "w": 1.0
-   }
-  ]
+  "logC": 0.25
  },
  "stations": [
   {
@@ -49,8 +33,8 @@
   {
    "id": "studio",
    "freq": 96.6,
-   "en": "Studio",
-   "de": "Studio"
+   "en": "Video & Voice",
+   "de": "Video & Stimme"
   },
   {
    "id": "networks",

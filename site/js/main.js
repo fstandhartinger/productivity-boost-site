@@ -31,11 +31,17 @@ if (hint && lang === 'en' && /^de\b/i.test(navigator.language || '')) {
 $$('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(b.dataset.copy);
-    const st = $('[data-copy-status]');
+    const st = (b.closest('[popover]') || d).querySelector('[data-copy-status]');
     if (st) st.textContent = b.dataset.copied;
     const sp = $('span', b); const old = sp.textContent; sp.textContent = b.dataset.copied;
     setTimeout(() => { sp.textContent = old; if (st) st.textContent = ''; }, 2000);
   } catch (e) {}
+}));
+
+// ---------- write me: small sheet with address, copy, open mail app ----------
+const mail = $('#mail');
+if (mail && mail.showPopover) $$('[data-mail]').forEach((a) => a.addEventListener('click', (e) => {
+  e.preventDefault(); try { $('#sheet')?.hidePopover(); } catch (x) {} mail.showPopover();
 }));
 
 // ---------- logbook link ----------
@@ -69,6 +75,8 @@ function setCurrent(id, frac) {
   if (id && id !== current) {
     current = id;
     navLinks.forEach((a) => a.setAttribute('aria-current', a.dataset.st === id ? 'true' : 'false'));
+    const cn = $('[data-curname]'); if (cn && NAMES[id]) cn.textContent = NAMES[id].n;
+    const top = $('.top'); if (top) top.dataset.st = id;
     if (bbar) {
       bbar.dataset.st = id;
       const n = NAMES[id];
@@ -108,7 +116,7 @@ if (sections.length) {
       if (ca) { const xa = ca.left + 6 - box.left, xb = cb ? cb.left + 6 - box.left : xa; frac = (xa + (xb - xa) * t) / box.width; }
     }
     setCurrent(sec.dataset.st, frac);
-    if (bbar) bbar.classList.toggle('on', scrollY > innerHeight * 0.9);
+    if (bbar) { const on = scrollY > innerHeight * 0.9; if (on !== bbar.classList.contains('on')) { bbar.classList.toggle('on', on); bbar.inert = !on; } }
   };
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
   addEventListener('resize', update);
@@ -143,9 +151,8 @@ function initInstrument(inst) {
     $$('.ruler .st', inst).forEach((a) => a.setAttribute('aria-current', a.dataset.st === id ? 'true' : 'false'));
     setNum(n.f);
     readout.classList.remove('locked'); void readout.offsetWidth; readout.classList.add('locked');
-    rname.textContent = n.n; rsub.textContent = n.r; go.href = '#' + id; go.tabIndex = 0; readout.removeAttribute('aria-hidden');
-    const pw = plot.parentElement; needle.style.left = `${(pw.offsetLeft + plot.offsetLeft + plot.offsetWidth * pct(FREQ[id]) / 100).toFixed(1)}px`;
-    needle.style.top = `${pw.offsetTop}px`; needle.style.height = `${plot.offsetHeight}px`;
+    rname.textContent = n.n; rsub.textContent = n.r; go.href = '#' + id;
+    needle.style.left = `${pct(FREQ[id]).toFixed(2)}%`;
     needle.classList.add('on');
     const i = ORDER_BAND.indexOf(id);
     range.value = String(i);
@@ -156,10 +163,25 @@ function initInstrument(inst) {
     }
   }
   range.addEventListener('input', () => lock(ORDER_BAND[+range.value], true));
+  function tuneTo(id, e) {
+    const target = d.getElementById(id); if (!target) return;
+    if (!d.startViewTransition || !motion()) return; // plain anchor jump
+    e.preventDefault();
+    lock(id, false);
+    rnum.style.viewTransitionName = 'freq';
+    const vt = d.startViewTransition(() => {
+      rnum.style.viewTransitionName = '';
+      const num = $('.st-num svg', target); if (num) num.style.viewTransitionName = 'freq';
+      target.scrollIntoView({ block: 'start' });
+      history.pushState(null, '', '#' + id);
+    });
+    vt.finished.finally(() => { const num = $('.st-num svg', target); if (num) num.style.viewTransitionName = ''; const h = $('h2', target); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } });
+  }
+  $$('[data-tune]', inst).forEach((a) => a.addEventListener('click', (e) => tuneTo(a.dataset.tune, e)));
+  go.addEventListener('click', (e) => tuneTo(go.getAttribute('href').slice(1), e));
   $$('.ruler .st, .plot .hit', inst).forEach((a) => {
     a.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') lock(a.dataset.tune, true); });
     a.addEventListener('focus', () => lock(a.dataset.tune, false));
-    a.addEventListener('click', () => lock(a.dataset.tune, true));
   });
   // pointer drag across the plot on desktop = tuning preview (no scroll hijack)
   plot.addEventListener('pointermove', (e) => {
@@ -199,15 +221,16 @@ function initInstrument(inst) {
   }
   function done() { revealed = true; plot.classList.add('live'); if (!$('.needle-line.on', inst)) lock('decisions', false); shimmer(); }
   let tShim = 0, lastShim = 0;
+  let shimT = 0;
   function shimmer() {
-    cancelAnimationFrame(raf);
+    cancelAnimationFrame(raf); clearTimeout(shimT);
     const strip = 6;
-    const tick = (now) => {
+    const tick = () => {
       if (!motion() || !visible) return;
-      if (now - lastShim > 85) { lastShim = now; tShim++; paintRows(ctx, sp, layout, 0, strip, 0, tShim); }
-      raf = requestAnimationFrame(tick);
+      tShim++; paintRows(ctx, sp, layout, 0, strip, 0, tShim);
+      shimT = setTimeout(() => requestAnimationFrame(tick), 85);
     };
-    raf = requestAnimationFrame(tick);
+    tick();
   }
   let visible = true;
   const vio = new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible && revealed && motion()) shimmer(); });
@@ -219,7 +242,7 @@ function initInstrument(inst) {
     try { localStorage.setItem('pause', paused ? '1' : '0'); } catch (e) {}
     pauseBtn.setAttribute('aria-pressed', String(paused));
     pauseBtn.setAttribute('aria-label', paused ? pauseBtn.dataset.lPlay : pauseBtn.dataset.lPause);
-    $$('video.loop').forEach((v) => paused ? v.pause() : null);
+    $$('video.loop').forEach((v) => { if (paused) v.pause(); else if (v.closest('.in')) v.play().catch(() => {}); });
     if (!paused && revealed) shimmer();
   });
   if (paused) { pauseBtn?.setAttribute('aria-pressed', 'true'); pauseBtn?.setAttribute('aria-label', pauseBtn.dataset.lPlay); }
@@ -230,15 +253,15 @@ function initInstrument(inst) {
 
   async function boot() {
     try { band = await (await fetch('/js/band.json')).json(); } catch (e) { return; }
+    if (!root.classList.contains('motion')) { revealed = true; lock('decisions', false); return; } // the static image is the final frame
     size();
-    if (!root.classList.contains('motion')) { paintAll(); plot.classList.add('live'); revealed = true; lock('decisions', false); return; }
     // start when the panel is in view (it usually is on load)
     const st = new IntersectionObserver(([e]) => { if (e.isIntersecting) { st.disconnect(); paused ? (paintAll(), done()) : reveal(); } });
     st.observe(plot);
   }
   let rs = 0;
   addEventListener('resize', () => { clearTimeout(rs); rs = setTimeout(() => {
-    if (!band) return;
+    if (!band || !sp) return;
     const r = plot.getBoundingClientRect(), dpr = Math.min(1.5, devicePixelRatio || 1);
     if (Math.round(r.width * dpr) === w && Math.round(r.height * dpr) === h) return; // e.g. the phone URL bar: nothing to redraw
     size(); paintAll(); if (current_lock) lock(current_lock, false);
@@ -246,3 +269,11 @@ function initInstrument(inst) {
   const idle = window.requestIdleCallback || ((f) => setTimeout(f, 200));
   if (d.readyState === 'complete') idle(boot); else addEventListener('load', () => idle(boot), { once: true });
 }
+
+// ---------- VR loop: its own pause control ----------
+$$('[data-vid]').forEach((b) => {
+  const v = b.parentElement.querySelector('video'); if (!v) return;
+  const sync = () => { const p = v.paused; b.setAttribute('aria-pressed', String(p)); b.setAttribute('aria-label', p ? b.dataset.lPlay : b.dataset.lPause); b.innerHTML = p ? '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.5v9l7.5-4.5z" fill="currentColor"/></svg>' : '<svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1" width="3" height="10" fill="currentColor"/><rect x="7" y="1" width="3" height="10" fill="currentColor"/></svg>'; };
+  v.addEventListener('play', sync); v.addEventListener('pause', sync); sync();
+  b.addEventListener('click', () => { if (v.paused) v.play().catch(() => {}); else v.pause(); });
+});
