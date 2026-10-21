@@ -66,6 +66,7 @@ h1,h2,h3{margin:0;font-weight:760}
 .btn.ghost:hover{border-color:var(--ink)}
 .btn svg{width:18px;height:18px}
 .top .write{display:none}
+@media (max-width:1079px){.brand span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
 @media (min-width:1080px){.stations-nav{display:block}.top .write{display:inline-flex;min-height:40px;font-size:.92rem}}
 @media (max-width:1279px){.stations-nav a span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
 

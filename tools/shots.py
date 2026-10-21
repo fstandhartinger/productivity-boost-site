@@ -18,7 +18,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     for name, path, w, h, scheme, full in shots:
         if only and name not in only.split(","): continue
-        ctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=2 if w < 500 else 1, color_scheme=scheme, is_mobile=w < 500, has_touch=w < 500)
+        ctx = b.new_context(viewport={"width": w, "height": h}, device_scale_factor=(1 if full else 2) if w < 500 else 1, color_scheme=scheme, is_mobile=w < 500, has_touch=w < 500)
         pg = ctx.new_page(); errs = []
         pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("console", lambda m: errs.append(m.text) if m.type in ("error", "warning") else None)
         pg.goto(base + path, wait_until="load"); pg.wait_for_timeout(3800)

@@ -134,8 +134,10 @@ function initInstrument(inst) {
     for (const ch of txt) { const code = ch.charCodeAt(0); const adv = (ch === '.' || ch === ',') ? 22 : 60; uses += `<use href="#g${code}" x="${x}" width="${adv}" height="100"/>`; x += adv + ((ch === '.' || ch === ',') ? 4 : 10); }
     rnum.setAttribute('viewBox', `-6 -6 ${x + 2} 112`); rnum.innerHTML = uses;
   }
+  let current_lock = null;
   function lock(id, user) {
     const n = NAMES[id]; if (!n) return;
+    current_lock = id;
     inst.dataset.st = id;
     $$('.col', plot).forEach((c) => c.classList.toggle('on', c.dataset.col === id));
     $$('.ruler .st', inst).forEach((a) => a.setAttribute('aria-current', a.dataset.st === id ? 'true' : 'false'));
@@ -235,7 +237,12 @@ function initInstrument(inst) {
     st.observe(plot);
   }
   let rs = 0;
-  addEventListener('resize', () => { clearTimeout(rs); rs = setTimeout(() => { if (!band) return; const ow = w; size(); if (w !== ow) { paintAll(); } }, 200); });
+  addEventListener('resize', () => { clearTimeout(rs); rs = setTimeout(() => {
+    if (!band) return;
+    const r = plot.getBoundingClientRect(), dpr = Math.min(1.5, devicePixelRatio || 1);
+    if (Math.round(r.width * dpr) === w && Math.round(r.height * dpr) === h) return; // e.g. the phone URL bar: nothing to redraw
+    size(); paintAll(); if (current_lock) lock(current_lock, false);
+  }, 200); });
   const idle = window.requestIdleCallback || ((f) => setTimeout(f, 200));
   if (d.readyState === 'complete') idle(boot); else addEventListener('load', () => idle(boot), { once: true });
 }

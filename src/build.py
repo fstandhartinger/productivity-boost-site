@@ -171,7 +171,6 @@ def head(lang, title, desc, path, alt_path, og="og", extra=""):
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
-<meta name="robots" content="noindex,nofollow">
 <link rel="canonical" href="{url}">
 <link rel="alternate" hreflang="en" href="{BASE_URL + en_path}">
 <link rel="alternate" hreflang="de" href="{BASE_URL + de_path}">
@@ -534,6 +533,16 @@ def main():
     write("/impressum/index.html", page_legal("impressum"))
     write("/datenschutz/index.html", page_legal("datenschutz"))
     write("/404.html", page_404())
+    # sitemap with hreflang pairs (for the real domain)
+    pairs = [("/", "/de/"), ("/works/", "/de/projekte/")]
+    urls = []
+    for en, de in pairs:
+        for loc in (en, de):
+            urls.append(f"<url><loc>{BASE_URL}{loc}</loc><xhtml:link rel=\"alternate\" hreflang=\"en\" href=\"{BASE_URL}{en}\"/><xhtml:link rel=\"alternate\" hreflang=\"de\" href=\"{BASE_URL}{de}\"/><xhtml:link rel=\"alternate\" hreflang=\"x-default\" href=\"{BASE_URL}{en}\"/></url>")
+    for loc in ("/impressum/", "/datenschutz/"):
+        urls.append(f"<url><loc>{BASE_URL}{loc}</loc></url>")
+    write("/sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' + "".join(urls) + "</urlset>\n")
+    write("/robots.txt", f"User-agent: *\nAllow: /\nSitemap: {BASE_URL}/sitemap.xml\n")
     # static files
     for d in ("fonts", "js"):
         shutil.copytree(os.path.join(SRC, d), os.path.join(OUT, d), dirs_exist_ok=True)
