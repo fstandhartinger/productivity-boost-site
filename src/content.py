@@ -60,7 +60,7 @@ T = {
   "nav_top": "Stations", "nav_inst": "Stations on the band", "nav_sheet": "All stations",
   "fig_alt": "Waterfall plot of everything Florian shipped from 1987 to October 2026: games from 1987, enterprise systems from 2003 to today, VR and AR apps from 2017 to 2020, and in 2026 projects on six stations at once: Ralph Wiggum (agents), AI video and voice tools, REAX live since 14 October 2026 (networks), Benchmark Heaven (benchmarks), Decision Models and REAX 1 (decisions).",
   "ann": {"rdvr": "Room Designer VR · Steam 2017", "ralph": "Ralph Wiggum · 306★", "reax": "REAX live · 14 Oct", "bh": "Benchmark Heaven", "dax": "Risk system · DAX insurer", "games": "Games, from age six", "lgbm": "LightGbmDotNet · 2018"},
-  "genres_short": "Decisions · Benchmarks · Networks · Video\u00a0&\u00a0Voice · Agents · Systems · Worlds",
+  "genres_short": "Worlds · Systems · Agents · Video\u00a0&\u00a0Voice · Networks · Benchmarks · Decisions",
   "vid_pause": "Pause video", "vid_play": "Play video",
  },
  "de": {
@@ -116,7 +116,7 @@ T = {
   "nav_top": "Sender", "nav_inst": "Sender auf dem Band", "nav_sheet": "Alle Sender",
   "fig_alt": "Wasserfall-Diagramm von allem, was Florian von 1987 bis Oktober 2026 ausgeliefert hat: Spiele ab 1987, Unternehmenssysteme von 2003 bis heute, VR- und AR-Apps von 2017 bis 2020, und 2026 Projekte auf sechs Sendern gleichzeitig: Ralph Wiggum (Agenten), KI-Video- und Stimm-Werkzeuge, REAX live seit 14. Oktober 2026 (Netze), Benchmark Heaven (Benchmarks), Decision Models und REAX 1 (Entscheidungen).",
   "ann": {"rdvr": "Room Designer VR · Steam 2017", "ralph": "Ralph Wiggum · 306★", "reax": "REAX live · 14. Okt.", "bh": "Benchmark Heaven", "dax": "Risikosystem · DAX-Versicherer", "games": "Spiele, ab sechs", "lgbm": "LightGbmDotNet · 2018"},
-  "genres_short": "Entscheidungen · Benchmarks · Netze · Video\u00a0&\u00a0Stimme · Agenten · Systeme · Welten",
+  "genres_short": "Welten · Systeme · Agenten · Video\u00a0&\u00a0Stimme · Netze · Benchmarks · Entscheidungen",
   "vid_pause": "Video anhalten", "vid_play": "Video abspielen",
  },
 }

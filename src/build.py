@@ -271,7 +271,7 @@ def ruler_svg():
 ANN = [  # in-plot labels: key, station, time, label offset (dx, dy in % of the plot), shown on phones
  ("reax", "networks", 2026 + 9.5 / 12, (-3, 13), True, "end"),
  ("ralph", "agents", 2026 + 0.5 / 12, (3, 6), True, "start"),
- ("rdvr", "worlds", 2017.5, (16, -5), True, "start"),
+ ("rdvr", "worlds", 2017.5, (1.5, -8), True, "start"),
  ("dax", "systems", 2015.0, (3, 3), False, "start"),
  ("bh", "benchmarks", 2026 + 5.5 / 12, (3, 7), False, "start"),
  ("lgbm", "decisions", 2018.5, (-3, 4), False, "end"),
@@ -325,7 +325,7 @@ def instrument(lang):
 def hero(lang):
     t = T[lang]
     face = picture("portrait-sq", "Florian Standhartinger", "56px", cls="face", eager=True)
-    portrait = picture("sstv", "Florian Standhartinger, received as a slow-scan TV picture", "(min-width:1080px) 300px, 1px", eager=True)
+    portrait = picture("sstv", "Florian Standhartinger, received as a slow-scan TV picture", "(min-width:1080px) 320px, 1px", eager=True)
     return f"""<section class="hero" aria-labelledby="h1"><div class="wrap hero-in">
 <div class="hero-txt">
 <div class="idline"><span class="facewrap">{face}</span><div class="who">Florian Standhartinger<span>{t["who_sub"]}</span></div></div>

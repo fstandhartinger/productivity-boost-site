@@ -56,20 +56,22 @@ def sstv_image(src, w, h, seed=36):
             v = int(rnd.random() * 70)
             po[x, y] = (v // 2, v, v // 2 + 10)
     d = ImageDraw.Draw(out)
-    d.rectangle([0, 0, w, int(h * 0.075)], fill=(8, 9, 13))
+    d.rectangle([0, 0, w, int(h * 0.085)], fill=(8, 9, 13))
     try:
-        f = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", max(10, w // 22))
+        f = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", max(11, w // 24))
     except Exception:
         f = None
     d.text((6, 3), "RX ROBOT36 21.10.26 JN68", fill=(214, 246, 96), font=f)
     return out
 
-pt_crop = pt.crop((1200, 100, 2300, 1475))
-for wpx in (240, 320, 480):
-    im = sstv_image(pt_crop, wpx, round(wpx * 1.25))
-    im.save(f"{TMP}/sstv-{wpx}.png"); avif(f"{TMP}/sstv-{wpx}.png", f"{IMG}/sstv-{wpx}.avif", 30)
-    im.save(f"{IMG}/sstv-{wpx}.webp", "WEBP", quality=82, method=6)
-manifest["sstv"] = {"base": "sstv", "widths": [240, 320, 480], "w": 480, "h": 600}
+pt_crop = pt.crop((900, 200, 2352, 1289))  # 4:3 landscape, face right of centre like the original framing
+frame = sstv_image(pt_crop, 320, 240)      # Robot 36 is 320x240
+frame.save(f"{TMP}/sstv-320.png"); avif(f"{TMP}/sstv-320.png", f"{IMG}/sstv-320.avif", 24)
+frame.save(f"{IMG}/sstv-320.webp", "WEBP", quality=90, method=6)
+big = frame.resize((640, 480), Image.NEAREST)  # the receiver's pixels, doubled
+big.save(f"{TMP}/sstv-640.png"); avif(f"{TMP}/sstv-640.png", f"{IMG}/sstv-640.avif", 26)
+big.save(f"{IMG}/sstv-640.webp", "WEBP", quality=88, method=6)
+manifest["sstv"] = {"base": "sstv", "widths": [320, 640], "w": 640, "h": 480}
 
 # --- Rewind Recorder (own product mock-up) ---
 rw = Image.open(os.path.join(MEDIA, "orig", "150daa_b4a13be7a747483b87229adc4be48315~mv2.png"))
