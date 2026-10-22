@@ -253,9 +253,10 @@ def public(lang):
         img = (picture(p["img"], p["alt_" + lang], "(min-width: 62em) 400px, (min-width: 48em) 46vw, 100vw", cls="chart" if p.get("chart") else "") if p.get("img")
                else f'<span class="word" aria-hidden="true">{esc(p.get("word", ""))}</span>')
         badge = f'<span class="vbadge" aria-hidden="true">{esc(t["video"])}</span>' if p.get("video") else ""
+        views = (f'<p class="views" id="pv{k}"><strong>{fmt_views(p["views"], lang)}</strong> {esc(t["views"])}</p>' if p.get("views")
+                 else f'<p class="views" id="pv{k}"><strong class="lbl">{esc(p["label_" + lang])}</strong></p>')
         cards += (f'<li class="post"><a href="{esc(p["url"])}" rel="noopener" target="_blank">'
-                  f'<div class="pimg">{img}{badge}</div>'
-                  (f'<p class="views" id="pv{k}"><strong>{fmt_views(p["views"], lang)}</strong> {esc(t["views"])}</p>' if p.get("views") else f'<p class="views" id="pv{k}"><strong class="lbl">{esc(p["label_" + lang])}</strong></p>')
+                  f'<div class="pimg">{img}{badge}</div>{views}'
                   f'<h3 id="pt{k}">{esc(p["title_" + lang])}</h3><p>{esc(p["what_" + lang])}</p>'
                   f'<p class="meta">{esc(p["date_" + lang])} · {esc(t["open_post"])}<span class="sr"> ({t["new_tab"]})</span><span aria-hidden="true"> ↗</span></p></a></li>')
     posts = f'<ul class="posts" role="list">{cards}</ul>' if cards else ""
