@@ -86,7 +86,7 @@ T = {
   "early_region": "Earlier projects, scrolls sideways", "swipe": "7 projects · swipe →",
   "early": [
     ("bms-area", "BMS & AREA", "Business systems", "Business monitoring and geo-information tools for a DAX-listed insurer: millions of records in real time, including contract structures and natural-catastrophe risk. Lead developer and architect."),
-    ("room-designer-vr-2", "Room Designer VR", "VR · Steam, 2017", "Plan a room while standing inside it: draw the floor plan on the ground, then place furniture, doors and windows. For HTC Vive."),
+    ("room-designer-vr", "Room Designer VR", "VR · Steam, 2017", "Plan a room while standing inside it: draw the floor plan on the ground, then place furniture, doors and windows. For HTC Vive."),
     ("subtitles", "Subtitles", "AR glasses", "Speech recognition and AI translation as live subtitles in smart glasses, for people who are hard of hearing and for conversations across languages."),
     ("rewind-recorder", "Rewind Recorder", "AR glasses · Vuzix", "The camera keeps a short buffer; one tap saves the last ten seconds as a video. For the moments you would otherwise miss."),
     ("non-convex-mesh-collider", "Non Convex Mesh Collider", "Unity Asset Store, 2017", "Collision detection for concave meshes, a gap in Unity’s physics at the time."),
@@ -170,7 +170,7 @@ T = {
   "early_region": "Frühere Projekte, seitlich scrollbar", "swipe": "7 Projekte · wischen →",
   "early": [
     ("bms-area", "BMS & AREA", "Geschäftssysteme", "Business-Monitoring- und Geoinformations-Werkzeuge für einen DAX-notierten Versicherer: Millionen Datensätze in Echtzeit, inklusive Vertragsstrukturen und Naturkatastrophen-Risiko. Leitender Entwickler und Architekt."),
-    ("room-designer-vr-2", "Room Designer VR", "VR · Steam, 2017", "Einen Raum planen, während man in ihm steht: Grundriss auf den Boden zeichnen, dann Möbel, Türen und Fenster platzieren. Für HTC Vive."),
+    ("room-designer-vr", "Room Designer VR", "VR · Steam, 2017", "Einen Raum planen, während man in ihm steht: Grundriss auf den Boden zeichnen, dann Möbel, Türen und Fenster platzieren. Für HTC Vive."),
     ("subtitles", "Subtitles", "AR-Brillen", "Spracherkennung und KI-Übersetzung als Live-Untertitel in der Datenbrille – für schwerhörige Menschen und für Gespräche über Sprachgrenzen hinweg."),
     ("rewind-recorder", "Rewind Recorder", "AR-Brillen · Vuzix", "Die Kamera hält einen kurzen Puffer; ein Tippen speichert die letzten zehn Sekunden als Video. Für Momente, die man sonst verpasst."),
     ("non-convex-mesh-collider", "Non Convex Mesh Collider", "Unity Asset Store, 2017", "Kollisionserkennung für konkave Meshes – damals eine Lücke in Unitys Physik."),
