@@ -115,6 +115,12 @@ def gen_css():
         f".ann.k-{k}{{left:{xpct(BAND_ST[sid]['freq']) + PHONE_ANN[k][0]:.2f}%;top:{ypct(tm) + PHONE_ANN[k][1]:.2f}%;transform:{'translate(-100%,-50%)' if PHONE_ANN[k][2] == 'end' else 'translateY(-50%)'}}}"
         for k, sid, tm, _, mob, _a in ANN if mob) + ".leader.dk{display:none}}")
     css.append("@media (min-width:640px){.leader.mb{display:none}}")
+    # station traces are decorative backgrounds (stretched on purpose to the band's width)
+    for s_ in BAND["stations"]:
+        k = f"trace-{s_['id']}"
+        if k in ASSETS:
+            css.append(f".trace.k-{s_['id']}{{background-image:url(/img/{k}-800.webp);background-image:image-set(url(/img/{k}-800.avif) type(\"image/avif\"),url(/img/{k}-800.webp) type(\"image/webp\"))}}")
+            css.append(f"@media (min-width:640px){{.trace.k-{s_['id']}{{background-image:image-set(url(/img/{k}-1600.avif) type(\"image/avif\"),url(/img/{k}-1600.webp) type(\"image/webp\"))}}}}")
     for s_ in BAND["stations"]:
         css.append(f".inst[data-st={s_['id']}] .lockmark{{left:{xpct(s_['freq']):.3f}%}}")
     return "".join(css)
@@ -506,7 +512,7 @@ def trace(sid, lang):
     if f"trace-{sid}" not in ASSETS:
         return ""
     t = T[lang]
-    return (f'<div class="trace" aria-hidden="true">{picture(f"trace-{sid}", "", "100vw")}'
+    return (f'<div class="trace k-{sid}" aria-hidden="true">'
             f'<span class="t0">1987</span><span class="tm">{t["trace_cap"].format(f=freq_txt(ST[sid]["freq"], lang))}</span><span class="t1">{t["trace_now"]}</span></div>')
 
 def station(sid, lang, idx):

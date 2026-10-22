@@ -447,9 +447,7 @@ footer summary{cursor:pointer;padding:14px 0;font-family:var(--mono);font-size:.
 section.station{scroll-margin-top:-12px}
 @media (max-height:500px) and (orientation:landscape){.hero h1{font-size:min(2.4rem,11vh)}}
 /* each station band carries its own column of the waterfall: time runs 1987 -> now */
-.trace{grid-column:1 / -1;position:relative;height:clamp(30px,3.6vw,52px);margin:8px 0 18px;border-radius:2px;background:#08070b}
-.trace picture,.trace img{display:block;width:100%;height:100%}
-.trace img{object-fit:fill;filter:drop-shadow(0 0 6px rgba(255,184,76,.35))}
+.trace{grid-column:1 / -1;position:relative;height:clamp(30px,3.6vw,52px);margin:8px 0 18px;border-radius:2px;background-color:#08070b;background-size:100% 100%;background-repeat:no-repeat;box-shadow:0 0 12px rgba(255,184,76,.18)}
 .trace span{position:absolute;top:calc(100% + 4px);font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;color:var(--panel-dim)}
 .trace .t0{left:0}.trace .t1{right:0}.trace .tm{left:50%;transform:translateX(-50%);white-space:nowrap}
 @media (max-width:639px){.trace .tm{display:none}}
