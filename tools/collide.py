@@ -1,5 +1,6 @@
-"""CI check: the hero's receiver windows (headline + SSTV picture) must never sit on a signal.
-Renders the static waterfall (reduced motion), hides the windows, and measures bright pixels under each window box."""
+"""CI check (desktop): the received-picture window must never sit on a signal or a label, and no in-plot label may sit on a
+signal or another label. Renders the static waterfall (reduced motion), hides windows + labels, measures bright pixels.
+Phones: tools/place.py check."""
 import sys, os, threading, http.server, socketserver, functools, io
 from playwright.sync_api import sync_playwright
 from PIL import Image
@@ -15,9 +16,9 @@ with sync_playwright() as p:
         for path in ("/", "/de/"):
             ctx = b.new_context(viewport={"width": w, "height": h}, reduced_motion="reduce"); pg = ctx.new_page()
             pg.goto(base + path); pg.wait_for_timeout(800)
-            boxes = pg.evaluate("""()=>[...document.querySelectorAll('.hero-txt,.decoder')].filter(e=>getComputedStyle(e).display!=='none').map(e=>{const r=e.getBoundingClientRect();return [e.className,r.left,r.top,r.right,r.bottom]})""")
+            boxes = pg.evaluate("""()=>[...document.querySelectorAll('.decoder')].filter(e=>getComputedStyle(e).display!=='none').map(e=>{const r=e.getBoundingClientRect();return [e.className,r.left,r.top,r.right,r.bottom]})""")
             labels = pg.evaluate("""()=>[...document.querySelectorAll('.plot .ann')].filter(e=>getComputedStyle(e).display!=='none').map(e=>{const r=e.getBoundingClientRect();return [e.textContent,r.left,r.top,r.right,r.bottom]})""")
-            pg.add_style_tag(content=".hero-txt,.decoder,.plot .ann,.plot .pt,.plot .leader{visibility:hidden!important}")
+            pg.add_style_tag(content=".decoder,.plot .ann,.plot .pt,.plot .leader{visibility:hidden!important}")
             pg.wait_for_timeout(100)
             img = Image.open(io.BytesIO(pg.screenshot())).convert("L")
             for name, l, t, r, bt in boxes:
@@ -27,6 +28,14 @@ with sync_playwright() as p:
                 bad = bright > 0.002 or hit
                 fails += bool(bad)
                 print(f"{'FAIL' if bad else 'ok  '} {w}x{h} {path:4} {name.split()[0]:9} bright={bright:.4f} labels={hit}")
+            for lab, l, t, r, bt in labels:
+                crop = img.crop((int(l), int(t), int(r), int(bt)))
+                px = list(crop.getdata()); br = sum(1 for v in px if v > 110) / max(1, len(px))
+                hit = [o[0] for o in labels if o[0] != lab and not (o[3] < l or o[1] > r or o[4] < t or o[2] > bt)]
+                bad = br > 0.01 or hit
+                fails += bool(bad)
+                if bad: print(f"FAIL {w}x{h} {path:4} label {lab!r} bright={br:.4f} overlaps={hit}")
+            print(f"     {w}x{h} {path:4} {len(labels)} labels checked")
             ctx.close()
     b.close()
 srv.shutdown()

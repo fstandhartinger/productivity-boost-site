@@ -12,7 +12,10 @@ if not base:
     base = f"http://127.0.0.1:{srv.server_address[1]}"
 shots = [("desk-en", "/", 1440, 900, "light", True), ("desk-de", "/de/", 1440, 900, "light", False), ("desk-en-dark", "/", 1440, 900, "dark", False),
          ("mob-en", "/", 390, 844, "light", True), ("mob-de", "/de/", 390, 844, "light", True), ("mob-en-dark", "/", 390, 844, "dark", False),
-         ("works-en", "/works/", 1440, 900, "light", False), ("mob-works-de", "/de/projekte/", 390, 844, "light", False)]
+         ("works-en", "/works/", 1440, 900, "light", False), ("mob-works-de", "/de/projekte/", 390, 844, "light", False),
+         ("desk-de-dark", "/de/", 1440, 900, "dark", False), ("mob-de-dark", "/de/", 390, 844, "dark", False),
+         ("desk-en-s2", "/#benchmarks", 1440, 900, "light", False), ("desk-de-s3", "/de/#agents", 1440, 900, "dark", False),
+         ("mob-en-s2", "/#networks", 390, 844, "light", False), ("mob-de-s3", "/de/#worlds", 390, 844, "dark", False)]
 only = os.environ.get("ONLY")
 with sync_playwright() as p:
     b = p.chromium.launch()
@@ -25,7 +28,7 @@ with sync_playwright() as p:
         for attempt in range(8):
             resp = pg.goto(base + path, wait_until="load")
             html = pg.content()
-            if resp and resp.status == 200 and (not marker or marker in html) and "Bad Gateway" not in html: break
+            if resp and resp.status in (200, 304) and (not marker or marker in html) and "Bad Gateway" not in html: break
             print(name, "stale or error, retry", attempt, resp.status if resp else None); pg.wait_for_timeout(10000)
         else:
             raise SystemExit(f"{name}: page never showed the expected build")

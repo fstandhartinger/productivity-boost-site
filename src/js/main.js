@@ -111,7 +111,11 @@ if (sections.length) {
       const r = sections[i].getBoundingClientRect();
       if (r.top <= mid) best = i;
     }
-    if (best === null) { setCurrent(sections[0].dataset.st, null); best = 0; }
+    if (best === null) { // still in the hero: no section is current yet
+      if (current !== null) { current = null; navLinks.forEach((a) => a.setAttribute('aria-current', 'false')); }
+      if (bbar && bbar.classList.contains('on')) { bbar.classList.remove('on'); bbar.inert = true; }
+      return;
+    }
     const sec = sections[best];
     const r = sec.getBoundingClientRect();
     const next = sections[best + 1];

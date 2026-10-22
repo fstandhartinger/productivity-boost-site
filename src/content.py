@@ -85,7 +85,7 @@ T = {
   "inst_title": "Selbstporträt, 1987–2026", "inst_kind": "Genres → · Zeit ↓ (log) · Helligkeit = GitHub-Sterne / live",
   "sstv_title": "SSTV-Decoder · Robot 36",
   "sstv_cap": "SSTV · empfangen 21. Okt. 2026", "tap2": "Nochmal tippen zum Hinspringen",
-  "sp_name": "Selbstporträt", "sp_flag": "Florian Standhartinger · 1987–2026", "sp_sub": "Sieben Sender, eine Person. Wähl einen Sender zum Einschalten.", "win_title": "Kennung", "brand_sub": "Selbstporträt, 1987–2026 · Passau",
+  "sp_name": "Selbstporträt", "sp_flag": "Florian Standhartinger · 1987–2026", "sp_sub": "Sieben Sender, eine Person. Wähl einen Sender zum Reinhören.", "win_title": "Kennung", "brand_sub": "Selbstporträt, 1987–2026 · Passau",
   "tap": "Sender wählen", "pick": "Sender wählen",
   "pause": "Bewegung anhalten", "play": "Bewegung fortsetzen",
   "legend": "<b>So liest man es:</b> Von links nach rechts die Genres, von oben nach unten die Zeit, das Neueste oben. Jedes Leuchten ist ein Projekt, das ich ausgeliefert habe, jede dünne Linie Jahre der Arbeit in einem Genre; am hellsten leuchten die mit den meisten GitHub-Sternen. Die Zeit läuft logarithmisch: je näher an heute, desto mehr Platz.",

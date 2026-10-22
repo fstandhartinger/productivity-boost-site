@@ -13,6 +13,6 @@ with sync_playwright() as p:
     b = p.chromium.launch(); pg = b.new_page(viewport={'width': w, 'height': h})
     pg.on('console', lambda m: print('console:', m.text))
     pg.on('pageerror', lambda e: print('pageerror:', e))
-    pg.goto(f'http://127.0.0.1:{port}/{page}'); pg.wait_for_timeout(1500)
+    pg.goto(f'http://127.0.0.1:{port}/{page}'); pg.wait_for_timeout(int(os.environ.get("WAIT", "1500")))
     pg.screenshot(path=out, full_page=full); b.close()
 srv.shutdown(); print('saved', out)

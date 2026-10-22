@@ -111,8 +111,10 @@ def gen_css():
     css.append(acss)
     css.append(".plot{--ar:6/5}")
     css.append(f".yours{{left:{xpct(107.4):.2f}%}}")
-    xr = xpct(BAND_ST["agents"]["freq"])
-    css.append(f"@media (max-width:639px){{.ann.k-ralph{{left:{xr + 2.5:.2f}%;transform:translateY(-50%)}}.leader.k-ralph{{display:none}}}}")
+    css.append("@media (max-width:639px){" + "".join(
+        f".ann.k-{k}{{left:{xpct(BAND_ST[sid]['freq']) + PHONE_ANN[k][0]:.2f}%;top:{ypct(tm) + PHONE_ANN[k][1]:.2f}%;transform:{'translate(-100%,-50%)' if PHONE_ANN[k][2] == 'end' else 'translateY(-50%)'}}}"
+        for k, sid, tm, _, mob, _a in ANN if mob) + ".leader.dk{display:none}}")
+    css.append("@media (min-width:640px){.leader.mb{display:none}}")
     for s_ in BAND["stations"]:
         css.append(f".inst[data-st={s_['id']}] .lockmark{{left:{xpct(s_['freq']):.3f}%}}")
     return "".join(css)
@@ -274,16 +276,24 @@ def ruler_svg():
             f'<g fill="currentColor" font-family="ui-monospace,monospace" font-size="9" opacity=".7">{"".join(labels)}</g></svg>')
 
 ANN = [  # in-plot labels: key, station, time, label offset (dx, dy in % of the plot), shown on phones
- ("reax", "networks", 2026 + 9.5 / 12, (-3, 9), True, "end"),
+ ("reax", "networks", 2026 + 9.5 / 12, (-3, 18), True, "end"),
  ("ralph", "agents", 2026 + 0.5 / 12, (-3, 6), True, "end"),
- ("rdvr", "worlds", 2017.5, (1.5, -8), True, "start"),
+ ("rdvr", "worlds", 2017.5, (1.5, -14), True, "start"),
  ("dax", "systems", 2015.0, (-3, 3), False, "end"),
  ("jev", "benchmarks", 2026 + 9.5 / 12, (-2.5, 22), True, "end"),
- ("bh", "benchmarks", 2026 + 6.5 / 12, (3, 14), False, "start"),
+ ("bh", "benchmarks", 2026 + 6.5 / 12, (2.5, 5), False, "start"),
  ("lgbm", "decisions", 2018.5, (-3, -9), False, "end"),
- ("dm", "decisions", 2026 + 9.5 / 12, (7.0, 25), False, "end"),
+ ("dm", "decisions", 2026 + 9.5 / 12, (4.0, 12), False, "end"),
  ("games", "worlds", 1994.0, (3, 0), True, "start"),
 ]
+
+PHONE_ANN = {  # phone placements (dx, dy in % of the plot, anchor), found by tools/place.py search: no label on a signal at 360-412 px, EN + DE
+ "reax": (-2.5, 32, "end"),
+ "jev": (-2.5, 15, "end"),
+ "ralph": (2.5, 14, "start"),
+ "rdvr": (2.5, -17, "start"),
+ "games": (2.5, -1, "start"),
+}
 
 def annotations(lang):
     t = T[lang]
@@ -295,7 +305,10 @@ def annotations(lang):
         cls = "ann" + ("" if mob else " desk") + (" rt" if anchor == "end" else "")
         out.append(f'<i class="pt a{i} k-{k}{"" if mob else " desk"}" aria-hidden="true"></i><span class="{cls} l{i} k-{k}" aria-hidden="true">{lab}</span>')
         css.append(f".pt.a{i}{{left:{x:.2f}%;top:{y:.2f}%}}.ann.l{i}{{left:{lx:.2f}%;top:{ly:.2f}%}}")
-        out.append(f'<svg class="leader k-{k}{"" if mob else " desk"}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="{x:.2f}" y1="{y:.2f}" x2="{lx:.2f}" y2="{ly:.2f}"/></svg>')
+        out.append(f'<svg class="leader dk k-{k}{"" if mob else " desk"}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="{x:.2f}" y1="{y:.2f}" x2="{lx:.2f}" y2="{ly:.2f}"/></svg>')
+        if mob:
+            mx, my = x + PHONE_ANN[k][0], y + PHONE_ANN[k][1]
+            out.append(f'<svg class="leader mb k-{k}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="{x:.2f}" y1="{y:.2f}" x2="{mx:.2f}" y2="{my:.2f}"/></svg>')
     return "".join(out), "".join(css)
 
 def instrument(lang):
@@ -321,26 +334,30 @@ def instrument(lang):
     return f"""<figure class="inst" data-st="none" aria-label="{t["inst_title"]}" aria-describedby="inst-cap">
 <div class="inst-head"><b class="ttl">{t["inst_title"]}</b><span class="kind">{t["inst_kind"]}</span><span class="kind-m">{t["tap"]} ↓</span><button class="pause" type="button" data-pause aria-pressed="false" aria-label="{t["pause"]}" data-l-pause="{t["pause"]}" data-l-play="{t["play"]}">{ICON["pause"]}</button></div>
 <div class="ruler">{ruler_svg()}<nav aria-label="{t["nav_inst"]}">{"".join(st_links)}</nav><input class="needle-range" type="range" min="0" max="6" step="1" value="6" aria-label="{t["pick"]}" aria-valuetext="{freq_txt(str(first["freq"]), lang)} {t["mhz"]}, {st_plain(first["id"], lang)}"></div>
-<div class="readout">{numerals("87.5–108", lang, cls="rnum num", label=False)}<span class="rtxt" aria-live="polite"><span class="rname">{t["sp_name"]}, 1987–2026</span><span class="rsub">{esc(t["sp_sub"])}</span></span><a href="#decisions" data-go data-aria="{t["go_aria"]}" aria-label="{t["go_aria"]}: {esc(st_plain("decisions", lang))}"><span class="gl">{t["readout_go"]}</span><span class="gs" aria-hidden="true">{t["go_short"]}</span></a></div>
+<div class="readout">{numerals("1987–2026", lang, cls="rnum num", label=False)}<span class="rtxt" aria-live="polite"><span class="rname">{t["sp_name"]}<span class="sr">, 1987–2026</span></span><span class="rsub">{esc(t["sp_sub"])}</span></span><a href="#decisions" data-go data-aria="{t["go_aria"]}" aria-label="{t["go_aria"]}: {esc(st_plain("decisions", lang))}"><span class="gl">{t["readout_go"]}</span><span class="gs" aria-hidden="true">{t["go_short"]}</span></a></div>
 <div class="plotwrap"><div class="years" aria-hidden="true">{yt}</div>
-<div class="plot">{wf_img}<i class="floor"></i><canvas aria-hidden="true"></canvas><i class="static"></i><i class="yours" aria-hidden="true"></i>{"".join(hits)}{ann}</div></div>
+<div class="plot">{wf_img}<i class="floor"></i><canvas aria-hidden="true"></canvas><i class="static"></i><i class="yours" aria-hidden="true"></i>{"".join(hits)}{ann}{decoder(lang)}</div></div>
 <div class="plotfoot"><span>{freq_txt("87.5", lang)} · {t["since87"]}</span><span class="mid" aria-hidden="true">{t["inst_kind"]}</span><a href="#contact">{t["yourproj"]} · {freq_txt("108.0", lang)} →</a></div>
 <script type="application/json" id="st-names">{names}</script>
 <figcaption id="inst-cap" class="sr">{esc(t["fig_alt"])}</figcaption>
 </figure>"""
 
+def decoder(lang):
+    t = T[lang]
+    return (f'<div class="decoder"><span class="wtitle" aria-hidden="true"><span>SSTV · Robot 36</span><span>320 × 240 · 36 s</span></span>'
+            f'<div class="sstv" role="img" aria-label="Florian Standhartinger · {t["sstv_title"]}">{picture("sstv", "", "(min-width:1080px) 440px, 1px", eager=True)}</div></div>')
+
 def hero(lang):
     t = T[lang]
     face = picture("sstv-face", "Florian Standhartinger", "40px", cls="face", eager=True)
     return f"""<section class="hero" aria-labelledby="h1"><div class="wrap hero-in">
-<div class="hero-txt"><span class="wtitle" aria-hidden="true">{t["win_title"]} · Passau · {t["who_sub"].split("·")[-1].strip()}</span>
+<div class="hero-txt">
 <div class="idline"><span class="facewrap">{face}</span><div class="who">Florian Standhartinger<span>{t["who_sub"]}</span></div></div>
 <h1 id="h1"><span>{esc(t["h1a"])}</span> <span class="l2">{esc(t["h1b"])}</span></h1>
 <p class="genres">{esc(t["genres"])}</p><p class="genres-short">{esc(t["genres_short"])}</p>
 <div class="ctas"><a class="btn inv" href="mailto:{EMAIL}" data-mail>{ICON["mail"]}{t["write"]}</a><a class="btn ghost" href="{t["works"]}">{t["all"]}</a></div>
 <p class="figline">{t["figures"]} <a href="#logbook" data-open-logbook>{t["logbook_link"]}</a></p>
 </div>
-<div class="decoder"><span class="wtitle" aria-hidden="true">SSTV · Robot 36</span><div class="sstv" role="img" aria-label="Florian Standhartinger · {t["sstv_title"]}">{picture("sstv", "", "(min-width:1080px) 320px, 1px", eager=True)}</div><span class="dlab" aria-hidden="true">{t["sstv_title"]} · RX 21.10.2026</span></div>
 {instrument(lang)}
 <p class="hero-meta">{t["figures"]} <a href="#logbook" data-open-logbook>{t["logbook_link"]}</a></p>
 </div></section>"""
