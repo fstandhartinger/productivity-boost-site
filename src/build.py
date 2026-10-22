@@ -35,9 +35,9 @@ def vq(path):
         _VQ[path] = f"{path}?v={sha(open(p, 'rb').read())}"
     return _VQ[path]
 
-def marks(s):
+def marks(s, lang="en"):
     """escaped text with [n] note markers turned into links to the footer notes."""
-    return re.sub(r"\[(\d)\]", r'<sup class="fn"><a href="#note-\1" aria-label="note \1">\1</a></sup>', esc(s))
+    return re.sub(r"\[(\d)\]", lambda m: f'<sup class="fn"><a href="#note-{m.group(1)}">{m.group(1)}<span class="sr"> ({T[lang]["note"]})</span></a></sup>', esc(s))
 
 def ext(url, label, lang, cls=""):
     c = f' class="{cls}"' if cls else ""
@@ -103,7 +103,7 @@ def header(lang, alt_path, home=True):
     nav = "".join(f'<li><a href="{pre}#{i}">{esc(l)}</a></li>' for i, l in t["nav"])
     alt_lang = "de" if lang == "en" else "en"
     sw = (f'<a class="lang" href="{alt_path}" hreflang="{alt_lang}" lang="{alt_lang}" title="{esc(t["switch_title"])}">'
-          f'<span aria-hidden="true">{t["switch_short"]}</span><span class="sr">{esc(t["switch_label"])}</span></a>') if alt_path else ""
+          f'{t["switch_short"]}<span class="sr"> – {esc(t["switch_label"])}</span></a>') if alt_path else ""
     theme = (f'<button class="theme" type="button" data-labels=\'{json.dumps(t["theme_states"], ensure_ascii=False)}\' aria-label="{esc(t["theme_states"]["system"])}">'
              '<svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="6.5"/><path d="M10 3.5a6.5 6.5 0 0 1 0 13z"/></svg></button>')
     return f"""<a class="skip" href="#main">{esc(t["skip"])}</a>
@@ -149,7 +149,7 @@ def decision(pr, lang, idx):
                  f'<span class="v">{p:.2f}</span></li>')
     def pretty(s):
         return esc(json.dumps(json.loads(s), indent=2, ensure_ascii=False))
-    return f"""<div class="dpanel" id="dp-{pr['id']}" role="tabpanel" aria-labelledby="dt-{pr['id']}" data-i="{idx}">
+    return f"""<div class="dpanel" id="dp-{pr['id']}" data-i="{idx}">
   <p class="dstate"><span class="label">{esc(t['state'])}</span> {esc(pr['state'])}</p>
   <p class="dq"><span class="label">{esc(t['question'])}</span> {esc(pr['q'])} <span class="model">{pr['model']}</span></p>
   <ol class="opts">{rows}</ol>
@@ -170,13 +170,14 @@ def hero(lang):
   <p class="eyebrow"><span>{esc(t["eyebrow"][0])}</span><span class="sep" aria-hidden="true"> · </span><span>{esc(t["eyebrow"][1])}</span></p>
   <h1 id="h1">{esc(t["h1"])}</h1>
   <p class="lede">{esc(t["sub"])}</p>
-  <p class="ctas">{ext("https://decisionmodels.io/login?next=/dashboard", esc(t["cta1"]), lang, "btn")}{ext(QS_URL, esc(t["cta2"]), lang, "tlink")}<a class="tlink down" href="#products">{esc(t["cta3"])}<span aria-hidden="true"> ↓</span></a></p>
+  <p class="ctas">{ext("https://decisionmodels.io/login?next=/dashboard", esc(t["cta1"]), lang, "btn")}{ext(QS_URL, esc(t["cta2"]), lang, "tlink")}</p>
  </div>
  <figure class="decide" aria-label="{esc(t['panel_label'])}">
   <div class="tabs" role="tablist" aria-label="{esc(t['panel_label'])}">{tabs}</div>
   {panels}
   <figcaption>{esc(t["panel_caption"])} {ext(QS_URL, 'decisionmodels.io/docs/quickstart', lang)}</figcaption>
  </figure>
+ <ul class="proof" role="list">{proof}</ul>
  </section>""" + fit(lang)
 
 def facts(items):
@@ -185,9 +186,11 @@ def facts(items):
 def links(items, lang):
     return '<p class="links">' + "".join(ext(u, esc(l), lang) for l, u in items) + "</p>"
 
-def shot(light, dark, mob_light, mob_dark, alt, sizes, href=None, cls="shot"):
-    """theme-aware screenshot: both variants lazy; CSS shows the one matching the theme (hidden lazy images never load)."""
-    tag, attrs = ("a", f' href="{esc(href)}" rel="noopener" target="_blank"') if href else ("div", "")
+def shot(light, dark, mob_light, mob_dark, alt, sizes, href=None, cls="shot", lang="en"):
+    """theme-aware screenshot link: both variants lazy; CSS shows the one matching the theme (hidden lazy images never load).
+    The link is named by its destination; the alt text describes the screenshot."""
+    host = re.sub(r"^https?://", "", href or "").rstrip("/")
+    tag, attrs = ("a", f' href="{esc(href)}" rel="noopener" target="_blank" aria-label="{esc(host)} ({T[lang]["new_tab"]})"') if href else ("div", "")
     if dark is None:
         return f'<{tag} class="{cls}"{attrs}>{picture(light, alt, sizes)}</{tag}>'
     return (f'<{tag} class="{cls}"{attrs}><span class="v-light">{picture(light, alt, sizes)}</span>'
@@ -202,11 +205,11 @@ def products(lang):
   <div class="ch-copy">
    <p class="kicker"><span>{esc(t["dm_kicker"])}</span><span class="host">{esc(t["dm_host"])}</span></p>
    <h3 id="dm-h">{rich(t["dm_h"])}</h3>
-   <p>{marks(t["dm_p"])}</p>
+   <p>{marks(t["dm_p"], lang)}</p>
    {facts(t["dm_facts"])}
    {links(t["dm_links"], lang)}
   </div>
-  {shot("dm-desk-light", "dm-desk-dark", None, None, t["dm_alt"], sizes, DM_URL)}
+  {shot("dm-desk-light", "dm-desk-dark", None, None, t["dm_alt"], sizes, DM_URL, lang=lang)}
  </article>
  <article class="chapter flip wrap" aria-labelledby="reax-h">
   <div class="ch-copy">
@@ -217,8 +220,8 @@ def products(lang):
    {links(t["reax_links"], lang)}
   </div>
   <div class="stack">
-   {shot("reax-desk", None, None, None, t["reax_alt"], sizes, "https://reax.co")}
-   {shot("mine-desk-light", "mine-desk-dark", None, None, t["mine_alt"], "(min-width: 48em) 34vw, 100vw", "https://mine.decisionmodels.io", "shot small")}
+   {shot("reax-desk", None, None, None, t["reax_alt"], sizes, "https://reax.co", lang=lang)}
+   {shot("mine-desk-light", "mine-desk-dark", None, None, t["mine_alt"], "(min-width: 48em) 34vw, 100vw", "https://mine.decisionmodels.io", "shot small", lang)}
   </div>
  </article>
  </section>"""
@@ -227,7 +230,7 @@ def fit(lang):
     t = T[lang]
     items = ""
     for i, (verb, name, txt, url, host) in enumerate(t["fit"]):
-        items += (f'<li class="node"><p class="label"><span class="n" aria-hidden="true">{i + 1}</span> {esc(verb)}</p><h3>{esc(name)}</h3><p>{marks(txt)}</p>'
+        items += (f'<li class="node"><p class="label"><span class="n" aria-hidden="true">{i + 1}</span> {esc(verb)}</p><h3>{esc(name)}</h3><p>{marks(txt, lang)}</p>'
                   f'<p class="host">{ext(url, esc(host), lang)}</p></li>')
     return f"""<section class="fit wrap" aria-labelledby="fit-h">
  <h2 class="label" id="fit-h">{esc(t["fit_h"])}</h2>
@@ -235,11 +238,9 @@ def fit(lang):
 </section>"""
 
 def fmt_views(v, lang):
-    if v >= 1_000_000:
-        s = f"{v / 1_000_000:.1f}".rstrip("0").rstrip(".") + "M"
-    else:
-        s = f"{v // 1000}k"
-    return s.replace(".", ",") if lang == "de" else s
+    if lang == "de":
+        return (f"{v // 100_000 / 10:.1f}".replace(".", ",") + " Mio.") if v >= 1_000_000 else f"{v // 1000}.000"
+    return (f"{v // 100_000 / 10:.1f}".rstrip("0").rstrip(".") + "M") if v >= 1_000_000 else f"{v // 1000}k"
 
 def public(lang):
     t = T[lang]
@@ -248,7 +249,7 @@ def public(lang):
         img = (picture(p["img"], p["alt_" + lang], "(min-width: 62em) 400px, (min-width: 48em) 46vw, 100vw") if p.get("img")
                else f'<span class="word" aria-hidden="true">{esc(p.get("word", ""))}</span>')
         badge = f'<span class="vbadge">{esc(t["video"])}</span>' if p.get("video") else ""
-        cards += (f'<li class="post"><a href="{esc(p["url"])}" rel="noopener" target="_blank" aria-labelledby="pt{k} pv{k}">'
+        cards += (f'<li class="post"><a href="{esc(p["url"])}" rel="noopener" target="_blank">'
                   f'<div class="pimg">{img}{badge}</div>'
                   f'<p class="views" id="pv{k}"><strong>{fmt_views(p["views"], lang)}</strong> {esc(t["views"])}</p>'
                   f'<h3 id="pt{k}">{esc(p["title_" + lang])}</h3><p>{esc(p["what_" + lang])}</p>'
@@ -259,7 +260,7 @@ def public(lang):
     return f"""<section class="public wrap" id="public" aria-labelledby="public-h">
  <p class="kicker"><span>{esc(t["pub_kicker"])}</span>{ext("https://x.com/airesearch12", "@airesearch12", lang, "host")}</p>
  <h2 id="public-h">{esc(t["pub_h"])}</h2>
- <p class="intro">{marks(t["pub_p"])}</p>
+ <p class="intro">{marks(t["pub_p"], lang)}</p>
  {posts}
  <h3 class="label lab-h">{esc(t["lab_h"])}</h3>
  <ul class="lab" role="list">{lab}</ul>
@@ -272,7 +273,8 @@ def earlier(lang):
     for name, title, tag, txt in t["early"]:
         key = "old-" + name
         alt = IMG[key].get("alt_" + lang) or title
-        cards += (f'<li class="ew">{picture(key, alt, "(min-width: 75em) 290px, (min-width: 48em) 30vw, 78vw")}'
+        wide = name == "bms-area"
+        cards += (f'<li class="ew{" wide" if wide else ""}">{picture(key, alt, "(min-width: 75em) 600px, (min-width: 48em) 60vw, 78vw" if wide else "(min-width: 75em) 290px, (min-width: 48em) 30vw, 78vw")}'
                   f'<p class="label">{esc(tag)}</p><h3>{esc(title)}</h3><p>{esc(txt)}</p></li>')
     return f"""<section class="earlier" id="earlier" aria-labelledby="earlier-h">
  <div class="wrap">
@@ -280,7 +282,7 @@ def earlier(lang):
   <h2 id="earlier-h">{esc(t["early_h"])}</h2>
   <p class="intro">{esc(t["early_p"])}</p>
  </div>
- <div class="rail-wrap"><ul class="rail" role="list" data-label="{esc(t['early_region'])}">{cards}</ul></div>
+ <div class="rail-wrap"><ul class="rail" role="list" data-label="{esc(t['early_region'])}">{cards}</ul><p class="swipe label" aria-hidden="true">{esc(t["swipe"])}</p></div>
 </section>"""
 
 def about(lang):
@@ -288,9 +290,9 @@ def about(lang):
     ps = "".join(f"<p>{esc(p)}</p>" for p in t["about_p"])
     els = "".join(f'<li><span class="label">{esc(k)}</span> {ext(u, esc(v), lang)}</li>' for k, v, u in t["elsewhere"])
     return f"""<section class="about wrap" id="about" aria-labelledby="about-h">
+ <p class="kicker a-k"><span>{esc(t["about_kicker"])}</span></p>
  <div class="portrait">{picture("portrait2", t["portrait_alt"], "(min-width: 48em) 320px, 60vw")}</div>
  <div class="about-copy">
-  <p class="kicker"><span>{esc(t["about_kicker"])}</span></p>
   <h2 id="about-h">{esc(t["about_h"])}</h2>
   {ps}
   <ul class="elsewhere" role="list">{els}</ul>

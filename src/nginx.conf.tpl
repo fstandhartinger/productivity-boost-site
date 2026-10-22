@@ -12,6 +12,7 @@ server {
   add_header Referrer-Policy strict-origin-when-cross-origin always;
   add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()" always;
   add_header Cross-Origin-Opener-Policy same-origin always;
+  add_header Strict-Transport-Security "max-age=31536000" always;
   add_header Content-Security-Policy "__CSP__" always;
   # preview host: keep it out of search engines until the real domain goes live
   set $robots "";
@@ -22,6 +23,6 @@ server {
   location = /healthz { access_log off; default_type text/plain; return 200 "ok\n"; }
   location ~* \.(woff2|avif|webp|png|jpg|svg|mp4|webm|css|js)$ { add_header Cache-Control "public, max-age=31536000, immutable"; add_header X-Content-Type-Options nosniff always; add_header X-Robots-Tag $robots always; try_files $uri =404; }
   location ~* \.(json)$ { add_header Cache-Control "public, max-age=3600"; add_header X-Content-Type-Options nosniff always; add_header X-Robots-Tag $robots always; try_files $uri =404; }
-  location / { add_header Cache-Control "public, max-age=300"; add_header X-Content-Type-Options nosniff always; add_header Referrer-Policy strict-origin-when-cross-origin always; add_header Content-Security-Policy "__CSP__" always; add_header X-Robots-Tag $robots always; try_files $uri $uri/ =404; }
+  location / { add_header Cache-Control "public, max-age=300, stale-while-revalidate=86400"; add_header Strict-Transport-Security "max-age=31536000" always; add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()" always; add_header X-Content-Type-Options nosniff always; add_header Referrer-Policy strict-origin-when-cross-origin always; add_header Content-Security-Policy "__CSP__" always; add_header X-Robots-Tag $robots always; try_files $uri $uri/ =404; }
   error_page 404 /404.html;
 }

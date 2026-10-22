@@ -61,6 +61,7 @@
     if (focus) tabs[i].focus();
   }
   if (tabs.length && panels.length === tabs.length) {
+    panels.forEach(function (p, j) { p.setAttribute("role", "tabpanel"); p.setAttribute("aria-labelledby", tabs[j].id); });
     tabs.forEach(function (t, i) {
       t.addEventListener("click", function () { show(i, false); });
       t.addEventListener("keydown", function (e) {
