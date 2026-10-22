@@ -121,6 +121,14 @@ for a, b, _, _ in HOPS:
     im.save(f"{IMG}/hop-{a}-{b}.webp", "WEBP", quality=72, method=6)
     manifest[f"hop-{a}-{b}"] = {"file": f"hop-{a}-{b}.webp", "w": im.width, "h": im.height}
 
+# --- station traces: each station's own column of the band, rotated so time runs 1987 (left) -> Oct 2026 (right) ---
+subprocess.run([sys.executable, "-I", os.path.join(ROOT, "tools", "render.py"), ROOT, json.dumps([(f"{TMP}/wf-tall.png", "mode=full&w=1400&h=1400")])], check=True)
+tall = Image.open(f"{TMP}/wf-tall.png").convert("RGB")
+for st in json.load(open(os.path.join(ROOT, "src", "data", "band.json")))["stations"]:
+    cx = (st["freq"] - 87.5) / (108 - 87.5) * tall.width; half = tall.width * 0.026
+    col = tall.crop((int(cx - half), 0, int(cx + half), tall.height)).rotate(-90, expand=True)  # newest (top) -> right
+    responsive(f"trace-{st['id']}", col.resize((1600, 64), Image.LANCZOS), [800, 1600], crf=36, q=74)
+
 # --- receiver monitors: screenshots of his own live products (Playwright, 1280x800 @1.5x, 22 Oct 2026), top 936 px ---
 for k in ("decisions", "benchmarks", "networks", "agents"):
     src = os.path.join(MEDIA, "rx", f"{k}.png")

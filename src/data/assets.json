@@ -99,6 +99,69 @@
   "w": 520,
   "h": 150
  },
+ "trace-worlds": {
+  "base": "trace-worlds",
+  "widths": [
+   800,
+   1600
+  ],
+  "w": 1600,
+  "h": 64
+ },
+ "trace-systems": {
+  "base": "trace-systems",
+  "widths": [
+   800,
+   1600
+  ],
+  "w": 1600,
+  "h": 64
+ },
+ "trace-agents": {
+  "base": "trace-agents",
+  "widths": [
+   800,
+   1600
+  ],
+  "w": 1600,
+  "h": 64
+ },
+ "trace-studio": {
+  "base": "trace-studio",
+  "widths": [
+   800,
+   1600
+  ],
+  "w": 1600,
+  "h": 64
+ },
+ "trace-networks": {
+  "base": "trace-networks",
+  "widths": [
+   800,
+   1600
+  ],
+  "w": 1600,
+  "h": 64
+ },
+ "trace-benchmarks": {
+  "base": "trace-benchmarks",
+  "widths": [
+   800,
+   1600
+  ],
+  "w": 1600,
+  "h": 64
+ },
+ "trace-decisions": {
+  "base": "trace-decisions",
+  "widths": [
+   800,
+   1600
+  ],
+  "w": 1600,
+  "h": 64
+ },
  "rx-decisions": {
   "base": "rx-decisions",
   "widths": [

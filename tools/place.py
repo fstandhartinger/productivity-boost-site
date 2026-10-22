@@ -11,7 +11,7 @@ class Q(http.server.SimpleHTTPRequestHandler):
 srv = socketserver.TCPServer(('127.0.0.1', 0), functools.partial(Q, directory=os.path.join(ROOT, "site"))); threading.Thread(target=srv.serve_forever, daemon=True).start()
 base = f"http://127.0.0.1:{srv.server_address[1]}"
 DESK = os.environ.get("MODE") == "desk"
-VIEWS = [(1280, 720), (1366, 768), (1440, 900), (1536, 864), (1680, 1050), (1920, 1080)] if DESK else [(360, 640), (390, 844), (412, 915)]
+VIEWS = [(1024, 768), (1280, 720), (1366, 768), (1440, 900), (1536, 864), (1680, 1050), (1920, 1080)] if DESK else [(360, 640), (390, 844), (412, 915)]
 data = []
 with sync_playwright() as p:
     b = p.chromium.launch()

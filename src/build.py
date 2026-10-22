@@ -178,6 +178,7 @@ def head(lang, title, desc, path, alt_path, og="og", extra=""):
                                               f'<link rel="alternate" hreflang="x-default" href="{BASE_URL + _en}">')
     t = T[lang]
     url = BASE_URL + path
+    canon = "" if path.endswith("404.html") else f'<link rel="canonical" href="{url}">'
     en_path, de_path = (path, alt_path) if lang == "en" else (alt_path, path)
     ld = {"@context": "https://schema.org", "@type": "Person", "name": "Florian Standhartinger", "url": BASE_URL + "/",
           "jobTitle": "AI builder", "worksFor": {"@type": "Organization", "name": "productivity-boost.com Betriebs UG (haftungsbeschränkt) & Co. KG"},
@@ -191,7 +192,7 @@ def head(lang, title, desc, path, alt_path, og="og", extra=""):
 <meta name="build" content="{BUILD_ID}">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
-<link rel="canonical" href="{url}">
+{canon}
 {alternates}
 <meta name="theme-color" content="#F2EFE7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0B0C0F" media="(prefers-color-scheme: dark)">
@@ -219,9 +220,9 @@ def topbar(lang, alt_path, active=None, home=True):
     for s_ in sorted(BAND["stations"], key=lambda q: q["freq"]):
         sid = s_["id"]
         href = f'{t["home"]}#{sid}' if not home else f'#{sid}'
-        links.append(f'<li><a href="{href}" data-st="{sid}"><b aria-hidden="true">{freq_txt(str(s_["freq"]), lang)}</b><span class="nm" aria-hidden="true">{esc(st_plain(sid, lang))}</span><span class="sr">{freq_txt(str(s_["freq"]), lang)} {T[lang]["mhz"]}, {esc(st_plain(sid, lang))}</span></a></li>')
+        links.append(f'<li><a href="{href}" data-st="{sid}"><b aria-hidden="true">{freq_txt(str(s_["freq"]), lang)}</b><span class="nm" aria-hidden="true">{esc(st_plain(sid, lang))}</span><span class="sr">{freq_txt(str(s_["freq"]), lang)} {esc(st_plain(sid, lang))} ({T[lang]["mhz"]})</span></a></li>')
     return f"""<a class="skip" href="#main">{t["skip"]}</a>
-<div class="langhint" id="langhint" hidden><div class="wrap"><a href="{alt_path}" lang="de" hreflang="de">{t["hint_link"]} →</a><button type="button" data-close-hint aria-label="{t["hint_close"]}">✕</button></div></div>
+<div class="langhint" id="langhint" hidden><div class="wrap"><a href="{alt_path}" lang="{"de" if lang == "en" else "en"}" hreflang="{"de" if lang == "en" else "en"}">{t["hint_link"]} →</a><button type="button" data-close-hint aria-label="{t["hint_close"]}">✕</button></div></div>
 <header class="top{" on-dark" if home else ""}"><div class="wrap">
 <a class="brand" href="{t["home"]}">{ICON["dial"]}<span>Florian Standhartinger</span><em class="bsub"><span class="sr"> · </span>{t["who_sub"]}</em></a>
 <nav class="stations-nav" aria-label="{t["nav_top"]}"><span class="curname" aria-hidden="true" data-curname></span><ol>{"".join(links)}</ol><div class="needle-track" aria-hidden="true"><i class="needle"></i></div></nav>
@@ -285,7 +286,7 @@ ANN = [  # in-plot labels: key, station, time, label offset (dx, dy in % of the 
  ("jev", "benchmarks", 2026 + 9.5 / 12, (-2.5, 22), True, "end"),
  ("bh", "benchmarks", 2026 + 6.5 / 12, (2.5, 5), False, "start"),
  ("lgbm", "decisions", 2018.5, (-3, -9), False, "end"),
- ("dm", "decisions", 2026 + 9.5 / 12, (4.0, 12), False, "end"),
+ ("dm", "decisions", 2026 + 9.5 / 12, (6.0, 12), False, "end"),
  ("games", "worlds", 1994.0, (3, 0), True, "start"),
 ]
 
@@ -320,7 +321,7 @@ def instrument(lang):
     for s in band_order:
         sid = s["id"]; nm = st_plain(sid, lang)
         short = nm
-        st_links.append(f'<a class="st x-{sid}" href="#{sid}" data-st="{sid}" data-tune="{sid}"><span aria-hidden="true">{freq_txt(str(s["freq"]), lang)}</span><i aria-hidden="true">{esc(short)}</i><span class="sr">{freq_txt(str(s["freq"]), lang)} {T[lang]["mhz"]}, {esc(nm)}</span></a>')
+        st_links.append(f'<a class="st x-{sid}" href="#{sid}" data-st="{sid}" data-tune="{sid}"><span aria-hidden="true">{freq_txt(str(s["freq"]), lang)}</span><i aria-hidden="true">{esc(short)}</i><span class="sr">{freq_txt(str(s["freq"]), lang)} {esc(nm)} ({T[lang]["mhz"]})</span></a>')
         hits.append(f'<a class="hit x-{sid}" href="#{sid}" data-tune="{sid}" tabindex="-1" aria-hidden="true"></a>')
     yt, _ = year_ticks(lang)
     ann, _ = annotations(lang)
@@ -336,7 +337,7 @@ def instrument(lang):
     return f"""<figure class="inst" data-st="none" aria-label="{t["inst_title"]}" aria-describedby="inst-cap">
 <div class="inst-head"><b class="ttl">{t["inst_title"]}</b><span class="kind">{t["inst_kind"]}</span><span class="kind-m">{t["tap"]} ↓</span><button class="pause" type="button" data-pause aria-pressed="false" aria-label="{t["pause"]}" data-l-pause="{t["pause"]}" data-l-play="{t["play"]}">{ICON["pause"]}</button></div>
 <div class="ruler">{ruler_svg()}<nav aria-label="{t["nav_inst"]}">{"".join(st_links)}</nav><input class="needle-range" type="range" min="0" max="6" step="1" value="6" aria-label="{t["pick"]}" aria-valuetext="{freq_txt(str(first["freq"]), lang)} {t["mhz"]}, {st_plain(first["id"], lang)}"></div>
-<div class="readout">{numerals("1987–2026", lang, cls="rnum num", label=False)}<span class="rtxt" aria-live="polite"><span class="rname">{t["sp_name"]}<span class="sr">, 1987–2026</span></span><span class="rsub">{esc(t["sp_sub"])}</span></span><a href="#decisions" data-go data-aria="{t["go_aria"]}" aria-label="{t["go_aria"]}: {esc(st_plain("decisions", lang))}"><span class="gl">{t["readout_go"]}</span><span class="gs" aria-hidden="true">{t["go_short"]}</span></a></div>
+<div class="readout">{numerals("1987–2026", lang, cls="rnum num", label=False)}<span class="rtxt"><span class="rname" aria-live="polite">{t["sp_name"]}<span class="sr">, 1987–2026</span></span><span class="rsub">{esc(t["sp_sub"])}</span></span><a href="#decisions" data-go data-aria="{t["go_aria"]}" aria-label="{t["go_aria"]}: {esc(st_plain("decisions", lang))}"><span class="gl">{t["readout_go"]}</span><span class="gs" aria-hidden="true">{t["go_short"]}</span></a></div>
 <div class="plotwrap"><div class="years" aria-hidden="true">{yt}</div>
 <div class="plot">{wf_img}<i class="floor"></i><canvas aria-hidden="true"></canvas><i class="static"></i><i class="yours" aria-hidden="true"></i>{"".join(hits)}{ann}{decoder(lang)}</div></div>
 <div class="plotfoot"><span>{freq_txt("87.5", lang)} · {t["since87"]}</span><span class="mid" aria-hidden="true">{t["inst_kind"]}</span><a href="#contact">{t["yourproj"]} · {freq_txt("108.0", lang)} →</a></div>
@@ -347,7 +348,7 @@ def instrument(lang):
 def decoder(lang):
     t = T[lang]
     return (f'<div class="decoder"><span class="wtitle" aria-hidden="true"><span>SSTV · Robot 36</span><span>320 × 240 · 36 s</span></span>'
-            f'<div class="sstv" role="img" aria-label="Florian Standhartinger · {t["sstv_title"]}">{picture("sstv", "", "(min-width:1080px) 440px, 1px", eager=True)}</div></div>')
+            f'<div class="sstv" role="img" aria-label="Florian Standhartinger · {t["sstv_title"]}">{picture("sstv", "", "(min-width:64em) 440px, 1px")}</div></div>')
 
 def hero(lang):
     t = T[lang]
@@ -383,8 +384,8 @@ def sig_decisions(lang):
 def sig_benchmarks(lang):
     t = T[lang]
     dots = ASSETS.get("jevdots", {}).get("svg", "")
-    cap = {"en": "Each dot is one AI system on the public JevBench board, placed by its Intelligence score (236 rows, 21 Oct 2026). Names on benchmarkheaven.com.",
-           "de": "Jeder Punkt ist ein KI-System auf der öffentlichen JevBench-Tafel, nach seinem Intelligence-Wert platziert (236 Zeilen, 21. Okt. 2026). Namen auf benchmarkheaven.com."}[lang]
+    cap = {"en": "Each dot is one AI system on the public JevBench board, placed by its Intelligence score (236 rows: 194 open-weights plus 42 API-hosted, 21 Oct 2026). Names on benchmarkheaven.com.",
+           "de": "Jeder Punkt ist ein KI-System auf der öffentlichen JevBench-Tafel, nach seinem Intelligence-Wert platziert (236 Zeilen: 194 offene Modelle plus 42 per API, 21. Okt. 2026). Namen auf benchmarkheaven.com."}[lang]
     k = {"en": [("194", "open-weights systems ranked"), ("1,500", "decisions per system"), ("4", "scores: accuracy, calibration, latency, cost")],
          "de": [("194", "offene Systeme im Ranking"), ("1.500", "Entscheidungen pro System"), ("4", "Werte: Genauigkeit, Kalibrierung, Latenz, Kosten")]}[lang]
     kp = "".join(f'<div><b>{a}</b>{esc(b)}</div>' for a, b in k)
@@ -491,7 +492,7 @@ def rxmon(sid, lang):
         return ""
     host, alt = RXMON[sid]
     return (f'<figure class="rxmon"><figcaption aria-hidden="true"><span>RX · {esc(host)}</span><span>22.10.2026</span></figcaption>'
-            f'{picture(f"rx-{sid}", alt[lang], "(min-width:1080px) 560px, 92vw")}</figure>')
+            f'{picture(f"rx-{sid}", alt[lang], ("(min-width:64em) 600px, 92vw" if sid == "decisions" else "(min-width:64em) 460px, 92vw"))}</figure>')
 
 def card(sid, lang):
     t = T[lang]; c = CARDS[sid]
@@ -501,12 +502,19 @@ def card(sid, lang):
 <dl><div><dt>{t["built"]}</dt><dd>{esc(c["built"][lang])}</dd></div><div><dt>{t["proofl"]}</dt><dd>{esc(c["proof"][lang]).replace("★", '<span aria-hidden="true">★</span><span class="sr"> GitHub stars</span>')}</dd></div></dl>
 <p class="note">{esc(c["note"][lang])}</p>{f'<p class="go">{links}</p>' if links else ''}</article>'''
 
+def trace(sid, lang):
+    if f"trace-{sid}" not in ASSETS:
+        return ""
+    t = T[lang]
+    return (f'<div class="trace" aria-hidden="true">{picture(f"trace-{sid}", "", "100vw")}'
+            f'<span class="t0">1987</span><span class="tm">{t["trace_cap"].format(f=freq_txt(ST[sid]["freq"], lang))}</span><span class="t1">{t["trace_now"]}</span></div>')
+
 def station(sid, lang, idx):
     t = T[lang]; s = ST[sid]
     wide = " wide" if sid == "decisions" else (" flip" if idx % 2 == 0 else "")
     return f'''<section class="station{wide}" id="{sid}" data-st="{sid}" aria-labelledby="h-{sid}">
 <div class="wrap"><header class="st-head"><div class="st-num">{numerals(s["freq"], lang)}<span class="mhz" aria-hidden="true">MHz</span></div>
-<div><h2 class="st-name" id="h-{sid}" lang="{lang}">{s["de"] if lang == "de" else s["en"]}</h2><p class="st-sub">{esc(s["sub"][lang])}</p></div></header>
+<div><h2 class="st-name" id="h-{sid}" lang="{lang}">{s["de"] if lang == "de" else s["en"]}</h2><p class="st-sub">{esc(s["sub"][lang])}</p></div>{trace(sid, lang)}</header>
 <div class="st-body">{SIG[sid](lang)}{card(sid, lang)}</div>
 <a class="more" href="{t["works"]}#{sid}">{t["more"].format(name=esc(st_plain(sid, lang)))}</a></div></section>'''
 
@@ -531,12 +539,12 @@ def how(lang):
 
 def end(lang):
     t = T[lang]
-    return f'''<section class="end" id="contact" aria-labelledby="h-end"><div class="wrap">
+    return f'''<section class="end" id="contact" aria-labelledby="h-end"><i class="carrier" aria-hidden="true"><b>?</b></i><div class="wrap">
 <p class="wrapline">{t["end_wrap"]}</p>
 <div class="bignum">{numerals("108.0", lang)}<span class="mono dim" aria-hidden="true">MHz</span></div>
 <h2 id="h-end">{esc(t["end_h"])}</h2>
 <p class="lead">{esc(t["end_p"])}</p>
-<div class="mailrow"><a class="btn" href="mailto:{EMAIL}">{ICON["mail"]}{t["write"]}</a><span class="addr">{EMAIL}</span>
+<div class="mailrow"><a class="btn big" href="mailto:{EMAIL}">{ICON["mail"]}{t["write"]}</a><span class="addr">{EMAIL}</span>
 <button class="tbtn" type="button" data-copy="{EMAIL}" data-copied="{t["copied"]}">{ICON["copy"]}<span>{t["copy"]}</span></button><span class="sr" role="status" data-copy-status></span></div>
 <div class="links"><a href="{GH_URL}">GitHub · fstandhartinger</a><a href="{X_URL}">X · @airesearch12</a><a href="{HF_URL}">Hugging Face · decisionmodels</a></div>
 <p class="sign">{t["sign"]}<small>{esc(t["sign_note"])}</small></p>

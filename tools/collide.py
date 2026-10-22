@@ -12,7 +12,7 @@ base = f"http://127.0.0.1:{srv.server_address[1]}"
 fails = 0
 with sync_playwright() as p:
     b = p.chromium.launch()
-    for w, h in ((1280, 720), (1366, 768), (1440, 900), (1536, 864), (1680, 1050), (1920, 1080)):
+    for w, h in ((1024, 768), (1280, 720), (1366, 768), (1440, 900), (1536, 864), (1680, 1050), (1920, 1080)):
         for path in ("/", "/de/"):
             ctx = b.new_context(viewport={"width": w, "height": h}, reduced_motion="reduce"); pg = ctx.new_page()
             pg.goto(base + path); pg.wait_for_timeout(800)

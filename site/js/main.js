@@ -20,7 +20,8 @@ $$('[data-theme-toggle]').forEach((b) => b.addEventListener('click', () => {
 
 // ---------- language hint (EN pages, German browsers) ----------
 const hint = $('#langhint');
-if (hint && lang === 'en' && /^de\b/i.test(navigator.language || '')) {
+const nl = navigator.language || '';
+if (hint && ((lang === 'en' && /^de\b/i.test(nl)) || (lang === 'de' && nl && !/^de\b/i.test(nl)))) {
   let off = false;
   try { off = localStorage.getItem('hint') === '0'; } catch (e) {}
   if (!off) { hint.hidden = false; hint.classList.add('on'); }
@@ -108,7 +109,9 @@ if (sections.length) {
       const r = sections[i].getBoundingClientRect();
       if (r.top <= mid) best = i;
     }
-    if (best === null) { // still in the hero: no section is current yet
+    // in the hero (nothing reached yet) or past the last station (manifesto, 108.0, footer): no station is current
+    if (best !== null && best === sections.length - 1 && sections[best].getBoundingClientRect().bottom < mid) best = null;
+    if (best === null) {
       if (current !== null) { current = null; navLinks.forEach((a) => a.setAttribute('aria-current', 'false')); const cn = $('[data-curname]'); if (cn) cn.textContent = ''; }
       if (navNeedle) navNeedle.classList.remove('on');
       if (bbar && bbar.classList.contains('on')) { bbar.classList.remove('on'); bbar.inert = true; }
