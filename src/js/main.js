@@ -14,7 +14,7 @@
   if (btn) {
     var labels = JSON.parse(btn.getAttribute("data-labels"));
     var cur = function () { return root.dataset.theme || "system"; };
-    var paint = function () { btn.setAttribute("aria-label", labels[cur()]); btn.setAttribute("title", labels[cur()]); };
+    var paint = function () { btn.setAttribute("aria-label", labels[cur()]); };
     paint();
     btn.addEventListener("click", function () {
       var next = { system: "light", light: "dark", dark: "system" }[cur()];
@@ -32,6 +32,17 @@
       if (e.key === "Escape" && menu.open) { menu.open = false; menu.querySelector("summary").focus(); }
     });
     document.addEventListener("click", function (e) { if (menu.open && !menu.contains(e.target)) menu.open = false; });
+  }
+
+  // earlier-work rail: a focusable, labelled scroll region only when it actually scrolls (phones)
+  var rail = document.querySelector(".rail");
+  if (rail) {
+    var fitRail = function () {
+      if (rail.scrollWidth > rail.clientWidth + 2) { rail.tabIndex = 0; rail.setAttribute("aria-label", rail.getAttribute("data-label")); }
+      else { rail.removeAttribute("tabindex"); rail.removeAttribute("aria-label"); }
+    };
+    fitRail();
+    window.addEventListener("resize", fitRail);
   }
 
   // decision panel: tabs (WAI-ARIA tabs pattern) + the bars settle once

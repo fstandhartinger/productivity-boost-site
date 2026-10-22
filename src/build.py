@@ -15,7 +15,14 @@ POSTS_F = os.path.join(SRC, "data", "posts.json")
 POSTS = json.load(open(POSTS_F)) if os.path.exists(POSTS_F) else []
 
 def esc(s):
-    return html.escape(s, quote=True)
+    return html.escape(s.replace("\u2011", "-"), quote=True)
+
+def rich(s):
+    """escaped text; words with a non-breaking hyphen (U+2011) never break (the font has no U+2011 glyph)."""
+    out = []
+    for part in re.split(r"(\S*\u2011\S*)", s):
+        out.append(f'<span class="nw">{esc(part)}</span>' if "\u2011" in part else esc(part))
+    return "".join(out)
 
 def sha(b):
     return hashlib.sha256(b).hexdigest()[:10]
@@ -27,6 +34,10 @@ def vq(path):
         p = os.path.join(SRC, path.lstrip("/"))
         _VQ[path] = f"{path}?v={sha(open(p, 'rb').read())}"
     return _VQ[path]
+
+def marks(s):
+    """escaped text with [n] note markers turned into links to the footer notes."""
+    return re.sub(r"\[(\d)\]", r'<sup class="fn"><a href="#note-\1" aria-label="note \1">\1</a></sup>', esc(s))
 
 def ext(url, label, lang, cls=""):
     c = f' class="{cls}"' if cls else ""
@@ -109,7 +120,7 @@ def header(lang, alt_path, home=True):
 
 def footer(lang, alt_path=None):
     t = T[lang]
-    notes = "".join(f"<li>{esc(n.format(asof=ASOF[lang]))}</li>" for n in t["notes"])
+    notes = "".join(f'<li id="note-{i + 1}">{esc(n.format(asof=ASOF[lang]))}</li>' for i, n in enumerate(t["notes"]))
     ln = f' <span class="muted">({t["legal_note"]})</span>' if t["legal_note"] else ""
     return f"""<footer class="foot">
  <div class="wrap">
@@ -133,7 +144,7 @@ def decision(pr, lang, idx):
     t = T[lang]
     rows = ""
     for i, (o, p) in enumerate(pr["opts"]):
-        rows += (f'<li class="opt{" win" if i == 0 else ""}"><span class="o w{stretch(p)}">{esc(o)}</span>'
+        rows += (f'<li class="opt{" win" if i == 0 else ""}"><span class="o">{esc(o)}</span>'
                  f'<span class="track" aria-hidden="true"><span class="fill p{round(p * 100)}"></span></span>'
                  f'<span class="v">{p:.2f}</span></li>')
     def pretty(s):
@@ -156,50 +167,46 @@ def hero(lang):
     proof = "".join(f"<li>{esc(x)}</li>" for x in t["proof"])
     return f"""<section class="hero wrap" aria-labelledby="h1">
  <div class="hero-copy">
-  <p class="eyebrow">{esc(t["eyebrow"])}</p>
+  <p class="eyebrow"><span>{esc(t["eyebrow"][0])}</span><span class="sep" aria-hidden="true"> · </span><span>{esc(t["eyebrow"][1])}</span></p>
   <h1 id="h1">{esc(t["h1"])}</h1>
   <p class="lede">{esc(t["sub"])}</p>
-  <p class="ctas"><a class="btn" href="#products">{esc(t["cta1"])}<span aria-hidden="true"> ↓</span></a>{ext(QS_URL, esc(t["cta2"]), lang, "tlink")}</p>
+  <p class="ctas">{ext("https://decisionmodels.io/login?next=/dashboard", esc(t["cta1"]), lang, "btn")}{ext(QS_URL, esc(t["cta2"]), lang, "tlink")}<a class="tlink down" href="#products">{esc(t["cta3"])}<span aria-hidden="true"> ↓</span></a></p>
  </div>
  <figure class="decide" aria-label="{esc(t['panel_label'])}">
   <div class="tabs" role="tablist" aria-label="{esc(t['panel_label'])}">{tabs}</div>
   {panels}
   <figcaption>{esc(t["panel_caption"])} {ext(QS_URL, 'decisionmodels.io/docs/quickstart', lang)}</figcaption>
  </figure>
- <ul class="proof" role="list">{proof}</ul>
-</section>"""
+ </section>""" + fit(lang)
 
 def facts(items):
-    return '<dl class="facts">' + "".join(f"<div><dt>{esc(k)}</dt><dd>{esc(v)}</dd></div>" for k, v in items) + "</dl>"
+    return '<dl class="facts">' + "".join(f"<div><dt>{esc(k)}</dt><dd>{rich(v)}</dd></div>" for k, v in items) + "</dl>"
 
 def links(items, lang):
     return '<p class="links">' + "".join(ext(u, esc(l), lang) for l, u in items) + "</p>"
 
-def shot(light, dark, mob_light, mob_dark, alt, sizes):
+def shot(light, dark, mob_light, mob_dark, alt, sizes, href=None, cls="shot"):
     """theme-aware screenshot: both variants lazy; CSS shows the one matching the theme (hidden lazy images never load)."""
+    tag, attrs = ("a", f' href="{esc(href)}" rel="noopener" target="_blank"') if href else ("div", "")
     if dark is None:
-        return f'<div class="shot">{picture(light, alt, sizes, mobile=mob_light)}</div>'
-    return (f'<div class="shot"><div class="v-light">{picture(light, alt, sizes, mobile=mob_light)}</div>'
-            f'<div class="v-dark">{picture(dark, alt, sizes, mobile=mob_dark)}</div></div>')
+        return f'<{tag} class="{cls}"{attrs}>{picture(light, alt, sizes)}</{tag}>'
+    return (f'<{tag} class="{cls}"{attrs}><span class="v-light">{picture(light, alt, sizes)}</span>'
+            f'<span class="v-dark">{picture(dark, alt, sizes)}</span></{tag}>')
 
 def products(lang):
     t = T[lang]
     sizes = "(min-width: 75em) 760px, (min-width: 48em) 58vw, 100vw"
-    fit = ""
-    for i, (verb, name, txt, url, host) in enumerate(t["fit"]):
-        fit += (f'<li class="node"><p class="label"><span class="n">{i + 1}</span> {esc(verb)}</p><h4>{esc(name)}</h4><p>{esc(txt)}</p>'
-                f'<p class="host">{ext(url, esc(host), lang)}</p></li>')
     return f"""<section class="products" id="products" aria-labelledby="products-h">
  <h2 class="sr" id="products-h">{esc(t["products_h"])}</h2>
  <article class="chapter wrap" aria-labelledby="dm-h">
   <div class="ch-copy">
    <p class="kicker"><span>{esc(t["dm_kicker"])}</span><span class="host">{esc(t["dm_host"])}</span></p>
-   <h3 id="dm-h">{esc(t["dm_h"])}</h3>
-   <p>{esc(t["dm_p"])}</p>
+   <h3 id="dm-h">{rich(t["dm_h"])}</h3>
+   <p>{marks(t["dm_p"])}</p>
    {facts(t["dm_facts"])}
    {links(t["dm_links"], lang)}
   </div>
-  {shot("dm-desk-light", "dm-desk-dark", "dm-mob-light", "dm-mob-dark", t["dm_alt"], sizes)}
+  {shot("dm-desk-light", "dm-desk-dark", None, None, t["dm_alt"], sizes, DM_URL)}
  </article>
  <article class="chapter flip wrap" aria-labelledby="reax-h">
   <div class="ch-copy">
@@ -210,14 +217,21 @@ def products(lang):
    {links(t["reax_links"], lang)}
   </div>
   <div class="stack">
-   {shot("reax-desk", None, "reax-mob", None, t["reax_alt"], sizes)}
-   {shot("mine-desk-light", "mine-desk-dark", "mine-mob-light", "mine-mob-dark", t["mine_alt"], "(min-width: 48em) 34vw, 100vw").replace('class="shot"', 'class="shot small"', 1)}
+   {shot("reax-desk", None, None, None, t["reax_alt"], sizes, "https://reax.co")}
+   {shot("mine-desk-light", "mine-desk-dark", None, None, t["mine_alt"], "(min-width: 48em) 34vw, 100vw", "https://mine.decisionmodels.io", "shot small")}
   </div>
  </article>
- <div class="fit wrap" aria-labelledby="fit-h">
-  <h3 class="label" id="fit-h">{esc(t["fit_h"])}</h3>
-  <ol class="flow">{fit}</ol>
- </div>
+ </section>"""
+
+def fit(lang):
+    t = T[lang]
+    items = ""
+    for i, (verb, name, txt, url, host) in enumerate(t["fit"]):
+        items += (f'<li class="node"><p class="label"><span class="n" aria-hidden="true">{i + 1}</span> {esc(verb)}</p><h3>{esc(name)}</h3><p>{marks(txt)}</p>'
+                  f'<p class="host">{ext(url, esc(host), lang)}</p></li>')
+    return f"""<section class="fit wrap" aria-labelledby="fit-h">
+ <h2 class="label" id="fit-h">{esc(t["fit_h"])}</h2>
+ <ol class="flow">{items}</ol>
 </section>"""
 
 def fmt_views(v, lang):
@@ -230,13 +244,14 @@ def fmt_views(v, lang):
 def public(lang):
     t = T[lang]
     cards = ""
-    for p in POSTS:
+    for k, p in enumerate(POSTS):
         img = (picture(p["img"], p["alt_" + lang], "(min-width: 62em) 400px, (min-width: 48em) 46vw, 100vw") if p.get("img")
                else f'<span class="word" aria-hidden="true">{esc(p.get("word", ""))}</span>')
-        cards += (f'<li class="post"><a href="{esc(p["url"])}" rel="noopener" target="_blank">'
-                  f'<div class="pimg">{img}</div>'
-                  f'<p class="views"><strong>{fmt_views(p["views"], lang)}</strong> {esc(t["views"])}{"+" if p.get("plus") else ""}</p>'
-                  f'<h3>{esc(p["title_" + lang])}</h3><p>{esc(p["what_" + lang])}</p>'
+        badge = f'<span class="vbadge">{esc(t["video"])}</span>' if p.get("video") else ""
+        cards += (f'<li class="post"><a href="{esc(p["url"])}" rel="noopener" target="_blank" aria-labelledby="pt{k} pv{k}">'
+                  f'<div class="pimg">{img}{badge}</div>'
+                  f'<p class="views" id="pv{k}"><strong>{fmt_views(p["views"], lang)}</strong> {esc(t["views"])}</p>'
+                  f'<h3 id="pt{k}">{esc(p["title_" + lang])}</h3><p>{esc(p["what_" + lang])}</p>'
                   f'<p class="meta">{esc(p["date_" + lang])} · {esc(t["open_post"])}<span class="sr"> ({t["new_tab"]})</span><span aria-hidden="true"> ↗</span></p></a></li>')
     posts = f'<ul class="posts" role="list">{cards}</ul>' if cards else ""
     lab = "".join(f'<li><p class="label">{esc(g)}</p><h4>{ext(u, esc(n), lang)}</h4><p>{esc(d)}</p><p class="meta">{esc(m)}</p></li>'
@@ -244,7 +259,7 @@ def public(lang):
     return f"""<section class="public wrap" id="public" aria-labelledby="public-h">
  <p class="kicker"><span>{esc(t["pub_kicker"])}</span>{ext("https://x.com/airesearch12", "@airesearch12", lang, "host")}</p>
  <h2 id="public-h">{esc(t["pub_h"])}</h2>
- <p class="intro">{esc(t["pub_p"])}</p>
+ <p class="intro">{marks(t["pub_p"])}</p>
  {posts}
  <h3 class="label lab-h">{esc(t["lab_h"])}</h3>
  <ul class="lab" role="list">{lab}</ul>
@@ -257,7 +272,7 @@ def earlier(lang):
     for name, title, tag, txt in t["early"]:
         key = "old-" + name
         alt = IMG[key].get("alt_" + lang) or title
-        cards += (f'<li class="ew{" wide" if name == "bms-area" else ""}">{picture(key, alt, "(min-width: 75em) 380px, (min-width: 48em) 30vw, 78vw")}'
+        cards += (f'<li class="ew">{picture(key, alt, "(min-width: 75em) 290px, (min-width: 48em) 30vw, 78vw")}'
                   f'<p class="label">{esc(tag)}</p><h3>{esc(title)}</h3><p>{esc(txt)}</p></li>')
     return f"""<section class="earlier" id="earlier" aria-labelledby="earlier-h">
  <div class="wrap">
@@ -265,7 +280,7 @@ def earlier(lang):
   <h2 id="earlier-h">{esc(t["early_h"])}</h2>
   <p class="intro">{esc(t["early_p"])}</p>
  </div>
- <div class="rail-wrap"><ul class="rail" role="list" tabindex="0" aria-label="{esc(t['early_region'])}">{cards}</ul></div>
+ <div class="rail-wrap"><ul class="rail" role="list" data-label="{esc(t['early_region'])}">{cards}</ul></div>
 </section>"""
 
 def about(lang):
@@ -284,11 +299,15 @@ def about(lang):
 
 def contact(lang):
     t = T[lang]
+    st = "".join(f'<li><span class="label">{esc(k)}</span>{ext(u, esc(v), lang)}</li>' for k, v, u in t["start"])
     return f"""<section class="contact wrap" id="contact" aria-labelledby="contact-h">
  <p class="kicker"><span>{esc(t["contact_kicker"])}</span></p>
- <h2 id="contact-h">{esc(t["contact_h"])}</h2>
- <p>{esc(t["contact_p"])}</p>
- <p class="mail"><a href="mailto:{EMAIL}">{EMAIL}</a></p>
+ <div class="c-grid">
+  <div><h2 id="contact-h">{esc(t["contact_h"])}</h2>
+  <p class="c-p">{esc(t["contact_p"])}</p>
+  <p class="mail"><a href="mailto:{EMAIL}">{EMAIL}</a></p></div>
+  <div class="start"><h3 class="label">{esc(t["start_h"])}</h3><ul role="list">{st}</ul></div>
+ </div>
 </section>"""
 
 # ---------------- pages ----------------
@@ -336,6 +355,8 @@ def main():
         shutil.copytree(os.path.join(SRC, d), os.path.join(OUT, d))
     os.makedirs(os.path.join(OUT, "css"))
     css = open(os.path.join(SRC, "css", "site.css"), encoding="utf-8").read() + "\n" + gen_css()
+    for f in ("archivo", "plex-mono"):
+        css = css.replace(f"url(/fonts/{f}.woff2)", f"url({vq(f'/fonts/{f}.woff2')})")
     open(os.path.join(OUT, "css", "site.css"), "w").write(minify_css(css))
     # css lives in src/css only as source; hash the built file for cache busting
     _VQ["/css/site.css"] = f"/css/site.css?v={sha(open(os.path.join(OUT, 'css', 'site.css'), 'rb').read())}"
