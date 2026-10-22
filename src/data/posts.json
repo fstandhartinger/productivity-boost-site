@@ -1,0 +1,21 @@
+[
+ {"id": "2110410684873814482", "url": "https://x.com/airesearch12/status/2110410684873814482", "views": 1096879, "img": "x-dm-launch",
+  "alt_en": "Still from the launch video: Florian Standhartinger in front of a dark wall with a green glow.",
+  "alt_de": "Standbild aus dem Launch-Video: Florian Standhartinger vor einer dunklen Wand mit grünem Schimmer.",
+  "title_en": "Launching Decision Models", "title_de": "Start von Decision Models",
+  "what_en": "After four weeks of benchmarking decision models, a place to actually use the best ones — with a launch video.",
+  "what_de": "Nach vier Wochen Benchmarks für Entscheidungsmodelle ein Ort, an dem man die besten wirklich nutzen kann – mit Launch-Video.",
+  "date_en": "14 Oct 2026", "date_de": "14.10.2026"},
+ {"id": "2101311992984199580", "url": "https://x.com/airesearch12/status/2101311992984199580", "views": 213673, "img": "x-jevbench",
+  "alt_en": "Bar chart of the JevBench v1.2 score for decision models, from the post.",
+  "alt_de": "Balkendiagramm des JevBench-v1.2-Scores für Entscheidungsmodelle, aus dem Beitrag.",
+  "title_en": "JevBench results", "title_de": "JevBench-Ergebnisse",
+  "what_en": "The first public results of JevBench, my benchmark for decision models: accuracy, calibration, speed and cost.",
+  "what_de": "Die ersten öffentlichen Ergebnisse von JevBench, meinem Benchmark für Entscheidungsmodelle: Genauigkeit, Kalibrierung, Tempo und Kosten.",
+  "date_en": "19 Sep 2026", "date_de": "19.09.2026"},
+ {"id": "1927412328020004865", "url": "https://x.com/airesearch12/status/1927412328020004865", "views": 113538, "img": null, "word": "fubea",
+  "title_en": "fubea.cloud", "title_de": "fubea.cloud",
+  "what_en": "A free, open-source deep-research agent — my fork of ii-agent, running on Chutes inference — that also codes, builds slides and web apps.",
+  "what_de": "Ein kostenloser Open-Source-Agent für Deep Research – mein Fork von ii-agent auf Chutes-Inferenz –, der auch programmiert, Folien und Web-Apps baut.",
+  "date_en": "27 May 2025", "date_de": "27.05.2025"}
+]

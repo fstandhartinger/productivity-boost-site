@@ -1,0 +1,241 @@
+{
+ "dm-desk-light": {
+  "widths": [
+   640,
+   960,
+   1440,
+   2000
+  ],
+  "w": 2000,
+  "h": 889
+ },
+ "dm-desk-dark": {
+  "widths": [
+   640,
+   960,
+   1440,
+   2000
+  ],
+  "w": 2000,
+  "h": 889
+ },
+ "reax-desk": {
+  "widths": [
+   640,
+   960,
+   1440,
+   2000
+  ],
+  "w": 2000,
+  "h": 1139
+ },
+ "mine-desk-light": {
+  "widths": [
+   640,
+   960,
+   1440,
+   2000
+  ],
+  "w": 2000,
+  "h": 1111
+ },
+ "mine-desk-dark": {
+  "widths": [
+   640,
+   960,
+   1440,
+   2000
+  ],
+  "w": 2000,
+  "h": 1111
+ },
+ "jev-desk-light": {
+  "widths": [
+   640,
+   960,
+   1440,
+   2000
+  ],
+  "w": 2000,
+  "h": 1250
+ },
+ "jev-desk-dark": {
+  "widths": [
+   640,
+   960,
+   1440,
+   2000
+  ],
+  "w": 2000,
+  "h": 1250
+ },
+ "dm-mob-light": {
+  "widths": [
+   390,
+   600,
+   780
+  ],
+  "w": 780,
+  "h": 1248
+ },
+ "dm-mob-dark": {
+  "widths": [
+   390,
+   600,
+   780
+  ],
+  "w": 780,
+  "h": 1248
+ },
+ "reax-mob": {
+  "widths": [
+   390,
+   600,
+   780
+  ],
+  "w": 780,
+  "h": 1248
+ },
+ "mine-mob-light": {
+  "widths": [
+   390,
+   600,
+   780
+  ],
+  "w": 780,
+  "h": 1248
+ },
+ "mine-mob-dark": {
+  "widths": [
+   390,
+   600,
+   780
+  ],
+  "w": 780,
+  "h": 1248
+ },
+ "old-bms-area": {
+  "widths": [
+   480,
+   800,
+   1200
+  ],
+  "w": 1200,
+  "h": 900,
+  "alt_en": "Flat illustration of a dashboard with pie chart, bar chart and line graph above a world map with three location pins, on a teal background",
+  "alt_de": "Flache Illustration eines Dashboards mit Kreis-, Balken- und Liniendiagramm \u00fcber einer Weltkarte mit drei Standortmarkierungen auf t\u00fcrkisem Hintergrund"
+ },
+ "old-room-designer-vr": {
+  "widths": [
+   480
+  ],
+  "w": 480,
+  "h": 360,
+  "alt_en": "Room Designer VR logo above a virtual living room with a sofa, a furniture selection menu and a VR controller menu",
+  "alt_de": "Room-Designer-VR-Logo \u00fcber einem virtuellen Wohnzimmer mit Sofa, M\u00f6belauswahlmen\u00fc und VR-Controller-Men\u00fc"
+ },
+ "old-room-designer-vr-2": {
+  "widths": [
+   480,
+   800
+  ],
+  "w": 800,
+  "h": 600,
+  "alt_en": "VR floor-plan editor on a blue grid with wall segments labelled with lengths in metres and a controller menu at the bottom",
+  "alt_de": "VR-Grundrisseditor auf blauem Raster mit Wandsegmenten, die mit L\u00e4ngenangaben in Metern beschriftet sind, und einem Controller-Men\u00fc am unteren Rand"
+ },
+ "old-subtitles": {
+  "widths": [
+   480
+  ],
+  "w": 480,
+  "h": 360,
+  "alt_en": "Black glasses frame icon with the word \"Subtitles\" inside the lens",
+  "alt_de": "Symbol eines schwarzen Brillengestells mit dem Wort \u201eSubtitles\u201c im Brillenglas"
+ },
+ "old-subtitles-photo": {
+  "widths": [
+   480,
+   800
+  ],
+  "w": 800,
+  "h": 600,
+  "alt_en": "Smiling woman in a yellow sweater wearing glasses, talking to a man; a green speech bubble reading \"How are you?\" is overlaid",
+  "alt_de": "L\u00e4chelnde Frau im gelben Pullover mit Brille im Gespr\u00e4ch mit einem Mann; eine gr\u00fcne Sprechblase mit \u201eHow are you?\u201c ist eingeblendet"
+ },
+ "old-non-convex-mesh-collider": {
+  "widths": [
+   480,
+   800,
+   1200
+  ],
+  "w": 1200,
+  "h": 900,
+  "alt_en": "Unity editor screenshot with a candelabra mesh and its collider, and the Non Convex Mesh Collider component with numbered setup steps",
+  "alt_de": "Screenshot des Unity-Editors mit einem Kerzenleuchter-Mesh samt Collider und der Komponente \u201eNon Convex Mesh Collider\u201c mit nummerierten Einrichtungsschritten"
+ },
+ "old-insight-profiler": {
+  "widths": [
+   480
+  ],
+  "w": 480,
+  "h": 360,
+  "alt_en": "Collage of profiler screenshots showing call trees, a timeline, a pie chart and source code with timings",
+  "alt_de": "Collage von Profiler-Screenshots mit Aufrufb\u00e4umen, Zeitleiste, Kreisdiagramm und Quellcode mit Laufzeiten"
+ },
+ "old-rewind-recorder": {
+  "widths": [
+   480,
+   800
+  ],
+  "w": 800,
+  "h": 600,
+  "alt_en": "Close-up of smart glasses at a football match; the lens shows a red record dot and the text \"Tap to save last 10 seconds as video ...\"",
+  "alt_de": "Nahaufnahme einer Datenbrille bei einem Fu\u00dfballspiel; im Glas sind ein roter Aufnahmepunkt und der Text \u201eTap to save last 10 seconds as video ...\u201c zu sehen"
+ },
+ "old-lightgbm-dotnet": {
+  "widths": [
+   480,
+   800,
+   1200
+  ],
+  "w": 1200,
+  "h": 900,
+  "alt_en": "LightGBM logo above the Microsoft .NET logo on a white background",
+  "alt_de": "LightGBM-Logo \u00fcber dem Microsoft-.NET-Logo auf wei\u00dfem Hintergrund"
+ },
+ "portrait": {
+  "widths": [
+   400,
+   800
+  ],
+  "w": 800,
+  "h": 1000
+ },
+ "x-dm-launch": {
+  "widths": [
+   480,
+   800,
+   1200
+  ],
+  "w": 1200,
+  "h": 675
+ },
+ "portrait2": {
+  "widths": [
+   400,
+   540
+  ],
+  "w": 540,
+  "h": 675
+ },
+ "x-jevbench": {
+  "widths": [
+   480,
+   800,
+   1200
+  ],
+  "w": 1200,
+  "h": 675
+ }
+}

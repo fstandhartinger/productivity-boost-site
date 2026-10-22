@@ -1,9 +1,9 @@
-# productivity-boost.com — Florian Standhartinger
+# productivity-boost.com — Florian Standhartinger's AI lab
 
-"Self-portrait as a radio band": a static EN/DE personal site. Frequency = genre, time = rows; the hero waterfall is drawn
-from `src/data/band.json` (every entry has a source).
+Calm, bilingual (EN at `/`, DE at `/de/`) company site: Decision Models and REAX first, built-in-public posts, earlier work
+with the images from the old florianstandhartinger.com, about, contact, Impressum + Datenschutz (German).
 
-- `src/` — generator (`build.py`), copy (`content.py`), CSS, JS (`band.js` renderer, `main.js` enhancement), data, legal texts.
-- `tools/assets.py <media-dir>` — images, video loop, waterfall images, dot plot (needs ffmpeg + Playwright).
-- `python3 -I src/build.py` — writes `site/` and `nginx.conf` (CSP hashes for the one inline script and style).
+- `src/content.py` — all copy (EN + DE); `src/build.py` — generator (writes `site/` + `nginx.conf` with CSP hashes).
+- `src/data/posts.json` — X posts (views from api.fxtwitter.com, rounded down); `src/data/img.json` — image manifest.
+- `tools/assets_r2.py`, `tools/xposts_r2.py` — AVIF/WebP pipeline; `tools/og_r2.py` — OG images; `tools/shots_r2.py` — screenshot matrix.
 - Served by nginx on 8080 (`/healthz`). Preview: https://productivity-boost.app.mintapis.com (noindex on the preview host).
