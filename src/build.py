@@ -172,6 +172,10 @@ def freq_txt(f, lang):
 
 # ---------- page chrome ----------
 def head(lang, title, desc, path, alt_path, og="og", extra=""):
+    # single-language pages (legal, 404) have no alternate
+    _en, _de = (path, alt_path) if lang == "en" else (alt_path, path)
+    alternates = "" if path == alt_path else (f'<link rel="alternate" hreflang="en" href="{BASE_URL + _en}">\n<link rel="alternate" hreflang="de" href="{BASE_URL + _de}">\n'
+                                              f'<link rel="alternate" hreflang="x-default" href="{BASE_URL + _en}">')
     t = T[lang]
     url = BASE_URL + path
     en_path, de_path = (path, alt_path) if lang == "en" else (alt_path, path)
@@ -188,9 +192,7 @@ def head(lang, title, desc, path, alt_path, og="og", extra=""):
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(desc)}">
 <link rel="canonical" href="{url}">
-<link rel="alternate" hreflang="en" href="{BASE_URL + en_path}">
-<link rel="alternate" hreflang="de" href="{BASE_URL + de_path}">
-<link rel="alternate" hreflang="x-default" href="{BASE_URL + en_path}">
+{alternates}
 <meta name="theme-color" content="#F2EFE7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0B0C0F" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
@@ -221,10 +223,10 @@ def topbar(lang, alt_path, active=None, home=True):
     return f"""<a class="skip" href="#main">{t["skip"]}</a>
 <div class="langhint" id="langhint" hidden><div class="wrap"><a href="{alt_path}" lang="de" hreflang="de">{t["hint_link"]} →</a><button type="button" data-close-hint aria-label="{t["hint_close"]}">✕</button></div></div>
 <header class="top{" on-dark" if home else ""}"><div class="wrap">
-<a class="brand" href="{t["home"]}" aria-label="Florian Standhartinger">{ICON["dial"]}<span aria-hidden="true">Florian Standhartinger</span><em class="bsub" aria-hidden="true">{t["who_sub"]}</em></a>
-<nav class="stations-nav" aria-label="{t["nav_top"]}"><span class="curname" aria-hidden="true" data-curname>{freq_txt("105.8", lang)} · {esc(st_plain("decisions", lang))}</span><ol>{"".join(links)}</ol><div class="needle-track" aria-hidden="true"><i class="needle"></i></div></nav>
+<a class="brand" href="{t["home"]}">{ICON["dial"]}<span>Florian Standhartinger</span><em class="bsub"><span class="sr"> · </span>{t["who_sub"]}</em></a>
+<nav class="stations-nav" aria-label="{t["nav_top"]}"><span class="curname" aria-hidden="true" data-curname></span><ol>{"".join(links)}</ol><div class="needle-track" aria-hidden="true"><i class="needle"></i></div></nav>
 <div class="tools">
-<a class="tbtn" href="{alt_path}" hreflang="{"de" if lang == "en" else "en"}" lang="{"de" if lang == "en" else "en"}"><span aria-hidden="true">{t["other_short"]}</span><span class="sr">{t["other_label"]}</span></a>
+<a class="tbtn" href="{alt_path}" hreflang="{"de" if lang == "en" else "en"}" lang="{"de" if lang == "en" else "en"}"><span>{t["other_short"]}</span><span class="sr"> · {t["other_label"]}</span></a>
 <button class="tbtn" type="button" data-theme-toggle aria-label="{t["theme"]}">{ICON["theme"]}</button>
 <a class="btn write" href="mailto:{EMAIL}" data-mail>{ICON["mail"]}{t["write"]}</a>
 </div></div></header>"""
@@ -473,11 +475,29 @@ def sig_worlds(lang):
 SIG = {"decisions": sig_decisions, "benchmarks": sig_benchmarks, "networks": sig_networks, "studio": sig_studio,
        "agents": sig_agents, "systems": sig_systems, "worlds": sig_worlds}
 
+RXMON = {  # his own live product pages as received screens (captured 22 Oct 2026)
+ "decisions": ("decisionmodels.io", {"en": "Screenshot of decisionmodels.io: “Inference for open-weights decision models”, with a sample request and its answer probabilities.",
+                                     "de": "Screenshot von decisionmodels.io: „Inference for open-weights decision models“, mit Beispielanfrage und Antwort-Wahrscheinlichkeiten."}),
+ "benchmarks": ("benchmarkheaven.com/jev-models", {"en": "Screenshot of the JevBench board on Benchmark Heaven: capability score of open-weights decision models, with cost and latency sliders.",
+                                                  "de": "Screenshot des JevBench-Boards auf Benchmark Heaven: Capability Score offener Entscheidungsmodelle, mit Reglern für Kosten und Latenz."}),
+ "networks": ("reax.co", {"en": "Screenshot of reax.co: “AI by the people, for the people.” REAX, Bittensor subnet 92, with its serve, verify, reward, improve loop.",
+                          "de": "Screenshot von reax.co: „AI by the people, for the people.“ REAX, Bittensor-Subnetz 92, mit dem Kreislauf Serve, Verify, Reward, Improve."}),
+ "agents": ("github.com/fstandhartinger/ralph-wiggum", {"en": "Screenshot of the ralph-wiggum repository on GitHub: 306 stars, 29 forks, MIT licence.",
+                                                       "de": "Screenshot des Repositorys ralph-wiggum auf GitHub: 306 Sterne, 29 Forks, MIT-Lizenz."}),
+}
+
+def rxmon(sid, lang):
+    if sid not in RXMON or f"rx-{sid}" not in ASSETS:
+        return ""
+    host, alt = RXMON[sid]
+    return (f'<figure class="rxmon"><figcaption aria-hidden="true"><span>RX · {esc(host)}</span><span>22.10.2026</span></figcaption>'
+            f'{picture(f"rx-{sid}", alt[lang], "(min-width:1080px) 560px, 92vw")}</figure>')
+
 def card(sid, lang):
     t = T[lang]; c = CARDS[sid]
     links = " · ".join(f'<a href="{u}">{esc(l)}</a>' for l, u in c["links"])
     return f'''<article class="card"><span class="qsl" aria-hidden="true">{t["qsl"]} {freq_txt(ST[sid]["freq"], lang)}</span>
-<div><div class="yr">{c["year"]}</div><h3>{esc(c["title"][lang])}</h3></div>
+<div class="ttl"><div class="yr">{c["year"]}</div><h3>{esc(c["title"][lang])}</h3></div>{rxmon(sid, lang)}
 <dl><div><dt>{t["built"]}</dt><dd>{esc(c["built"][lang])}</dd></div><div><dt>{t["proofl"]}</dt><dd>{esc(c["proof"][lang]).replace("★", '<span aria-hidden="true">★</span><span class="sr"> GitHub stars</span>')}</dd></div></dl>
 <p class="note">{esc(c["note"][lang])}</p>{f'<p class="go">{links}</p>' if links else ''}</article>'''
 
@@ -575,8 +595,8 @@ def page_legal(kind):
 def page_404():
     t = T["en"]
     body = [head("en", "Off the band — Florian Standhartinger", "This page does not exist.", "/404.html", "/404.html"), "<body>", sprite(), topbar("en", "/de/", home=False),
-            f'<main id="main" class="wrap end"><p class="wrapline">404 · no carrier</p><div class="bignum">{numerals("404", "en", label=False)}</div>'
-            f'<h1>Nothing on this frequency.</h1><p class="lead">The page you tuned to doesn’t exist (any more). <a href="/">Back to the band</a> · <a href="/de/" lang="de" hreflang="de">Zurück zum Band</a></p></main>',
+            f'<main id="main" class="end nf"><div class="wrap"><p class="wrapline">404 · no carrier</p><div class="bignum">{numerals("404", "en", label=False)}</div>'
+            f'<h1>Nothing on this frequency.</h1><p class="lead">The page you tuned to doesn’t exist (any more). <a href="/">Back to the band</a> · <a href="/de/" lang="de" hreflang="de">Zurück zum Band</a></p></div></main>',
             footer("en"), "</body></html>"]
     return "\n".join(body)
 

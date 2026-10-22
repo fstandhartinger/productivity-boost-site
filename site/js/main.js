@@ -94,10 +94,7 @@ function setCurrent(id, frac) {
       else if (f) { const a = $(`.sheet a[data-st="${id}"]`); if (a) { f.textContent = $('b', a).textContent; nn.textContent = a.textContent.replace(f.textContent, ''); } }
     }
   }
-  if (navNeedle && frac != null) {
-    const track = navNeedle.parentElement.getBoundingClientRect().width;
-    navNeedle.style.transform = `translateX(${(frac * track).toFixed(1)}px)`;
-  }
+  if (navNeedle && frac != null) { navNeedle.style.transform = `translateX(${frac.toFixed(1)}px)`; navNeedle.classList.add('on'); }
 }
 if (sections.length) {
   // map scroll position to a continuous position along the nav (page order), so the needle glides through hops
@@ -112,7 +109,8 @@ if (sections.length) {
       if (r.top <= mid) best = i;
     }
     if (best === null) { // still in the hero: no section is current yet
-      if (current !== null) { current = null; navLinks.forEach((a) => a.setAttribute('aria-current', 'false')); }
+      if (current !== null) { current = null; navLinks.forEach((a) => a.setAttribute('aria-current', 'false')); const cn = $('[data-curname]'); if (cn) cn.textContent = ''; }
+      if (navNeedle) navNeedle.classList.remove('on');
       if (bbar && bbar.classList.contains('on')) { bbar.classList.remove('on'); bbar.inert = true; }
       return;
     }
@@ -124,15 +122,18 @@ if (sections.length) {
     if (links.length) {
       const a = links.find((l) => l.dataset.st === sec.dataset.st);
       const b = next ? links.find((l) => l.dataset.st === next.dataset.st) : null;
-      const box = links[0].closest('ol').getBoundingClientRect();
-      const ca = a ? a.getBoundingClientRect() : null, cb = b ? b.getBoundingClientRect() : null;
-      if (ca) { const xa = ca.left + 6 - box.left, xb = cb ? cb.left + 6 - box.left : xa; frac = (xa + (xb - xa) * t) / box.width; }
+      // needle x in px inside its track, on the centre of the active station's frequency
+      const box = navNeedle ? navNeedle.parentElement.getBoundingClientRect() : null;
+      const ca = a ? $('b', a).getBoundingClientRect() : null, cb = b ? $('b', b).getBoundingClientRect() : null;
+      if (ca && box && box.width) { const xa = ca.left + ca.width / 2 - box.left, xb = cb ? cb.left + cb.width / 2 - box.left : xa; frac = xa + (xb - xa) * t; }
     }
     setCurrent(sec.dataset.st, frac);
     if (bbar) { const on = scrollY > innerHeight * 0.9; if (on !== bbar.classList.contains('on')) { bbar.classList.toggle('on', on); bbar.inert = !on; } }
   };
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
   addEventListener('resize', update);
+  // the header reflows when it leaves the dark hero (brand subline); re-place the needle then
+  if (links.length && 'ResizeObserver' in window) new ResizeObserver(() => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }).observe(links[0].closest('ol'));
   update();
 }
 // close the sheet after choosing a station
@@ -260,11 +261,10 @@ function initInstrument(inst) {
     paused = !paused;
     try { localStorage.setItem('pause', paused ? '1' : '0'); } catch (e) {}
     pauseBtn.setAttribute('aria-pressed', String(paused));
-    pauseBtn.setAttribute('aria-label', paused ? pauseBtn.dataset.lPlay : pauseBtn.dataset.lPause);
     $$('video.loop').forEach((v) => { if (paused) v.pause(); else if (v.closest('.in')) v.play().catch(() => {}); });
     if (!paused && revealed) shimmer();
   });
-  if (paused) { pauseBtn?.setAttribute('aria-pressed', 'true'); pauseBtn?.setAttribute('aria-label', pauseBtn.dataset.lPlay); }
+  if (paused) { pauseBtn?.setAttribute('aria-pressed', 'true'); }
   // skip the reveal on any key/tap
   const skip = () => { if (!revealed && sp) { cancelAnimationFrame(raf); paintAll(); done(); } };
   addEventListener('keydown', skip, { once: true });
@@ -292,7 +292,7 @@ function initInstrument(inst) {
 // ---------- VR loop: its own pause control ----------
 $$('[data-vid]').forEach((b) => {
   const v = b.parentElement.querySelector('video'); if (!v) return;
-  const sync = () => { const p = v.paused; b.setAttribute('aria-pressed', String(p)); b.setAttribute('aria-label', p ? b.dataset.lPlay : b.dataset.lPause); b.innerHTML = p ? '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.5v9l7.5-4.5z" fill="currentColor"/></svg>' : '<svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1" width="3" height="10" fill="currentColor"/><rect x="7" y="1" width="3" height="10" fill="currentColor"/></svg>'; };
+  const sync = () => { const p = v.paused; b.setAttribute('aria-pressed', String(p)); b.innerHTML = p ? '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.5v9l7.5-4.5z" fill="currentColor"/></svg>' : '<svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1" width="3" height="10" fill="currentColor"/><rect x="7" y="1" width="3" height="10" fill="currentColor"/></svg>'; };
   v.addEventListener('play', sync); v.addEventListener('pause', sync); sync();
   b.addEventListener('click', () => { if (v.paused) v.play().catch(() => {}); else v.pause(); });
 });

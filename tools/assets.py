@@ -86,13 +86,14 @@ responsive("rdvr", ss2, [480, 800, 1200], crf=34)
 tr = os.path.join(steam, "trailer_720p.mp4")
 if os.path.exists(tr):
     # two shots from Florian's own trailer: draw the floor plan (26 s), then stand in the furnished room (155 s)
-    fc = ("[0:v]trim=start=26:end=29.5,setpts=PTS-STARTPTS,scale=640:-2,fps=24[a];"
-          "[0:v]trim=start=155:end=158.5,setpts=PTS-STARTPTS,scale=640:-2,fps=24[b];[a][b]concat=n=2:v=1:a=0[v]")
+    crop = "crop=iw:ih*0.76:0:ih*0.12,scale=640:-2"
+    fc = (f"[0:v]trim=start=155:end=158.5,setpts=PTS-STARTPTS,{crop},fps=24[a];"
+          f"[0:v]trim=start=27.6:end=31.1,setpts=PTS-STARTPTS,{crop},fps=24[b];[a][b]concat=n=2:v=1:a=0[v]")
     subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", tr, "-filter_complex", fc, "-map", "[v]", "-an",
                     "-c:v", "libx264", "-profile:v", "main", "-crf", "30", "-preset", "slow", "-movflags", "+faststart", "-pix_fmt", "yuv420p", f"{IMG}/rdvr-loop.mp4"], check=True)
     subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", tr, "-filter_complex", fc, "-map", "[v]", "-an",
                     "-c:v", "libvpx-vp9", "-crf", "40", "-b:v", "0", "-row-mt", "1", f"{IMG}/rdvr-loop.webm"], check=True)
-    subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", "156", "-i", tr, "-frames:v", "1", "-vf", "scale=640:-2", f"{TMP}/poster.png"], check=True)
+    subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", "155.2", "-i", tr, "-frames:v", "1", "-vf", crop, f"{TMP}/poster.png"], check=True)
     pim = Image.open(f"{TMP}/poster.png"); pim.convert("RGB").save(f"{IMG}/rdvr-poster.webp", "WEBP", quality=72, method=6)
     manifest["rdvr_loop"] = {"mp4": "rdvr-loop.mp4", "webm": "rdvr-loop.webm", "poster": "rdvr-poster.webp", "w": pim.width, "h": pim.height}
 
@@ -120,6 +121,12 @@ for a, b, _, _ in HOPS:
     im.save(f"{IMG}/hop-{a}-{b}.webp", "WEBP", quality=72, method=6)
     manifest[f"hop-{a}-{b}"] = {"file": f"hop-{a}-{b}.webp", "w": im.width, "h": im.height}
 
+# --- receiver monitors: screenshots of his own live products (Playwright, 1280x800 @1.5x, 22 Oct 2026), top 936 px ---
+for k in ("decisions", "benchmarks", "networks", "agents"):
+    src = os.path.join(MEDIA, "rx", f"{k}.png")
+    if os.path.exists(src):
+        responsive(f"rx-{k}", Image.open(src).convert("RGB").crop((0, 0, 1920, 936)), [480, 800, 1200], crf=32, q=80)
+
 # --- JevBench dot plot (public board, 21 Oct 2026), inline SVG ---
 rows = json.load(open(os.path.join(ROOT, "src", "data", "jevbench_intel.json")))
 import re as _re
@@ -135,7 +142,8 @@ for v, below in pairs:
     y = 112 - k * 4.6
     dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="1.9"' + (' fill="none" stroke="currentColor" stroke-width=".7" opacity=".6"/>' if below else '/>'))
 axis = "".join(f'<text x="{14 + t / 100 * 272:.1f}" y="128" text-anchor="middle">{t}</text>' for t in (0, 25, 50, 75, 100))
-svg = (f'<svg class="dots" viewBox="0 0 300 134" aria-hidden="true"><line x1="14" y1="116" x2="286" y2="116" stroke="#8E97A8" stroke-width=".6"/>'
+top = int(112 - max(bins.values()) * 4.6 - 10)  # crop the empty sky above the tallest stack
+svg = (f'<svg class="dots" viewBox="0 {top} 300 {134 - top}" aria-hidden="true"><line x1="14" y1="116" x2="286" y2="116" stroke="#8E97A8" stroke-width=".6"/>'
        f'<g fill="currentColor" fill-opacity=".9">{"".join(dots)}</g><g font-family="ui-monospace,monospace" font-size="7" fill="#8E97A8">{axis}</g></svg>')
 manifest["jevdots"] = {"svg": svg, "n": len(vals), "max": max(vals), "min": min(vals)}
 print("jevbench n", len(vals), "range", min(vals), max(vals), "tallest bin", max(bins.values()))
@@ -148,7 +156,7 @@ class Q(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a): pass
 srv = socketserver.TCPServer(("127.0.0.1", 0), functools.partial(Q, directory=ROOT)); threading.Thread(target=srv.serve_forever, daemon=True).start()
 og = {"en": ("Florian Standhartinger · Passau · coding since 1987", "I build AI.", "I just can’t stay on one station.", "Self-portrait, 1987–2026"),
-      "de": ("Florian Standhartinger · Passau · programmiert seit 1987", "Ich baue KI.", "Nur bleibe ich auf keinem Sender lange.", "Selbstporträt, 1987–2026")}
+      "de": ("Florian Standhartinger · Passau · programmiert seit 1987", "Ich baue KI.", "Und wechsle ständig den Sender.", "Selbstporträt, 1987–2026")}
 with sync_playwright() as p:
     b = p.chromium.launch(); pg = b.new_page(viewport={"width": 1200, "height": 630})
     for lg, (k, a, bb, t) in og.items():
