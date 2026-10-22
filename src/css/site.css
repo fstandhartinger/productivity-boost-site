@@ -78,8 +78,8 @@ h1,h2,h3{margin:0;font-weight:760}
 .btn.ghost:hover{border-color:var(--ink)}
 .btn svg{width:18px;height:18px}
 .top .write{display:none}
-@media (max-width:1079px){.brand span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
-@media (min-width:1080px){.stations-nav{display:flex}.top .write{display:inline-flex;min-height:40px;font-size:.92rem}}
+@media (max-width:67.49em){.brand span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
+@media (min-width:67.5em){.stations-nav{display:flex}.top .write{display:inline-flex;min-height:40px;font-size:.92rem}}
 
 
 /* hero = the instrument: always dark, full bleed */
@@ -181,7 +181,7 @@ html:not(.js) .needle-range,html:not(.js) [data-theme-toggle],html:not(.js) .pau
 .plotfoot .mid{display:none;color:var(--panel-dim);text-align:center}
 .plotfoot .mid b{color:var(--panel-ink);font-weight:400}
 @media (min-width:640px){.ruler .st i{display:inline}}
-@media (max-width:1079px){html{scroll-padding-bottom:84px}}
+@media (max-width:67.49em){html{scroll-padding-bottom:84px}}
 @media (max-width:639px){
   .idline{margin-bottom:8px}.facewrap{width:40px;height:40px}.idline .who span{font-size:.66rem}.hero .genres{display:none}.genres-short{display:block}.ctas{margin-top:14px}.hero-in{gap:14px}
   .readout .rname em{display:none}
@@ -200,7 +200,7 @@ html:not(.js) .needle-range,html:not(.js) [data-theme-toggle],html:not(.js) .pau
 }
 @media (max-width:639px) and (max-height:720px){.genres-short{display:none}.hero h1{font-size:min(2.3rem,10.5cqi)}.idline .facewrap{display:none}.ctas{margin-top:10px}.ctas .btn{min-height:44px}}
 @media (max-width:379px){.ruler{height:62px}.ruler .st:nth-of-type(even){padding-top:16px}}
-@media (min-width:1080px){
+@media (min-width:67.5em){
   .hero{height:calc(100svh - var(--nav));min-height:680px;display:flex;flex-direction:column;padding:14px 0 12px}
   .hero-in{flex:1;min-height:0;width:100%;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
   .hero-in>*{grid-area:1 / 1}
@@ -343,7 +343,7 @@ footer summary{cursor:pointer;padding:14px 0;font-family:var(--mono);font-size:.
 .bbar .cur b{font-family:var(--mono);font-weight:400;font-size:.78rem;color:var(--acc-d)}
 .bbar .cur span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .bbar .btn{min-height:48px;padding:0 16px;font-size:.95rem}
-@media (min-width:1080px){.bbar{display:none}}
+@media (min-width:67.5em){.bbar{display:none}}
 .sheet{border:0;padding:0;margin:auto auto 0;position:fixed;width:100%;max-width:560px;max-height:85vh;border-radius:14px 14px 0 0;background:var(--paper);color:var(--ink);box-shadow:0 -10px 40px rgba(0,0,0,.35)}
 .sheet::backdrop{background:rgba(0,0,0,.45)}
 .sheet .in{padding:8px 16px calc(16px + env(safe-area-inset-bottom))}
@@ -397,7 +397,7 @@ footer summary{cursor:pointer;padding:14px 0;font-family:var(--mono);font-size:.
   .hop .viz{display:block}
   footer .wrap{grid-template-columns:1.4fr 1fr;align-items:start}
 }
-@media (min-width:1080px){
+@media (min-width:67.5em){
   .station.wide .st-body{grid-template-columns:1fr}
   .station.wide .sig{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:start;padding:24px}
   .station.wide .st-body .card{display:grid;grid-template-columns:1fr 1fr;column-gap:32px}
@@ -416,7 +416,7 @@ footer summary{cursor:pointer;padding:14px 0;font-family:var(--mono);font-size:.
 ::view-transition-group(freq){animation-duration:.5s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
 
 
-@media (min-width:1080px) and (max-height:760px){.decoder{display:none}.idline .facewrap{display:block;width:44px;height:44px}}
+@media (min-width:67.5em) and (max-height:760px){.decoder{display:none}.idline .facewrap{display:block;width:44px;height:44px}}
 
 @media (max-width:380px){.readout .rname{font-size:.82rem;letter-spacing:.02em}.readout .rnum{width:50px;height:18px}.readout a{padding:0 10px;min-width:48px}}
 
@@ -424,4 +424,8 @@ footer summary{cursor:pointer;padding:14px 0;font-family:var(--mono);font-size:.
 @container inst (max-width:560px){.ruler{height:40px}.ruler .st i{display:none}.readout .rname em{display:none}}
 
 .wtitle{display:none}
-@media (min-width:1080px){.wtitle{display:block}.readout:not(.locked) a{visibility:hidden}.inst .readout a{padding:10px 16px;border:1px solid var(--panel-hair);border-radius:999px;text-decoration:none}}
+@media (min-width:67.5em){.wtitle{display:block}.inst .readout a{padding:10px 16px;border:1px solid var(--panel-hair);border-radius:999px;text-decoration:none}}
+
+.readout:not(.tuned) a{visibility:hidden}
+.readout:not(.tuned) .rnum{display:none}
+@media (max-width:639px){.inst-head .kind-m{display:none}}

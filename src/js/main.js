@@ -76,7 +76,7 @@ $$('.sig, .hop').forEach((el) => io.observe(el));
 
 // ---------- current station: nav needle + bottom bar ----------
 const navNeedle = $('.stations-nav .needle');
-const navLinks = $$('.stations-nav a, .ruler .st, .sheet a');
+const navLinks = $$('.stations-nav a, .sheet a'); // the ruler's own lock reflects tuning only
 const bbar = $('#bbar');
 const sections = $$('section.station, section.works-group');
 let current = null;
@@ -155,7 +155,7 @@ function initInstrument(inst) {
     const n = NAMES[id]; if (!n) return;
     current_lock = id;
     inst.dataset.st = id;
-    inst.classList.add('locked');
+    inst.classList.add('locked'); readout.classList.add('tuned');
     $$('.ruler .st', inst).forEach((a) => a.setAttribute('aria-current', a.dataset.st === id ? 'true' : 'false'));
     setNum(n.f);
     if (user) { readout.classList.remove('locked'); void readout.offsetWidth; readout.classList.add('locked'); }
