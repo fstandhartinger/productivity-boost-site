@@ -274,10 +274,10 @@ ANN = [  # in-plot labels: key, station, time, label offset (dx, dy in % of the 
  ("reax", "networks", 2026 + 9.5 / 12, (-3, 9), True, "end"),
  ("ralph", "agents", 2026 + 0.5 / 12, (3, 6), True, "start"),
  ("rdvr", "worlds", 2017.5, (1.5, -8), True, "start"),
- ("dax", "systems", 2015.0, (3, 3), False, "start"),
+ ("dax", "systems", 2015.0, (-3, 3), False, "end"),
  ("jev", "benchmarks", 2026 + 9.5 / 12, (-2.5, 22), True, "end"),
  ("bh", "benchmarks", 2026 + 6.5 / 12, (3, 14), False, "start"),
- ("lgbm", "decisions", 2018.5, (-3, 4), False, "end"),
+ ("lgbm", "decisions", 2018.5, (-3, -9), False, "end"),
  ("games", "worlds", 1994.0, (3, 0), True, "start"),
 ]
 
@@ -289,9 +289,9 @@ def annotations(lang):
         lx, ly = x + dx, y + dy
         lab = esc(t["ann"][k]).replace("★", '<span aria-hidden="true">★</span><span class="sr"> GitHub stars</span>')
         cls = "ann" + ("" if mob else " desk") + (" rt" if anchor == "end" else "")
-        out.append(f'<i class="pt a{i}{"" if mob else " desk"}" aria-hidden="true"></i><span class="{cls} l{i}" aria-hidden="true">{lab}</span>')
+        out.append(f'<i class="pt a{i} k-{k}{"" if mob else " desk"}" aria-hidden="true"></i><span class="{cls} l{i} k-{k}" aria-hidden="true">{lab}</span>')
         css.append(f".pt.a{i}{{left:{x:.2f}%;top:{y:.2f}%}}.ann.l{i}{{left:{lx:.2f}%;top:{ly:.2f}%}}")
-        out.append(f'<svg class="leader{"" if mob else " desk"}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="{x:.2f}" y1="{y:.2f}" x2="{lx:.2f}" y2="{ly:.2f}"/></svg>')
+        out.append(f'<svg class="leader k-{k}{"" if mob else " desk"}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><line x1="{x:.2f}" y1="{y:.2f}" x2="{lx:.2f}" y2="{ly:.2f}"/></svg>')
     return "".join(out), "".join(css)
 
 def instrument(lang):

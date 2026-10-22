@@ -200,26 +200,29 @@ html:not(.js) .needle-range,html:not(.js) [data-theme-toggle],html:not(.js) .pau
 @media (max-width:639px) and (max-height:720px){.genres-short{display:none}.hero h1{font-size:min(2.3rem,10.5cqi)}.idline .facewrap{display:none}.ctas{margin-top:10px}.ctas .btn{min-height:44px}}
 @media (max-width:379px){.ruler{height:62px}.ruler .st:nth-of-type(even){padding-top:16px}}
 @media (min-width:1080px){
-  .hero{height:calc(100svh - var(--nav));min-height:660px;display:flex;flex-direction:column;padding:18px 0 14px}
-  .hero-in{flex:1;min-height:0;width:100%;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto minmax(0,1fr);column-gap:clamp(32px,4vw,72px);row-gap:14px;align-items:stretch}
-  .hero-txt{grid-column:1;grid-row:1;align-self:end}
-  .decoder{display:flex;flex-direction:column;grid-column:2;grid-row:1;align-self:stretch;min-height:150px}
-  .decoder .sstv{flex:1 1 auto;min-height:0;width:100%;aspect-ratio:auto;border:0;background:none}
-  .decoder .sstv img{object-fit:contain;object-position:right top}
-  .decoder .dlab{text-align:right}
-  .inst{grid-column:1 / -1;grid-row:2;min-height:0;position:relative}
+  .hero{height:calc(100svh - var(--nav));min-height:680px;display:flex;flex-direction:column;padding:14px 0 12px}
+  .hero-in{flex:1;min-height:0;width:100%;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+  .hero-in>*{grid-area:1 / 1}
+  .inst{min-height:0;position:relative}
+  /* the headline and the received picture live in the waterfall's quiet floor (pre-2017, between Systems and Decisions) */
+  .hero-txt{align-self:end;justify-self:start;z-index:5;position:relative;margin:0 0 50px calc(38px + (100% - 38px) * .475);width:calc((100% - 38px) * .37);padding:0;pointer-events:none}
+  .hero-txt a,.hero-txt button{pointer-events:auto}
+  .decoder{display:block;align-self:end;justify-self:start;z-index:5;margin:0 0 56px calc(38px + (100% - 38px) * .245);width:calc((100% - 38px) * .165);pointer-events:none}
+  .plot .k-lgbm{display:none}
+  .decoder .sstv{border:1px solid rgba(255,184,76,.25)}
+  .decoder .dlab{display:none}
   .hero-meta{display:none}
-  .hero h1{font-size:min(4.8rem,7vh,8.4cqi)}
-  .idline{margin-bottom:8px}.hero .genres{margin-top:10px}.ctas{margin-top:14px}
-  .hero-txt .genres{max-width:64ch}
-  .plotwrap{flex:1 1 auto;min-height:200px;display:flex}
+  .hero h1{font-size:min(4.4rem,6vh,11cqi)}
+  .hero .genres{display:none}.genres-short{display:none}
+  .idline{margin-bottom:6px}.ctas{margin-top:16px}
+  .plotwrap{flex:1 1 auto;min-height:240px;display:flex}
   .plot{aspect-ratio:auto;height:auto;flex:1 1 auto}
-  .figline{display:block;margin:12px 0 0;font-size:.8rem;color:var(--panel-dim)}.figline a{color:var(--panel-ink)}
+  .figline{display:block;margin:12px 0 0;font-size:.78rem;color:var(--panel-dim)}.figline a{color:var(--panel-ink)}
   .js .top.on-dark .brand span{visibility:hidden}
   .idline .facewrap{display:none}
-  .inst-head{position:absolute;top:14px;right:0;z-index:2;min-height:0;padding:0}
+  .inst-head{position:absolute;top:14px;right:0;z-index:6;min-height:0;padding:0}
   .inst-head .ttl,.inst-head .kind{display:none}
-  .inst .readout{order:1;margin:0 0 4px 38px;padding:2px 56px 4px 0;border-top:0;min-height:64px;height:auto;gap:18px}
+  .inst .readout{order:1;margin:0 0 4px 38px;padding:2px 60px 4px 0;border-top:0;min-height:64px;height:auto;gap:18px}
   .readout .rnum{height:56px;width:190px;color:#FFE3A6;stroke-width:5.5;filter:drop-shadow(0 0 8px rgba(252,184,76,.38))}
   .readout .rname,.readout .rsub{white-space:normal}.readout .rname{font-size:1.2rem}
   .ruler{order:2}
