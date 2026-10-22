@@ -37,7 +37,7 @@ def vq(path):
 
 def marks(s, lang="en"):
     """escaped text with [n] note markers turned into links to the footer notes."""
-    return re.sub(r"\[(\d)\]", lambda m: f'<sup class="fn"><a href="#note-{m.group(1)}">{m.group(1)}<span class="sr"> ({T[lang]["note"]})</span></a></sup>', esc(s))
+    return re.sub(r"\[(\d)\]", lambda m: f'<sup class="fn"><a id="ref-{m.group(1)}" href="#note-{m.group(1)}">{m.group(1)}<span class="sr"> ({T[lang]["note"]})</span></a></sup>', esc(s))
 
 def ext(url, label, lang, cls=""):
     c = f' class="{cls}"' if cls else ""
@@ -87,7 +87,7 @@ def head(lang, title, desc, path, alt_path=None, og=True, robots=None):
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f5f0">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d0e10">
 <meta name="build" content="{BUILD_ID}">{rb}
-<link rel="canonical" href="{BASE_URL}{path}">{alts}
+{"" if path == "/404.html" else f'<link rel="canonical" href="{BASE_URL}{path}">'}{alts}
 <script>{THEME_JS}</script>
 <link rel="preload" href="{vq('/fonts/archivo.woff2')}" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{vq('/css/site.css')}">
@@ -120,14 +120,14 @@ def header(lang, alt_path, home=True):
 
 def footer(lang, alt_path=None):
     t = T[lang]
-    notes = "".join(f'<li id="note-{i + 1}">{esc(n.format(asof=ASOF[lang]))}</li>' for i, n in enumerate(t["notes"]))
-    ln = f' <span class="muted">({t["legal_note"]})</span>' if t["legal_note"] else ""
+    notes = "".join(f'<li id="note-{i + 1}">{esc(n.format(asof=ASOF[lang]))} <a class="back" href="#ref-{i + 1}">{esc(t["back"])}<span class="sr"> ({t["note"]} {i + 1})</span></a></li>' for i, n in enumerate(t["notes"]))
+    ln = f' <span class="muted nw">({t["legal_note"]})</span>' if t["legal_note"] else ""
     return f"""<footer class="foot">
  <div class="wrap">
   <div class="notes"><h2 class="label">{esc(t["notes_h"])}</h2><ol>{notes}</ol></div>
   <div class="legal">
    <p>{esc(t["company"])}</p>
-   <p><a href="/impressum/" hreflang="de" lang="de">{esc(t["imprint"])}</a> · <a href="/datenschutz/" hreflang="de" lang="de">{esc(t["privacy"])}</a>{ln}</p>
+   <p><a href="/impressum/" hreflang="de">{esc(t["imprint"])}</a> · <a href="/datenschutz/" hreflang="de">{esc(t["privacy"])}</a>{ln}</p>
    <p class="muted">© 2014–2026 · <a href="{EMAIL and 'mailto:' + EMAIL}">{EMAIL}</a></p>
   </div>
  </div>
@@ -154,8 +154,8 @@ def decision(pr, lang, idx):
   <p class="dq"><span class="label">{esc(t['question'])}</span> {esc(pr['q'])} <span class="model">{pr['model']}</span></p>
   <ol class="opts">{rows}</ol>
   <details class="json"><summary>{esc(t['panel_json'])}</summary>
-   <p class="label">{esc(t['req'])} · POST /v1/systemone</p><pre tabindex="0"><code>{pretty(pr['req'])}</code></pre>
-   <p class="label">{esc(t['res'])}</p><pre tabindex="0"><code>{pretty(pr['res'])}</code></pre>
+   <p class="label">{esc(t['req'])} · POST /v1/systemone</p><pre tabindex="0" role="region" aria-label="{esc(t['req'])} JSON"><code>{pretty(pr['req'])}</code></pre>
+   <p class="label">{esc(t['res'])}</p><pre tabindex="0" role="region" aria-label="{esc(t['res'])} JSON"><code>{pretty(pr['res'])}</code></pre>
   </details>
  </div>"""
 
@@ -172,7 +172,7 @@ def hero(lang):
   <p class="lede">{esc(t["sub"])}</p>
   <p class="ctas">{ext("https://decisionmodels.io/login?next=/dashboard", esc(t["cta1"]), lang, "btn")}{ext(QS_URL, esc(t["cta2"]), lang, "tlink")}</p>
  </div>
- <figure class="decide" aria-label="{esc(t['panel_label'])}">
+ <figure class="decide">
   <div class="tabs" role="tablist" aria-label="{esc(t['panel_label'])}">{tabs}</div>
   {panels}
   <figcaption>{esc(t["panel_caption"])} {ext(QS_URL, 'decisionmodels.io/docs/quickstart', lang)}</figcaption>
@@ -198,7 +198,8 @@ def shot(light, dark, mob_light, mob_dark, alt, sizes, href=None, cls="shot", la
 
 def products(lang):
     t = T[lang]
-    sizes = "(min-width: 75em) 760px, (min-width: 48em) 58vw, 100vw"
+    sizes = "(min-width: 75em) 640px, (min-width: 62em) 52vw, 100vw"
+    cap = t["shot_cap"]
     return f"""<section class="products" id="products" aria-labelledby="products-h">
  <h2 class="sr" id="products-h">{esc(t["products_h"])}</h2>
  <article class="chapter wrap" aria-labelledby="dm-h">
@@ -206,23 +207,27 @@ def products(lang):
    <p class="kicker"><span>{esc(t["dm_kicker"])}</span><span class="host">{esc(t["dm_host"])}</span></p>
    <h3 id="dm-h">{rich(t["dm_h"])}</h3>
    <p>{marks(t["dm_p"], lang)}</p>
-   {facts(t["dm_facts"])}
    {links(t["dm_links"], lang)}
   </div>
-  {shot("dm-desk-light", "dm-desk-dark", None, None, t["dm_alt"], sizes, DM_URL, lang=lang)}
+  <figure class="ch-media">
+   {shot("dm-desk-light", "dm-desk-dark", None, None, t["dm_alt"], sizes, DM_URL, lang=lang)}
+   <figcaption>{esc(cap.format(site="decisionmodels.io"))}</figcaption>
+  </figure>
+  <div class="ch-foot">{facts(t["dm_facts"])}</div>
  </article>
  <article class="chapter flip wrap" aria-labelledby="reax-h">
   <div class="ch-copy">
    <p class="kicker"><span>{esc(t["reax_kicker"])}</span><span class="host">{esc(t["reax_host"])}</span></p>
    <h3 id="reax-h">{esc(t["reax_h"])}</h3>
    <p>{esc(t["reax_p"])}</p>
-   {facts(t["reax_facts"])}
    {links(t["reax_links"], lang)}
   </div>
-  <div class="stack">
+  <figure class="ch-media stack">
    {shot("reax-desk", None, None, None, t["reax_alt"], sizes, "https://reax.co", lang=lang)}
-   {shot("mine-desk-light", "mine-desk-dark", None, None, t["mine_alt"], "(min-width: 48em) 34vw, 100vw", "https://mine.decisionmodels.io", "shot small", lang)}
-  </div>
+   {shot("mine-desk-light", "mine-desk-dark", None, None, t["mine_alt"], "(min-width: 62em) 340px, 70vw", "https://mine.decisionmodels.io", "shot small", lang)}
+   <figcaption>{esc(cap.format(site="reax.co · mine.decisionmodels.io"))}</figcaption>
+  </figure>
+  <div class="ch-foot">{facts(t["reax_facts"])}</div>
  </article>
  </section>"""
 
@@ -274,7 +279,8 @@ def earlier(lang):
         key = "old-" + name
         alt = IMG[key].get("alt_" + lang) or title
         wide = name == "bms-area"
-        cards += (f'<li class="ew{" wide" if wide else ""}">{picture(key, alt, "(min-width: 75em) 600px, (min-width: 48em) 60vw, 78vw" if wide else "(min-width: 75em) 290px, (min-width: 48em) 30vw, 78vw")}'
+        logo = name in ("lightgbm-dotnet", "subtitles")
+        cards += (f'<li class="ew{" wide" if wide else ""}{" logo" if logo else ""}">{picture(key, alt, "(min-width: 75em) 600px, (min-width: 48em) 60vw, 78vw" if wide else "(min-width: 75em) 290px, (min-width: 48em) 30vw, 78vw")}'
                   f'<p class="label">{esc(tag)}</p><h3>{esc(title)}</h3><p>{esc(txt)}</p></li>')
     return f"""<section class="earlier" id="earlier" aria-labelledby="earlier-h">
  <div class="wrap">
