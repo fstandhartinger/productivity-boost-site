@@ -2,7 +2,7 @@
  {
   "id": "2110410684873814482",
   "url": "https://x.com/airesearch12/status/2110410684873814482",
-  "views": 1096879,
+  "views": null,
   "img": "x-dm-launch",
   "alt_en": "Frame from the launch video: “Powered by Bittensor” next to “Subnet 92: REAX”.",
   "alt_de": "Bild aus dem Launch-Video: „Powered by Bittensor“ neben „Subnet 92: REAX“.",
@@ -12,7 +12,9 @@
   "what_de": "Der Start von Decision Models, betrieben mit der REAX-Engine auf Bittensor-Subnet 92, mit einem 30-Sekunden-Launch-Video.",
   "date_en": "14 Oct 2026",
   "date_de": "14.10.2026",
-  "video": true
+  "video": true,
+  "label_en": "Launch post",
+  "label_de": "Launch-Beitrag"
  },
  {
   "id": "2101311992984199580",

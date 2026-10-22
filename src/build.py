@@ -255,7 +255,7 @@ def public(lang):
         badge = f'<span class="vbadge" aria-hidden="true">{esc(t["video"])}</span>' if p.get("video") else ""
         cards += (f'<li class="post"><a href="{esc(p["url"])}" rel="noopener" target="_blank">'
                   f'<div class="pimg">{img}{badge}</div>'
-                  f'<p class="views" id="pv{k}"><strong>{fmt_views(p["views"], lang)}</strong> {esc(t["views"])}</p>'
+                  (f'<p class="views" id="pv{k}"><strong>{fmt_views(p["views"], lang)}</strong> {esc(t["views"])}</p>' if p.get("views") else f'<p class="views" id="pv{k}"><strong class="lbl">{esc(p["label_" + lang])}</strong></p>')
                   f'<h3 id="pt{k}">{esc(p["title_" + lang])}</h3><p>{esc(p["what_" + lang])}</p>'
                   f'<p class="meta">{esc(p["date_" + lang])} · {esc(t["open_post"])}<span class="sr"> ({t["new_tab"]})</span><span aria-hidden="true"> ↗</span></p></a></li>')
     posts = f'<ul class="posts" role="list">{cards}</ul>' if cards else ""

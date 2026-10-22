@@ -191,6 +191,7 @@ a.shot:hover{transform:translateY(-2px)}
 .word{display:grid;place-items:center;height:100%;font-size:clamp(2.6rem,5vw,3.6rem);font-weight:600;font-stretch:125%;letter-spacing:-.04em;color:var(--ink);background:radial-gradient(120% 90% at 50% 120%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 70%)}
 .post .views{margin:1.1rem 1.25rem .4rem;font:400 .8rem/1.2 var(--mono);color:var(--ink-3)}
 .post .views strong{font:560 2.3rem/1 var(--sans);font-stretch:110%;letter-spacing:-.02em;color:var(--ink);margin-right:.35rem}
+.post .views strong.lbl{font-size:1.25rem;line-height:2.3rem;font-stretch:100%}
 .post h3{font-size:1.3rem;margin:0 1.25rem .45rem;letter-spacing:-.015em}
 .post p{margin:0 1.25rem .9rem;font-size:.95rem;color:var(--ink-2)}
 .post .meta{margin-top:auto;padding-bottom:.4rem;font:400 .75rem/1.5 var(--mono);color:var(--ink-3)}
