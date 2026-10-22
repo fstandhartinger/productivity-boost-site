@@ -155,7 +155,7 @@ def decision(pr, lang, idx):
   <ol class="opts">{rows}</ol>
   <details class="json"><summary>{esc(t['panel_json'])}</summary>
    <p class="label">{esc(t['req'])} · POST /v1/systemone</p><pre tabindex="0" role="region" aria-label="{esc(t['req'])} JSON"><code>{pretty(pr['req'])}</code></pre>
-   <p class="label">{esc(t['res'])}</p><pre tabindex="0" role="region" aria-label="{esc(t['res'])} JSON"><code>{pretty(pr['res'])}</code></pre>
+   {f'<p class="label">{esc(t["noul_note"])}</p>' if pr["id"] == "guard" else ""}<p class="label">{esc(t['res'])}</p><pre tabindex="0" role="region" aria-label="{esc(t['res'])} JSON"><code>{pretty(pr['res'])}</code></pre>
   </details>
  </div>"""
 
@@ -243,7 +243,7 @@ def fit(lang):
 
 def fmt_views(v, lang):
     if lang == "de":
-        return (f"{v // 100_000 / 10:.1f}".replace(".", ",") + " Mio.") if v >= 1_000_000 else f"{v // 1000}.000"
+        return f"{v // 1_000_000} Mio." if v >= 1_000_000 else f"{v // 1000} Tsd."
     return (f"{v // 100_000 / 10:.1f}".rstrip("0").rstrip(".") + "M") if v >= 1_000_000 else f"{v // 1000}k"
 
 def public(lang):
@@ -252,7 +252,7 @@ def public(lang):
     for k, p in enumerate(POSTS):
         img = (picture(p["img"], p["alt_" + lang], "(min-width: 62em) 400px, (min-width: 48em) 46vw, 100vw", cls="chart" if p.get("chart") else "") if p.get("img")
                else f'<span class="word" aria-hidden="true">{esc(p.get("word", ""))}</span>')
-        badge = f'<span class="vbadge">{esc(t["video"])}</span>' if p.get("video") else ""
+        badge = f'<span class="vbadge" aria-hidden="true">{esc(t["video"])}</span>' if p.get("video") else ""
         cards += (f'<li class="post"><a href="{esc(p["url"])}" rel="noopener" target="_blank">'
                   f'<div class="pimg">{img}{badge}</div>'
                   f'<p class="views" id="pv{k}"><strong>{fmt_views(p["views"], lang)}</strong> {esc(t["views"])}</p>'

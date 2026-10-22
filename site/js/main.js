@@ -32,6 +32,7 @@
       if (e.key === "Escape" && menu.open) { menu.open = false; menu.querySelector("summary").focus(); }
     });
     document.addEventListener("click", function (e) { if (menu.open && !menu.contains(e.target)) menu.open = false; });
+    menu.addEventListener("focusout", function (e) { if (menu.open && e.relatedTarget && !menu.contains(e.relatedTarget)) menu.open = false; });
   }
 
   // earlier-work rail: a focusable, labelled scroll region only when it actually scrolls (phones)

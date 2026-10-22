@@ -120,10 +120,10 @@ h1{font-size:clamp(2.35rem,5.6vw,5.4rem);font-stretch:108%;font-weight:560;lette
 .json .label{margin:.6rem 0 0;font-size:.75rem}
 .decide figcaption{margin-top:.6rem;font-size:.8rem;line-height:1.45;color:var(--ink-3)}
 .decide figcaption a{white-space:nowrap;display:inline-block;padding-block:.3rem}
-.proof{display:flex;flex-wrap:wrap;gap:.45rem 1.75rem;list-style:none;align-self:start}
+.proof{display:flex;flex-direction:column;gap:.45rem;list-style:none;align-self:start}
 @media (min-width:62em){.hero{grid-template-rows:auto auto;row-gap:2.25rem}.hero-copy{grid-column:1;grid-row:1}.decide{grid-column:2;grid-row:1/span 2;align-self:center}.proof{grid-column:1;grid-row:2}}
-.proof li{font:400 .86rem/1.4 var(--mono);color:var(--ink-2);display:flex;align-items:center;gap:.55rem}
-.proof li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.proof li{font:400 .86rem/1.4 var(--mono);color:var(--ink-2);display:flex;align-items:flex-start;gap:.55rem}
+.proof li::before{content:"";flex:none;width:6px;height:6px;margin-top:.5em;border-radius:50%;background:var(--accent)}
 
 /* ---------- section scaffolding ---------- */
 section{position:relative}
@@ -273,7 +273,7 @@ a.shot:hover{transform:translateY(-2px)}
 .lab h4 a,.kicker a.host{display:inline-block;padding-block:.2rem}
 .down{color:var(--ink-2);gap:.3rem}
 
-.ew.logo img{object-fit:contain;padding:6% 8%;background:#fff}
+.ew.logo img{object-fit:contain;background:#fff}
 @media (forced-colors:active){
   .tabs button[aria-selected=true]{outline:2px solid Highlight;outline-offset:-2px;border-bottom:3px solid CanvasText}
   .track{border:1px solid CanvasText;background:Canvas}
