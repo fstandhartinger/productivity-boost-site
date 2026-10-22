@@ -149,7 +149,7 @@ def decision(pr, lang, idx):
                  f'<span class="v">{(f"{p:.2f}".replace(".", ",") if lang == "de" else f"{p:.2f}")}</span></li>')
     def pretty(s):
         return esc(json.dumps(json.loads(s), indent=2, ensure_ascii=False))
-    return f"""<div class="dpanel" id="dp-{pr['id']}" data-i="{idx}">
+    return f"""<div class="dpanel{' on' if idx == 0 else ''}" id="dp-{pr['id']}" data-i="{idx}">
   <p class="dstate"><span class="label">{esc(t['state'])}</span> {esc(pr['state'])}</p>
   <p class="dq"><span class="label">{esc(t['question'])}</span> {esc(pr['q'])} <span class="model">{pr['model']}</span></p>
   <ol class="opts">{rows}</ol>

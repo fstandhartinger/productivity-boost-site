@@ -54,6 +54,7 @@
       t.setAttribute("aria-selected", on ? "true" : "false");
       t.tabIndex = on ? 0 : -1;
       panels[j].hidden = !on;
+      panels[j].classList.toggle("on", on);
       panels[j].classList.remove("play");
     });
     void panels[i].offsetWidth;
