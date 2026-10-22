@@ -250,7 +250,7 @@ def public(lang):
     t = T[lang]
     cards = ""
     for k, p in enumerate(POSTS):
-        img = (picture(p["img"], p["alt_" + lang], "(min-width: 62em) 400px, (min-width: 48em) 46vw, 100vw", cls="chart" if p.get("chart") else "") if p.get("img")
+        img = (picture(p["img"], p["alt_" + lang], "(min-width: 75em) 560px, (min-width: 48em) 46vw, 100vw", cls="chart" if p.get("chart") else "") if p.get("img")
                else f'<span class="word" aria-hidden="true">{esc(p.get("word", ""))}</span>')
         badge = f'<span class="vbadge" aria-hidden="true">{esc(t["video"])}</span>' if p.get("video") else ""
         views = (f'<p class="views" id="pv{k}"><strong>{fmt_views(p["views"], lang)}</strong> {esc(t["views"])}</p>' if p.get("views")
