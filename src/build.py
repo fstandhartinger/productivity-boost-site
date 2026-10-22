@@ -112,19 +112,19 @@ def header(lang, alt_path, home=True):
   <a class="mark" href="{base}"><span class="dot" aria-hidden="true"></span><span>productivity-boost<span class="tld">.com</span></span></a>
   <nav class="nav" aria-label="{'Main' if lang == 'en' else 'Hauptnavigation'}"><ul>{nav}</ul></nav>
   <div class="tools">{sw}{theme}
-   <details class="menu"><summary>{esc(t["menu"])}</summary><nav aria-label="{esc(t['menu'])}"><ul>{nav}</ul></nav></details>
+   <details class="menu"><summary>{esc(t["menu"])}</summary><nav aria-label="{esc(t['menu'])}"><ul role="list">{nav}</ul></nav></details>
   </div>
  </div>
 </header>
 <div class="sentinel" aria-hidden="true"></div>"""
 
-def footer(lang, alt_path=None):
+def footer(lang, alt_path=None, notes_block=True):
     t = T[lang]
     notes = "".join(f'<li id="note-{i + 1}">{esc(n.format(asof=ASOF[lang]))} <a class="back" href="#ref-{i + 1}">{esc(t["back"])}<span class="sr"> ({t["note"]} {i + 1})</span></a></li>' for i, n in enumerate(t["notes"]))
     ln = f' <span class="muted nw">({t["legal_note"]})</span>' if t["legal_note"] else ""
     return f"""<footer class="foot">
  <div class="wrap">
-  <div class="notes"><h2 class="label">{esc(t["notes_h"])}</h2><ol>{notes}</ol></div>
+  {f'<div class="notes"><h2 class="label">{esc(t["notes_h"])}</h2><ol>{notes}</ol></div>' if notes_block else '<div></div>'}
   <div class="legal">
    <p>{esc(t["company"])}</p>
    <p><a href="/impressum/" hreflang="de">{esc(t["imprint"])}{f' (<span lang="de">{t["imprint_de"]}</span>)' if t["imprint_de"] else ""}</a> · <a href="/datenschutz/" hreflang="de">{esc(t["privacy"])}{f' (<span lang="de">{t["privacy_de"]}</span>)' if t["privacy_de"] else ""}</a>{ln}</p>
@@ -224,8 +224,7 @@ def products(lang):
   </div>
   <figure class="ch-media stack">
    {shot("reax-desk", None, None, None, t["reax_alt"], sizes, "https://reax.co", lang=lang)}
-   {shot("mine-desk-light", "mine-desk-dark", None, None, t["mine_alt"], "(min-width: 62em) 340px, 70vw", "https://mine.decisionmodels.io", "shot small", lang)}
-   <figcaption>{esc(cap.format(site="reax.co · mine.decisionmodels.io"))}</figcaption>
+   <figcaption>{esc(cap.format(site="reax.co"))}</figcaption>
   </figure>
   <div class="ch-foot">{facts(t["reax_facts"])}</div>
  </article>
@@ -288,7 +287,7 @@ def earlier(lang):
   <h2 id="earlier-h">{esc(t["early_h"])}</h2>
   <p class="intro">{esc(t["early_p"])}</p>
  </div>
- <div class="rail-wrap"><ul class="rail" role="list" data-label="{esc(t['early_region'])}">{cards}</ul><p class="swipe label" aria-hidden="true">{esc(t["swipe"])}</p></div>
+ <div class="rail-wrap"><ul class="rail" role="list" data-label="{esc(t['early_region'])}">{cards}</ul></div>
 </section>"""
 
 def about(lang):
@@ -330,13 +329,13 @@ def page_legal(kind):
     body = open(os.path.join(SRC, "legal", f"{kind}.html"), encoding="utf-8").read()
     title = {"impressum": "Impressum", "datenschutz": "Datenschutzerklärung"}[kind]
     return (head("de", f"{title} — productivity-boost.com", f"{title} von productivity-boost.com", f"/{kind}/", None, og=False) +
-            "\n<body>\n" + header("de", None, home=False) + f'\n<main id="main" class="legalpage wrap">{body}</main>\n' + footer("de"))
+            "\n<body>\n" + header("de", None, home=False) + f'\n<main id="main" class="legalpage wrap">{body}</main>\n' + footer("de", notes_block=False))
 
 def page_404():
     t = T["en"]; d = T["de"]
     return (head("en", t["nf_title"], t["nf_p"], "/404.html", None, og=False, robots="noindex") + "\n<body>\n" + header("en", None, home=False) +
             f'\n<main id="main" class="nf wrap"><p class="kicker"><span>404</span></p><h1>{esc(t["nf_title"])}</h1><p>{esc(t["nf_p"])} <a href="/">{esc(t["nf_home"])}</a></p>'
-            f'<p lang="de">{esc(d["nf_p"])} <a href="/de/">{esc(d["nf_home"])}</a></p></main>\n' + footer("en"))
+            f'<p lang="de">{esc(d["nf_p"])} <a href="/de/">{esc(d["nf_home"])}</a></p></main>\n' + footer("en", notes_block=False))
 
 def write(rel, s):
     p = os.path.join(OUT, rel)

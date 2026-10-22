@@ -13,7 +13,7 @@
   color-scheme:light;
 }
 :root[data-theme=dark]{
-  --paper:#0d0e10; --paper-2:#16181b; --ink:#eae9e4; --ink-2:#b9b8b2; --ink-3:#8e8d88; --rule:rgba(234,233,228,.12); --rule-2:rgba(234,233,228,.24);
+  --paper:#0d0e10; --paper-2:#16181b; --ink:#eae9e4; --ink-2:#b9b8b2; --ink-3:#8e8d88; --rule:rgba(234,233,228,.16); --rule-2:rgba(234,233,228,.3);
   --accent:#3fd39b; --accent-ink:#0d0e10; --track:#25272b; --fill:#eae9e4; --fill-2:#6d6f74;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 50px -16px rgba(0,0,0,.7); color-scheme:dark;
 }
@@ -122,7 +122,7 @@ h1{font-size:clamp(2.35rem,5.6vw,5.4rem);font-stretch:108%;font-weight:560;lette
 .decide figcaption a{white-space:nowrap;display:inline-block;padding-block:.3rem}
 .proof{display:flex;flex-wrap:wrap;gap:.45rem 1.75rem;list-style:none;align-self:start}
 @media (min-width:62em){.hero{grid-template-rows:auto auto;row-gap:2.25rem}.hero-copy{grid-column:1;grid-row:1}.decide{grid-column:2;grid-row:1/span 2;align-self:center}.proof{grid-column:1;grid-row:2}}
-.proof li{font:400 .8rem/1.4 var(--mono);color:var(--ink-2);display:flex;align-items:center;gap:.55rem}
+.proof li{font:400 .86rem/1.4 var(--mono);color:var(--ink-2);display:flex;align-items:center;gap:.55rem}
 .proof li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
 
 /* ---------- section scaffolding ---------- */
@@ -137,7 +137,7 @@ h3{font-size:clamp(1.75rem,3vw,2.6rem);font-stretch:106%;letter-spacing:-.028em}
 /* ---------- product chapters ---------- */
 .products{padding-top:clamp(4.5rem,9vw,7.5rem)}
 .p-head{margin-bottom:clamp(2.5rem,5vw,4rem)}
-.chapter{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"copy media" "foot foot";gap:clamp(2rem,4vw,3.5rem) clamp(2rem,5vw,4.5rem);align-items:center;margin-bottom:clamp(4.5rem,10vw,9rem)}
+.chapter{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"copy media" "foot foot";gap:clamp(2rem,4vw,3.5rem) clamp(2rem,5vw,4.5rem);align-items:start;margin-bottom:clamp(4.5rem,10vw,9rem)}
 .ch-copy{grid-area:copy}
 .ch-media{grid-area:media;margin:0}
 .ch-media figcaption{margin-top:.8rem;font-size:.8rem;color:var(--ink-3)}
@@ -214,9 +214,10 @@ a.shot:hover{transform:translateY(-2px)}
 .ew picture{display:block;border-radius:10px;overflow:hidden;border:1px solid var(--rule);background:var(--paper);aspect-ratio:4/3}
 .ew picture img{width:100%;height:100%;object-fit:cover}
 .ew.wide{grid-column:span 2}
-.ew.wide picture{aspect-ratio:8/3}
+@media (min-width:62em){.ew picture,.ew.wide picture{aspect-ratio:auto;height:calc((min(100vw,var(--wrap)) - 2 * var(--pad) - 4.5rem) * .1875)}}
+@media (min-width:48em) and (max-width:61.99em){.ew picture,.ew.wide picture{aspect-ratio:auto;height:calc((100vw - 2 * var(--pad) - 3rem) * .25)}}
 .rail:focus-visible{outline-offset:8px}
-.swipe{display:none}
+
 
 /* ---------- about + contact ---------- */
 .a-k{grid-column:1/-1;margin-bottom:0}
@@ -296,7 +297,6 @@ a.shot:hover{transform:translateY(-2px)}
   .lab{grid-template-columns:repeat(2,minmax(0,1fr))}
   .rail{grid-template-columns:repeat(3,minmax(0,1fr))}
   .ew.wide{grid-column:span 3}
-  .ew.wide picture{aspect-ratio:3/1}
 }
 @media (max-width:47.99em){
   body{font-size:1rem}
@@ -325,13 +325,14 @@ a.shot:hover{transform:translateY(-2px)}
   .eyebrow .sep{display:none}
   .eyebrow span{display:block}
   .lab{grid-template-columns:minmax(0,1fr);gap:1.6rem}
-  .rail-wrap{padding-inline:0}
-  .rail{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 var(--pad) 1rem;scroll-padding-inline:var(--pad)}
-  .ew,.ew.wide{flex:0 0 78%;scroll-snap-align:start}
-  .ew.wide picture{aspect-ratio:4/3}
-  .swipe{display:block;padding:0 var(--pad);margin:.25rem 0 0}
+  .rail{grid-template-columns:minmax(0,1fr);gap:1.6rem}
+  .ew,.ew.wide{grid-column:auto;display:grid;grid-template-columns:7.5rem minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:1rem}
+  .ew picture,.ew.wide picture{grid-row:1/span 3;aspect-ratio:4/3;align-self:start}
+  .ew .label{margin:0 0 .2rem}
+  .ew h3{font-size:1.1rem}
+  .ew p:not(.label){font-size:.9rem;margin:0}
   .about{grid-template-columns:minmax(0,1fr)}
-  .portrait{max-width:none}
+  .portrait{max-width:60%}
   .foot .wrap{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:25em){.mark .tld{display:none}.mark{font-size:.95rem}.lang,.theme{min-width:40px}.menu summary{padding:0 .4rem}}

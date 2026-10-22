@@ -20,6 +20,7 @@ server {
   add_header X-Robots-Tag $robots always;
   location = /robots.txt { default_type text/plain; if ($host ~* "mintapis\.com$") { return 200 "User-agent: *\nDisallow: /\n"; } try_files /robots.txt =404; }
   location ~ ^/en(?:/(.*))?$ { return 301 /$1; }
+  location ~ ^/de/(impressum|datenschutz)/?$ { return 301 /$1/; }
   location = /healthz { access_log off; default_type text/plain; return 200 "ok\n"; }
   location ~* \.(woff2|avif|webp|png|jpg|svg|mp4|webm|css|js)$ { add_header Cache-Control "public, max-age=31536000, immutable"; add_header X-Content-Type-Options nosniff always; add_header X-Robots-Tag $robots always; try_files $uri =404; }
   location ~* \.(json)$ { add_header Cache-Control "public, max-age=3600"; add_header X-Content-Type-Options nosniff always; add_header X-Robots-Tag $robots always; try_files $uri =404; }
