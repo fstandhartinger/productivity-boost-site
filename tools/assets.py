@@ -130,10 +130,14 @@ for st in json.load(open(os.path.join(ROOT, "src", "data", "band.json")))["stati
     responsive(f"trace-{st['id']}", col.resize((1600, 64), Image.LANCZOS), [800, 1600], crf=36, q=74)
 
 # --- receiver monitors: screenshots of his own live products (Playwright, 1280x800 @1.5x, 22 Oct 2026), top 936 px ---
-for k in ("decisions", "benchmarks", "networks", "agents"):
+# each cropped to one readable region (headline / score / about box / README top); decisions: price box excluded
+RX_CROPS = {"decisions": (60, 300, 1000, 725), "benchmarks": (0, 570, 1440, 1030), "networks": (60, 260, 1900, 960),
+            "agents": (1440, 400, 1910, 960), "studio": (0, 0, 1257, 790)}
+for k, box in RX_CROPS.items():
     src = os.path.join(MEDIA, "rx", f"{k}.png")
     if os.path.exists(src):
-        responsive(f"rx-{k}", Image.open(src).convert("RGB").crop((0, 0, 1920, 936)), [480, 800, 1200], crf=32, q=80)
+        im = Image.open(src).convert("RGB").crop(box)
+        responsive(f"rx-{k}", im, [w for w in (480, 800, 1200) if w <= im.width] or [im.width], crf=32, q=80)
 
 # --- JevBench dot plot (public board, 21 Oct 2026), inline SVG ---
 rows = json.load(open(os.path.join(ROOT, "src", "data", "jevbench_intel.json")))

@@ -220,15 +220,16 @@ def head(lang, title, desc, path, alt_path, og="og", extra=""):
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
 {extra}</head>'''
 
-def topbar(lang, alt_path, active=None, home=True):
+def topbar(lang, alt_path, active=None, home=True, hint=True):
     t = T[lang]
     links = []
     for s_ in sorted(BAND["stations"], key=lambda q: q["freq"]):
         sid = s_["id"]
         href = f'{t["home"]}#{sid}' if not home else f'#{sid}'
         links.append(f'<li><a href="{href}" data-st="{sid}"><b aria-hidden="true">{freq_txt(str(s_["freq"]), lang)}</b><span class="nm" aria-hidden="true">{esc(st_plain(sid, lang))}</span><span class="sr">{freq_txt(str(s_["freq"]), lang)} {esc(st_plain(sid, lang))} ({T[lang]["mhz"]})</span></a></li>')
+    hint_html = f'''<aside class="langhint" id="langhint" aria-label="{t["hint_label"]}" hidden><div class="wrap"><a href="{alt_path}" lang="{"de" if lang == "en" else "en"}" hreflang="{"de" if lang == "en" else "en"}">{t["hint_link"]} →</a><button type="button" data-close-hint aria-label="{t["hint_close"]}">✕</button></div></aside>''' if hint else ""
     return f"""<a class="skip" href="#main">{t["skip"]}</a>
-<div class="langhint" id="langhint" hidden><div class="wrap"><a href="{alt_path}" lang="{"de" if lang == "en" else "en"}" hreflang="{"de" if lang == "en" else "en"}">{t["hint_link"]} →</a><button type="button" data-close-hint aria-label="{t["hint_close"]}">✕</button></div></div>
+{hint_html}
 <header class="top{" on-dark" if home else ""}"><div class="wrap">
 <a class="brand" href="{t["home"]}">{ICON["dial"]}<span>Florian Standhartinger</span><em class="bsub"><span class="sr"> · </span>{t["who_sub"]}</em></a>
 <nav class="stations-nav" aria-label="{t["nav_top"]}"><span class="curname" aria-hidden="true" data-curname></span><ol>{"".join(links)}</ol><div class="needle-track" aria-hidden="true"><i class="needle"></i></div></nav>
@@ -482,15 +483,17 @@ def sig_worlds(lang):
 SIG = {"decisions": sig_decisions, "benchmarks": sig_benchmarks, "networks": sig_networks, "studio": sig_studio,
        "agents": sig_agents, "systems": sig_systems, "worlds": sig_worlds}
 
-RXMON = {  # his own live product pages as received screens (captured 22 Oct 2026)
- "decisions": ("decisionmodels.io", {"en": "Screenshot of decisionmodels.io: “Inference for open-weights decision models”, with a sample request and its answer probabilities.",
-                                     "de": "Screenshot von decisionmodels.io: „Inference for open-weights decision models“, mit Beispielanfrage und Antwort-Wahrscheinlichkeiten."}),
- "benchmarks": ("benchmarkheaven.com/jev-models", {"en": "Screenshot of the JevBench board on Benchmark Heaven: capability score of open-weights decision models, with cost and latency sliders.",
-                                                  "de": "Screenshot des JevBench-Boards auf Benchmark Heaven: Capability Score offener Entscheidungsmodelle, mit Reglern für Kosten und Latenz."}),
+RXMON = {  # his own live product pages as received screens (captured 22 Oct 2026), each cropped to one readable region
+ "decisions": ("decisionmodels.io", {"en": "Screenshot of decisionmodels.io: “Decision Models · Jev-compatible API. Inference for open-weights decision models.”",
+                                     "de": "Screenshot von decisionmodels.io: „Decision Models · Jev-compatible API. Inference for open-weights decision models.“"}),
+ "benchmarks": ("benchmarkheaven.com/jev-models", {"en": "Screenshot of the JevBench board on Benchmark Heaven: “JevBench Capability Score (open weights)”, with sliders for maximum cost and latency.",
+                                                  "de": "Screenshot des JevBench-Boards auf Benchmark Heaven: „JevBench Capability Score (open weights)“, mit Reglern für maximale Kosten und Latenz."}),
  "networks": ("reax.co", {"en": "Screenshot of reax.co: “AI by the people, for the people.” REAX, Bittensor subnet 92, with its serve, verify, reward, improve loop.",
                           "de": "Screenshot von reax.co: „AI by the people, for the people.“ REAX, Bittensor-Subnetz 92, mit dem Kreislauf Serve, Verify, Reward, Improve."}),
- "agents": ("github.com/fstandhartinger/ralph-wiggum", {"en": "Screenshot of the ralph-wiggum repository on GitHub: 306 stars, 29 forks, MIT licence.",
-                                                       "de": "Screenshot des Repositorys ralph-wiggum auf GitHub: 306 Sterne, 29 Forks, MIT-Lizenz."}),
+ "agents": ("github.com/fstandhartinger/ralph-wiggum", {"en": "Screenshot of the ralph-wiggum repository’s About box on GitHub: “Ralph Wiggum: Autonomous AI coding with spec-driven development”, MIT licence, 306 stars, 29 forks.",
+                                                       "de": "Screenshot der About-Box des Repositorys ralph-wiggum auf GitHub: „Ralph Wiggum: Autonomous AI coding with spec-driven development“, MIT-Lizenz, 306 Sterne, 29 Forks."}),
+ "studio": ("github.com/fstandhartinger/h3-studio", {"en": "Screenshot of the H3 Studio README on GitHub: a web UI for generating video with MiniMax H3 on a self-hosted GPU — video plus a natively synchronised stereo soundtrack from one prompt; modes text, image, first+last frame and reference to video.",
+                                                    "de": "Screenshot der H3-Studio-README auf GitHub: eine Web-Oberfläche, die mit MiniMax H3 auf einer eigenen GPU Videos erzeugt — Bild und synchroner Stereoton aus einem Prompt; Modi Text, Bild, erstes+letztes Bild und Referenz zu Video."}),
 }
 
 def rxmon(sid, lang):
@@ -546,13 +549,13 @@ def how(lang):
 def end(lang):
     t = T[lang]
     return f'''<section class="end" id="contact" aria-labelledby="h-end"><i class="carrier" aria-hidden="true"><b>?</b></i><div class="wrap">
-<p class="wrapline">{t["end_wrap"]}</p>
+<div class="endl"><p class="wrapline">{t["end_wrap"]}</p>
 <div class="bignum">{numerals("108.0", lang)}<span class="mono dim" aria-hidden="true">MHz</span></div>
 <h2 id="h-end">{esc(t["end_h"])}</h2>
 <p class="lead">{esc(t["end_p"])}</p>
 <div class="mailrow"><a class="btn big" href="mailto:{EMAIL}">{ICON["mail"]}{t["write"]}</a><span class="addr">{EMAIL}</span>
 <button class="tbtn" type="button" data-copy="{EMAIL}" data-copied="{t["copied"]}">{ICON["copy"]}<span>{t["copy"]}</span></button><span class="sr" role="status" data-copy-status></span></div>
-<div class="links"><a href="{GH_URL}">GitHub · fstandhartinger</a><a href="{X_URL}">X · @airesearch12</a><a href="{HF_URL}">Hugging Face · decisionmodels</a></div>
+</div><div class="endr"><div class="links"><a href="{GH_URL}">GitHub · fstandhartinger</a><a href="{X_URL}">X · @airesearch12</a><a href="{HF_URL}">Hugging Face · decisionmodels</a></div>
 <p class="sign">{t["sign"]}<small>{esc(t["sign_note"])}</small></p>
 </div></section>'''
 
@@ -603,12 +606,12 @@ def page_legal(kind):
     title = "Impressum" if kind == "impressum" else "Datenschutzerklärung"
     t = T["de"]
     body = [head("de", f"{title} | productivity-boost.com", f"{title} von productivity-boost.com Betriebs UG (haftungsbeschränkt) & Co. KG.", f"/{kind}/", f"/{kind}/"),
-            "<body>", sprite(), topbar("de", "/", home=False), f'<main id="main" class="wrap legalpage">{src}</main>', footer("de"), "</body></html>"]
+            "<body>", sprite(), topbar("de", "/", home=False, hint=False), f'<main id="main" class="wrap legalpage">{src}</main>', footer("de"), "</body></html>"]
     return "\n".join(body)
 
 def page_404():
     t = T["en"]
-    body = [head("en", "Off the band — Florian Standhartinger", "This page does not exist.", "/404.html", "/404.html"), "<body>", sprite(), topbar("en", "/de/", home=False),
+    body = [head("en", "Off the band — Florian Standhartinger", "This page does not exist.", "/404.html", "/404.html"), "<body>", sprite(), topbar("en", "/de/", home=False, hint=False),
             f'<main id="main" class="end nf"><div class="wrap"><p class="wrapline">404 · no carrier</p><div class="bignum">{numerals("404", "en", label=False)}</div>'
             f'<h1>Nothing on this frequency.</h1><p class="lead">The page you tuned to doesn’t exist (any more). <a href="/">Back to the band</a> · <a href="/de/" lang="de" hreflang="de">Zurück zum Band</a></p></div></main>',
             footer("en"), "</body></html>"]

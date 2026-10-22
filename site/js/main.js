@@ -24,7 +24,12 @@ const nl = navigator.language || '';
 if (hint && ((lang === 'en' && /^de\b/i.test(nl)) || (lang === 'de' && nl && !/^de\b/i.test(nl)))) {
   let off = false;
   try { off = localStorage.getItem('hint') === '0'; } catch (e) {}
-  if (!off) { hint.hidden = false; hint.classList.add('on'); }
+  if (!off) {
+    hint.hidden = false; hint.classList.add('on');
+    // a hint, not a banner: it leaves once the visitor starts reading
+    const away = () => { if (scrollY > innerHeight * 0.5) { hint.hidden = true; removeEventListener('scroll', away); } };
+    addEventListener('scroll', away, { passive: true });
+  }
   $('[data-close-hint]', hint)?.addEventListener('click', () => { hint.hidden = true; try { localStorage.setItem('hint', '0'); } catch (e) {} });
 }
 
