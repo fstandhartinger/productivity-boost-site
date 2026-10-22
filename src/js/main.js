@@ -138,6 +138,8 @@ if (sections.length) {
 // close the sheet after choosing a station
 
 // ---------- the instrument ----------
+// the SSTV picture decodes once per visit; layout changes (resize, rotate) must not replay it
+$$('.sstv img').forEach((i) => i.addEventListener('animationend', () => { i.style.animation = 'none'; }, { once: true }));
 const inst = $('.inst');
 if (inst) initInstrument(inst);
 
