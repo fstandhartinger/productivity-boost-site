@@ -175,11 +175,10 @@
   "base": "rx-benchmarks",
   "widths": [
    480,
-   800,
-   1200
+   800
   ],
-  "w": 1440,
-  "h": 460
+  "w": 960,
+  "h": 305
  },
  "rx-networks": {
   "base": "rx-networks",
@@ -190,14 +189,6 @@
   ],
   "w": 1840,
   "h": 700
- },
- "rx-agents": {
-  "base": "rx-agents",
-  "widths": [
-   470
-  ],
-  "w": 470,
-  "h": 560
  },
  "rx-studio": {
   "base": "rx-studio",

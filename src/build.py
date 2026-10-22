@@ -139,13 +139,22 @@ def sha(s):
     return "'sha256-" + base64.b64encode(hashlib.sha256(s.encode()).digest()).decode() + "'"
 
 # ---------- images ----------
+_VQ = {}
+def vq(fname):
+    """?v=<content hash> so changed images under an unchanged name are refetched despite the immutable cache."""
+    if fname not in _VQ:
+        import hashlib
+        p = os.path.join(OUT, "img", fname)
+        _VQ[fname] = hashlib.md5(open(p, "rb").read()).hexdigest()[:8] if os.path.exists(p) else "0"
+    return f"/img/{fname}?v={_VQ[fname]}"
+
 def picture(name, alt, sizes, cls="", eager=False, fetch_high=False, ar=None):
     a = ASSETS.get(name)
     if not a:
         return f'<!-- missing asset {name} -->'
     ws = a["widths"]; base = a["base"]
-    srcset_avif = ", ".join(f"/img/{base}-{w}.avif {w}w" for w in ws)
-    srcset_webp = ", ".join(f"/img/{base}-{w}.webp {w}w" for w in ws)
+    srcset_avif = ", ".join(f"{vq(f'{base}-{w}.avif')} {w}w" for w in ws)
+    srcset_webp = ", ".join(f"{vq(f'{base}-{w}.webp')} {w}w" for w in ws)
     w0 = ws[-1]; h0 = round(w0 * a["h"] / a["w"])
     attrs = f'width="{w0}" height="{h0}" alt="{esc(alt)}" decoding="async"'
     attrs += ' loading="eager"' if eager else ' loading="lazy"'
@@ -155,7 +164,7 @@ def picture(name, alt, sizes, cls="", eager=False, fetch_high=False, ar=None):
         attrs += f' class="{cls}"'
     return (f'<picture><source type="image/avif" srcset="{srcset_avif}" sizes="{sizes}">'
             f'<source type="image/webp" srcset="{srcset_webp}" sizes="{sizes}">'
-            f'<img src="/img/{base}-{ws[len(ws)//2]}.webp" {attrs}></picture>')
+            f'<img src="{vq(f"{base}-{ws[len(ws)//2]}.webp")}" {attrs}></picture>')
 
 ICON = {
  "mail": '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>',
@@ -343,7 +352,7 @@ def instrument(lang):
     first = band_order[-1]
     return f"""<figure class="inst" data-st="none" aria-label="{t["inst_title"]}" aria-describedby="inst-cap">
 <div class="inst-head"><b class="ttl">{t["inst_title"]}</b><span class="kind">{t["inst_kind"]}</span><span class="kind-m">{t["tap"]} ↓</span><button class="pause" type="button" data-pause aria-pressed="false" aria-label="{t["pause"]}" data-l-pause="{t["pause"]}" data-l-play="{t["play"]}">{ICON["pause"]}</button></div>
-<div class="ruler">{ruler_svg()}<nav aria-label="{t["nav_inst"]}">{"".join(st_links)}</nav><input class="needle-range" type="range" min="0" max="6" step="1" value="6" aria-label="{t["pick"]}" aria-valuetext="{freq_txt(str(first["freq"]), lang)} {t["mhz"]}, {st_plain(first["id"], lang)}"></div>
+<div class="ruler">{ruler_svg()}<nav aria-label="{t["nav_inst"]}">{"".join(st_links)}</nav><input class="needle-range" type="range" min="0" max="6" step="1" value="6" aria-label="{t["pick"]}" aria-valuetext="{t["pick"]}"></div>
 <div class="readout">{numerals("1987–2026", lang, cls="rnum num", label=False)}<span class="rtxt"><span class="rname" aria-live="polite">{t["sp_name"]}<span class="sr">, 1987–2026</span></span><span class="rsub">{esc(t["sp_sub"])}</span></span><a href="#decisions" data-go data-aria="{t["go_aria"]}" aria-label="{t["go_aria"]}: {esc(st_plain("decisions", lang))}"><span class="gl">{t["readout_go"]}</span><span class="gs" aria-hidden="true">{t["go_short"]}</span></a></div>
 <div class="plotwrap"><div class="years" aria-hidden="true">{yt}</div>
 <div class="plot">{wf_img}<i class="floor"></i><canvas aria-hidden="true"></canvas><i class="static"></i><i class="yours" aria-hidden="true"></i>{"".join(hits)}{ann}{decoder(lang)}</div></div>
@@ -470,10 +479,10 @@ def sig_worlds(lang):
     t = T[lang]
     v = ASSETS.get("rdvr_loop")
     cap = {"en": "Room Designer VR, from its own Steam trailer (2017). Silent loop.", "de": "Room Designer VR, aus dem eigenen Steam-Trailer (2017). Stumme Schleife."}[lang]
-    alt = {"en": "Room Designer VR: drawing a floor plan with a VR controller on a blueprint grid.", "de": "Room Designer VR: ein Grundriss wird mit dem VR-Controller auf ein Raster gezeichnet."}[lang]
+    alt = {"en": "Room Designer VR: standing in a furnished living room, then drawing a floor plan with a VR controller on a blueprint grid.", "de": "Room Designer VR: in einem eingerichteten Wohnzimmer stehen, dann einen Grundriss mit dem VR-Controller auf ein Raster zeichnen."}[lang]
     if v:
-        media = (f'<video class="loop" muted loop playsinline preload="none" width="{v["w"]}" height="{v["h"]}" poster="/img/{v["poster"]}" aria-label="{esc(alt)}">'
-                 f'<source src="/img/{v["webm"]}" type="video/webm"><source src="/img/{v["mp4"]}" type="video/mp4"></video>'
+        media = (f'<video class="loop" muted loop playsinline preload="none" width="{v["w"]}" height="{v["h"]}" poster="{vq(v["poster"])}" aria-label="{esc(alt)}">'
+                 f'<source src="{vq(v["webm"])}" type="video/webm"><source src="{vq(v["mp4"])}" type="video/mp4"></video>'
                  f'<button class="vbtn" type="button" data-vid aria-pressed="false" aria-label="{t["vid_pause"]}" data-l-pause="{t["vid_pause"]}" data-l-play="{t["vid_play"]}">{ICON["pause"]}</button>')
     else:
         media = picture("rdvr", alt, "(min-width:900px) 40vw, 92vw")
@@ -486,12 +495,10 @@ SIG = {"decisions": sig_decisions, "benchmarks": sig_benchmarks, "networks": sig
 RXMON = {  # his own live product pages as received screens (captured 22 Oct 2026), each cropped to one readable region
  "decisions": ("decisionmodels.io", {"en": "Screenshot of decisionmodels.io: “Decision Models · Jev-compatible API. Inference for open-weights decision models.”",
                                      "de": "Screenshot von decisionmodels.io: „Decision Models · Jev-compatible API. Inference for open-weights decision models.“"}),
- "benchmarks": ("benchmarkheaven.com/jev-models", {"en": "Screenshot of the JevBench board on Benchmark Heaven: “JevBench Capability Score (open weights)”, with sliders for maximum cost and latency.",
-                                                  "de": "Screenshot des JevBench-Boards auf Benchmark Heaven: „JevBench Capability Score (open weights)“, mit Reglern für maximale Kosten und Latenz."}),
+ "benchmarks": ("benchmarkheaven.com/jev-models", {"en": "Screenshot of the JevBench board on Benchmark Heaven: “JevBench Capability Score (open weights). Capability Score averages Intelligence and Calibration.” with a slider for maximum cost.",
+                                                  "de": "Screenshot des JevBench-Boards auf Benchmark Heaven: „JevBench Capability Score (open weights). Capability Score averages Intelligence and Calibration.“ mit einem Regler für die maximalen Kosten."}),
  "networks": ("reax.co", {"en": "Screenshot of reax.co: “AI by the people, for the people.” REAX, Bittensor subnet 92, with its serve, verify, reward, improve loop.",
                           "de": "Screenshot von reax.co: „AI by the people, for the people.“ REAX, Bittensor-Subnetz 92, mit dem Kreislauf Serve, Verify, Reward, Improve."}),
- "agents": ("github.com/fstandhartinger/ralph-wiggum", {"en": "Screenshot of the ralph-wiggum repository’s About box on GitHub: “Ralph Wiggum: Autonomous AI coding with spec-driven development”, MIT licence, 306 stars, 29 forks.",
-                                                       "de": "Screenshot der About-Box des Repositorys ralph-wiggum auf GitHub: „Ralph Wiggum: Autonomous AI coding with spec-driven development“, MIT-Lizenz, 306 Sterne, 29 Forks."}),
  "studio": ("github.com/fstandhartinger/h3-studio", {"en": "Screenshot of the H3 Studio README on GitHub: a web UI for generating video with MiniMax H3 on a self-hosted GPU — video plus a natively synchronised stereo soundtrack from one prompt; modes text, image, first+last frame and reference to video.",
                                                     "de": "Screenshot der H3-Studio-README auf GitHub: eine Web-Oberfläche, die mit MiniMax H3 auf einer eigenen GPU Videos erzeugt — Bild und synchroner Stereoton aus einem Prompt; Modi Text, Bild, erstes+letztes Bild und Referenz zu Video."}),
 }

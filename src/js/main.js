@@ -27,10 +27,10 @@ if (hint && ((lang === 'en' && /^de\b/i.test(nl)) || (lang === 'de' && nl && !/^
   if (!off) {
     hint.hidden = false; hint.classList.add('on');
     // a hint, not a banner: it leaves once the visitor starts reading
-    const away = () => { if (scrollY > innerHeight * 0.5) { hint.hidden = true; removeEventListener('scroll', away); } };
+    const away = () => { if (scrollY > innerHeight * 0.5) { hint.hidden = true; hint.classList.remove('on'); removeEventListener('scroll', away); } };
     addEventListener('scroll', away, { passive: true });
   }
-  $('[data-close-hint]', hint)?.addEventListener('click', () => { hint.hidden = true; try { localStorage.setItem('hint', '0'); } catch (e) {} });
+  $('[data-close-hint]', hint)?.addEventListener('click', () => { hint.hidden = true; hint.classList.remove('on'); try { localStorage.setItem('hint', '0'); } catch (e) {} });
 }
 
 // ---------- copy address ----------
