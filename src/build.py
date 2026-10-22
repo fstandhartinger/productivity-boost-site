@@ -127,7 +127,7 @@ def footer(lang, alt_path=None):
   <div class="notes"><h2 class="label">{esc(t["notes_h"])}</h2><ol>{notes}</ol></div>
   <div class="legal">
    <p>{esc(t["company"])}</p>
-   <p><a href="/impressum/" hreflang="de">{esc(t["imprint"])}</a> · <a href="/datenschutz/" hreflang="de">{esc(t["privacy"])}</a>{ln}</p>
+   <p><a href="/impressum/" hreflang="de">{esc(t["imprint"])}{f' (<span lang="de">{t["imprint_de"]}</span>)' if t["imprint_de"] else ""}</a> · <a href="/datenschutz/" hreflang="de">{esc(t["privacy"])}{f' (<span lang="de">{t["privacy_de"]}</span>)' if t["privacy_de"] else ""}</a>{ln}</p>
    <p class="muted">© 2014–2026 · <a href="{EMAIL and 'mailto:' + EMAIL}">{EMAIL}</a></p>
   </div>
  </div>
@@ -146,7 +146,7 @@ def decision(pr, lang, idx):
     for i, (o, p) in enumerate(pr["opts"]):
         rows += (f'<li class="opt{" win" if i == 0 else ""}"><span class="o">{esc(o)}</span>'
                  f'<span class="track" aria-hidden="true"><span class="fill p{round(p * 100)}"></span></span>'
-                 f'<span class="v">{p:.2f}</span></li>')
+                 f'<span class="v">{(f"{p:.2f}".replace(".", ",") if lang == "de" else f"{p:.2f}")}</span></li>')
     def pretty(s):
         return esc(json.dumps(json.loads(s), indent=2, ensure_ascii=False))
     return f"""<div class="dpanel" id="dp-{pr['id']}" data-i="{idx}">
@@ -201,7 +201,7 @@ def products(lang):
     sizes = "(min-width: 75em) 640px, (min-width: 62em) 52vw, 100vw"
     cap = t["shot_cap"]
     return f"""<section class="products" id="products" aria-labelledby="products-h">
- <h2 class="sr" id="products-h">{esc(t["products_h"])}</h2>
+ <div class="wrap p-head"><p class="kicker"><span>{esc(t["products_k"])}</span></p><h2 id="products-h">{esc(t["products_h"])}</h2></div>
  <article class="chapter wrap" aria-labelledby="dm-h">
   <div class="ch-copy">
    <p class="kicker"><span>{esc(t["dm_kicker"])}</span><span class="host">{esc(t["dm_host"])}</span></p>
@@ -251,7 +251,7 @@ def public(lang):
     t = T[lang]
     cards = ""
     for k, p in enumerate(POSTS):
-        img = (picture(p["img"], p["alt_" + lang], "(min-width: 62em) 400px, (min-width: 48em) 46vw, 100vw") if p.get("img")
+        img = (picture(p["img"], p["alt_" + lang], "(min-width: 62em) 400px, (min-width: 48em) 46vw, 100vw", cls="chart" if p.get("chart") else "") if p.get("img")
                else f'<span class="word" aria-hidden="true">{esc(p.get("word", ""))}</span>')
         badge = f'<span class="vbadge">{esc(t["video"])}</span>' if p.get("video") else ""
         cards += (f'<li class="post"><a href="{esc(p["url"])}" rel="noopener" target="_blank">'
@@ -352,7 +352,8 @@ def gen_css():
 def minify_css(s):
     s = re.sub(r"/\*.*?\*/", "", s, flags=re.S)
     s = re.sub(r"\s+", " ", s)
-    s = re.sub(r"\s*([{};:,>])\s*", r"\1", s)
+    s = re.sub(r"\s*([{};,>])\s*", r"\1", s)
+    s = re.sub(r":\s+", ":", s)  # never strip the space *before* a colon: ".a :is(.b)" is a descendant selector
     return s.replace(";}", "}").strip()
 
 def main():

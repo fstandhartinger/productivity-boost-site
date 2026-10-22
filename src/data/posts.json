@@ -26,7 +26,8 @@
   "what_en": "The first public results of JevBench, my benchmark for decision models: accuracy, calibration, speed and cost.",
   "what_de": "Die ersten öffentlichen Ergebnisse von JevBench, meinem Benchmark für Entscheidungsmodelle: Genauigkeit, Kalibrierung, Tempo und Kosten.",
   "date_en": "19 Sep 2026",
-  "date_de": "19.09.2026"
+  "date_de": "19.09.2026",
+  "chart": true
  },
  {
   "id": "1927412328020004865",
