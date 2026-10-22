@@ -232,7 +232,7 @@ function initInstrument(inst) {
     };
     raf = requestAnimationFrame(step);
   }
-  function done() { revealed = true; plot.classList.add('live', 'done'); if (!inst.classList.contains('locked')) lock('decisions', false); shimmer(); }
+  function done() { revealed = true; plot.classList.add('live', 'done'); shimmer(); }
   let tShim = 0, lastShim = 0;
   let shimT = 0;
   function shimmer() {
@@ -266,7 +266,7 @@ function initInstrument(inst) {
 
   async function boot() {
     try { band = await (await fetch('/js/band.json')).json(); } catch (e) { root.classList.remove('motion'); return; } // static image + labels
-    if (!root.classList.contains('motion')) { revealed = true; lock('decisions', false); return; } // the static image is the final frame
+    if (!root.classList.contains('motion')) { revealed = true; return; } // the static image is the final frame
     size();
     // start when the panel is in view (it usually is on load)
     const st = new IntersectionObserver(([e]) => { if (e.isIntersecting) { st.disconnect(); paused ? (paintAll(), done()) : reveal(); } });
@@ -277,7 +277,7 @@ function initInstrument(inst) {
     if (!band || !sp) return;
     const r = plot.getBoundingClientRect(), dpr = Math.min(1.25, devicePixelRatio || 1);
     if (Math.round(r.width * dpr) === w && Math.round(r.height * dpr) === h) return; // e.g. the phone URL bar: nothing to redraw
-    size(); paintAll(); if (current_lock) lock(current_lock, false);
+    size(); paintAll();
   }, 200); });
   const idle = window.requestIdleCallback || ((f) => setTimeout(f, 200));
   if (d.readyState === 'complete') idle(boot); else addEventListener('load', () => idle(boot), { once: true });

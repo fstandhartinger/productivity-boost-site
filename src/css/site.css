@@ -55,6 +55,7 @@ h1,h2,h3{margin:0;font-weight:760}
 .top .wrap{display:flex;align-items:center;gap:20px;height:var(--nav)}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--display);font-size:1rem;letter-spacing:.005em;font-stretch:90%;white-space:nowrap}
 .brand svg{width:26px;height:26px}
+.brand .bsub{display:none;font-style:normal;font-family:var(--mono);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--panel-dim);font-stretch:100%}
 .stations-nav{flex:1;min-width:0;position:relative;display:none}
 .stations-nav{display:none;align-items:center;gap:14px}
 .stations-nav a{position:relative}
@@ -205,11 +206,13 @@ html:not(.js) .needle-range,html:not(.js) [data-theme-toggle],html:not(.js) .pau
   .hero-in>*{grid-area:1 / 1}
   .inst{min-height:0;position:relative}
   /* the headline and the received picture live in the waterfall's quiet floor (pre-2017, between Systems and Decisions) */
-  .hero-txt{align-self:end;justify-self:start;z-index:5;position:relative;margin:0 0 50px calc(38px + (100% - 38px) * .475);width:calc((100% - 38px) * .37);padding:0;pointer-events:none}
+  .hero-txt{align-self:end;justify-self:start;z-index:5;position:relative;margin:0 0 50px calc(38px + (100% - 38px) * .465);width:calc((100% - 38px) * .385);padding:12px 20px 16px;background:rgba(6,6,9,.84);border:1px solid rgba(255,184,76,.22);border-radius:3px;pointer-events:none}
+  .hero-txt .idline{display:none}
+  .wtitle{display:block;margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid var(--panel-hair);font-family:var(--mono);font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--panel-dim)}
   .hero-txt a,.hero-txt button{pointer-events:auto}
-  .decoder{display:block;align-self:end;justify-self:start;z-index:5;margin:0 0 56px calc(38px + (100% - 38px) * .245);width:calc((100% - 38px) * .165);pointer-events:none}
+  .decoder{display:block;align-self:end;justify-self:start;z-index:5;margin:0 0 50px calc(38px + (100% - 38px) * .262);width:calc((100% - 38px) * .17);padding:10px 12px 12px;background:rgba(6,6,9,.84);border:1px solid rgba(255,184,76,.22);border-radius:3px;pointer-events:none}
   .plot .k-lgbm{display:none}
-  .decoder .sstv{border:1px solid rgba(255,184,76,.25)}
+  .decoder .sstv{border:0}
   .decoder .dlab{display:none}
   .hero-meta{display:none}
   .hero h1{font-size:min(4.4rem,6vh,11cqi)}
@@ -218,7 +221,7 @@ html:not(.js) .needle-range,html:not(.js) [data-theme-toggle],html:not(.js) .pau
   .plotwrap{flex:1 1 auto;min-height:240px;display:flex}
   .plot{aspect-ratio:auto;height:auto;flex:1 1 auto}
   .figline{display:block;margin:12px 0 0;font-size:.78rem;color:var(--panel-dim)}.figline a{color:var(--panel-ink)}
-  .js .top.on-dark .brand span{visibility:hidden}
+  .top.on-dark .brand{font-size:1.25rem}.top.on-dark .brand .bsub{display:inline;margin-left:6px}
   .idline .facewrap{display:none}
   .inst-head{position:absolute;top:14px;right:0;z-index:6;min-height:0;padding:0}
   .inst-head .ttl,.inst-head .kind{display:none}
@@ -419,3 +422,6 @@ footer summary{cursor:pointer;padding:14px 0;font-family:var(--mono);font-size:.
 
 @container inst (max-width:820px){.ruler{height:62px}.ruler .st:nth-of-type(even) i{margin-top:12px}.inst-head .kind{font-size:.64rem}}
 @container inst (max-width:560px){.ruler{height:40px}.ruler .st i{display:none}.readout .rname em{display:none}}
+
+.wtitle{display:none}
+@media (min-width:1080px){.wtitle{display:block}.readout:not(.locked) a{visibility:hidden}.inst .readout a{padding:10px 16px;border:1px solid var(--panel-hair);border-radius:999px;text-decoration:none}}

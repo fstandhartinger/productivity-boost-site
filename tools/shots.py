@@ -29,7 +29,7 @@ with sync_playwright() as p:
             print(name, "stale or error, retry", attempt, resp.status if resp else None); pg.wait_for_timeout(10000)
         else:
             raise SystemExit(f"{name}: page never showed the expected build")
-        pg.wait_for_timeout(3800)
+        pg.wait_for_timeout(5200)
         pg.screenshot(path=f"{out}/{name}-top.png")
         if full:
             # scroll through to trigger in-view states, then full page
