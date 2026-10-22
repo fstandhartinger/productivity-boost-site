@@ -205,7 +205,7 @@ function initInstrument(inst) {
   $$('[data-tune]', inst).forEach((a) => a.addEventListener('click', (e) => {
     const id = a.dataset.tune, touch = (lastPointer === 'touch' || lastPointer === 'pen') && e.detail > 0;
     lastPointer = '';
-    if (touch && (a.classList.contains('hit') || previewed !== id)) { e.preventDefault(); previewed = id; lock(id, true); return; }
+    if (touch && previewed !== id) { e.preventDefault(); previewed = id; lock(id, true); return; }
     previewed = null; tuneTo(id, e);
   }));
   go.addEventListener('click', (e) => tuneTo(go.getAttribute('href').slice(1), e));

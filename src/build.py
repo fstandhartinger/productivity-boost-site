@@ -36,10 +36,10 @@ GLYPHS = {
  "8": "M30 47c-11 0-18-8-18-20S19 6 30 6s18 9 18 21-7 20-18 20zm0 0C16 47 8 57 8 71s9 23 22 23 22-9 22-23-8-24-22-24z",
  "9": "M14 92c20-6 38-26 38-55C52 18 43 6 30 6S8 17 8 33s9 27 22 27c11 0 19-7 22-17",
  ".": "M8 92.5v.1",
- "–": "M6 60h34",
+ "–": "M4 60h50",
  ",": "M9 90l-5 11",
 }
-ADV = {".": 22, ",": 22, "–": 46}
+ADV = {".": 22, ",": 22, "–": 58}
 
 def sprite():
     syms = "".join(f'<symbol id="g{ord(k)}" viewBox="0 0 {ADV.get(k,60)} 100" overflow="visible"><path d="{d}"/></symbol>' for k, d in GLYPHS.items())
@@ -320,7 +320,7 @@ def annotations(lang):
     for i, (k, sid, tm, (dx, dy), mob, anchor) in enumerate(ANN):
         x = xpct(BAND_ST[sid]["freq"]); y = ypct(tm)
         lx, ly = x + dx, y + dy
-        lab = esc(t["ann"][k]).replace("★", '<span aria-hidden="true">★</span><span class="sr"> GitHub stars</span>')
+        lab = esc(t["ann"][k]).replace("★", '<span aria-hidden="true">★</span><span class="sr">{T[lang]["stars_sr"]}</span>')
         cls = "ann" + ("" if mob else " desk") + (" rt" if anchor == "end" else "")
         out.append(f'<i class="pt a{i} k-{k}{"" if mob else " desk"}" aria-hidden="true"></i><span class="{cls} l{i} k-{k}" aria-hidden="true">{lab}</span>')
         css.append(f".pt.a{i}{{left:{x:.2f}%;top:{y:.2f}%}}.ann.l{i}{{left:{lx:.2f}%;top:{ly:.2f}%}}")
@@ -352,8 +352,8 @@ def instrument(lang):
     first = band_order[-1]
     return f"""<figure class="inst" data-st="none" aria-label="{t["inst_title"]}" aria-describedby="inst-cap">
 <div class="inst-head"><b class="ttl">{t["inst_title"]}</b><span class="kind">{t["inst_kind"]}</span><span class="kind-m">{t["tap"]} ↓</span><button class="pause" type="button" data-pause aria-pressed="false" aria-label="{t["pause"]}" data-l-pause="{t["pause"]}" data-l-play="{t["play"]}">{ICON["pause"]}</button></div>
-<div class="ruler">{ruler_svg()}<nav aria-label="{t["nav_inst"]}">{"".join(st_links)}</nav><input class="needle-range" type="range" min="0" max="6" step="1" value="6" aria-label="{t["pick"]}" aria-valuetext="{t["pick"]}"></div>
 <div class="readout">{numerals("1987–2026", lang, cls="rnum num", label=False)}<span class="rtxt"><span class="rname" aria-live="polite">{t["sp_name"]}<span class="sr">, 1987–2026</span></span><span class="rsub">{esc(t["sp_sub"])}</span></span><a href="#decisions" data-go data-aria="{t["go_aria"]}" aria-label="{t["go_aria"]}: {esc(st_plain("decisions", lang))}"><span class="gl">{t["readout_go"]}</span><span class="gs" aria-hidden="true">{t["go_short"]}</span></a></div>
+<div class="ruler">{ruler_svg()}<nav aria-label="{t["nav_inst"]}">{"".join(st_links)}</nav><input class="needle-range" type="range" min="0" max="6" step="1" value="6" aria-label="{t["pick"]}" aria-valuetext="{t["pick"]}"></div>
 <div class="plotwrap"><div class="years" aria-hidden="true">{yt}</div>
 <div class="plot">{wf_img}<i class="floor"></i><canvas aria-hidden="true"></canvas><i class="static"></i><i class="yours" aria-hidden="true"></i>{"".join(hits)}{ann}{decoder(lang)}</div></div>
 <div class="plotfoot"><span>{freq_txt("87.5", lang)} · {t["since87"]}</span><span class="mid" aria-hidden="true">{t["inst_kind"]}</span><a href="#contact">{t["yourproj"]} · {freq_txt("108.0", lang)} →</a></div>
@@ -415,7 +415,7 @@ def sig_networks(lang):
     pp = "".join(f'<div><b>{a}</b>{esc(b)}</div>' for a, b in pools)
     ring = netring_svg()
     cap = {"en": "Miners serve, validators re-run every answer and time it (illustration).", "de": "Miner liefern, Validatoren rechnen jede Antwort nach und stoppen die Zeit (Illustration)."}[lang]
-    return f'''<div class="panel sig dark"><div class="sig-cap"><span>REAX · netuid 92</span><b>Live · 14 Oct 2026</b></div>
+    return f'''<div class="panel sig dark"><div class="sig-cap"><span>REAX · netuid 92</span><b>{"Live · 14. Okt. 2026" if lang == "de" else "Live · 14 Oct 2026"}</b></div>
 <figure role="img" aria-label="{esc(cap)}">{ring}</figure><p class="sig-note">{esc(cap)}</p><div class="pools">{pp}</div></div>'''
 
 def netring_svg():
@@ -439,7 +439,7 @@ def sig_studio(lang):
                   "(min-width:900px) 40vw, 92vw", cls="archive")
     cap = {"en": "Rewind Recorder, Vuzix AR glasses: the moment you just saw becomes a video. Archive, around 2020.",
            "de": "Rewind Recorder, Vuzix-AR-Brille: der Moment, den du gerade gesehen hast, wird zum Video. Archiv, um 2020."}[lang]
-    return f'''<div class="panel sig dark"><div class="sig-cap"><span>Studio · AR · video</span><b>Archive</b></div>
+    return f'''<div class="panel sig dark"><div class="sig-cap"><span>{"Studio · AR · Video" if lang == "de" else "Studio · AR · video"}</span><b>{"Archiv" if lang == "de" else "Archive"}</b></div>
 <div class="media">{img}<div class="cap">{esc(cap)}</div></div></div>'''
 
 def sig_agents(lang):
@@ -456,7 +456,7 @@ def sig_systems(lang):
     t = T[lang]
     cap = {"en": "Illustration — the real system is confidential: exposure from millions of contracts, aggregated live and put on a map.",
            "de": "Illustration – das echte System ist vertraulich: Risiken aus Millionen Verträgen, live aggregiert und auf die Karte gebracht."}[lang]
-    return f'''<div class="panel sig dark"><div class="sig-cap"><span>Risk · geo · real time</span><b>{t["illus"]}</b></div>
+    return f'''<div class="panel sig dark"><div class="sig-cap"><span>{"Risiko · Geo · Echtzeit" if lang == "de" else "Risk · geo · real time"}</span><b>{t["illus"]}</b></div>
 <figure role="img" aria-label="{esc(cap)}">{systems_svg()}</figure><p class="sig-note">{esc(cap)}</p></div>'''
 
 def systems_svg():
@@ -495,8 +495,6 @@ SIG = {"decisions": sig_decisions, "benchmarks": sig_benchmarks, "networks": sig
 RXMON = {  # his own live product pages as received screens (captured 22 Oct 2026), each cropped to one readable region
  "decisions": ("decisionmodels.io", {"en": "Screenshot of decisionmodels.io: “Decision Models · Jev-compatible API. Inference for open-weights decision models.”",
                                      "de": "Screenshot von decisionmodels.io: „Decision Models · Jev-compatible API. Inference for open-weights decision models.“"}),
- "benchmarks": ("benchmarkheaven.com/jev-models", {"en": "Screenshot of the JevBench board on Benchmark Heaven: “JevBench Capability Score (open weights). Capability Score averages Intelligence and Calibration.” with a slider for maximum cost.",
-                                                  "de": "Screenshot des JevBench-Boards auf Benchmark Heaven: „JevBench Capability Score (open weights). Capability Score averages Intelligence and Calibration.“ mit einem Regler für die maximalen Kosten."}),
  "networks": ("reax.co", {"en": "Screenshot of reax.co: “AI by the people, for the people.” REAX, Bittensor subnet 92, with its serve, verify, reward, improve loop.",
                           "de": "Screenshot von reax.co: „AI by the people, for the people.“ REAX, Bittensor-Subnetz 92, mit dem Kreislauf Serve, Verify, Reward, Improve."}),
  "studio": ("github.com/fstandhartinger/h3-studio", {"en": "Screenshot of the H3 Studio README on GitHub: a web UI for generating video with MiniMax H3 on a self-hosted GPU — video plus a natively synchronised stereo soundtrack from one prompt; modes text, image, first+last frame and reference to video.",
@@ -512,10 +510,11 @@ def rxmon(sid, lang):
 
 def card(sid, lang):
     t = T[lang]; c = CARDS[sid]
-    links = " · ".join(f'<a href="{u}">{esc(l)}</a>' for l, u in c["links"])
+    de_l = {"REAX 1 on Hugging Face": "REAX 1 auf Hugging Face", "Mine with your GPU": "Mit deiner GPU minen"}
+    links = " · ".join(f'<a href="{u}">{esc(de_l.get(l, l) if lang == "de" else l)}</a>' for l, u in c["links"])
     return f'''<article class="card"><span class="qsl" aria-hidden="true">{t["qsl"]} {freq_txt(ST[sid]["freq"], lang)}</span>
 <div class="ttl"><div class="yr">{c["year"]}</div><h3>{esc(c["title"][lang])}</h3></div>{rxmon(sid, lang)}
-<dl><div><dt>{t["built"]}</dt><dd>{esc(c["built"][lang])}</dd></div><div><dt>{t["proofl"]}</dt><dd>{esc(c["proof"][lang]).replace("★", '<span aria-hidden="true">★</span><span class="sr"> GitHub stars</span>')}</dd></div></dl>
+<dl><div><dt>{t["built"]}</dt><dd>{esc(c["built"][lang])}</dd></div><div><dt>{t["proofl"]}</dt><dd>{esc(c["proof"][lang]).replace("★", '<span aria-hidden="true">★</span><span class="sr">{T[lang]["stars_sr"]}</span>')}</dd></div></dl>
 <p class="note">{esc(c["note"][lang])}</p>{f'<p class="go">{links}</p>' if links else ''}</article>'''
 
 def trace(sid, lang):
@@ -532,7 +531,7 @@ def station(sid, lang, idx):
 <div class="wrap"><header class="st-head"><div class="st-num">{numerals(s["freq"], lang)}<span class="mhz" aria-hidden="true">MHz</span></div>
 <div><h2 class="st-name" id="h-{sid}" lang="{lang}">{s["de"] if lang == "de" else s["en"]}</h2><p class="st-sub">{esc(s["sub"][lang])}</p></div>{trace(sid, lang)}</header>
 <div class="st-body">{SIG[sid](lang)}{card(sid, lang)}</div>
-<a class="more" href="{t["works"]}#{sid}">{t["more"].format(name=esc(st_plain(sid, lang)))}</a></div></section>'''
+<a class="more" href="{t["works"]}#{sid}">{t["more"].format(name=esc(st_plain(sid, lang)), f=freq_txt(ST[sid]["freq"], lang))}</a></div></section>'''
 
 def hop(h, lang):
     t = T[lang]
@@ -542,11 +541,11 @@ def hop(h, lang):
     if viz:
         vimg = f'<img class="slice" src="/img/{viz["file"]}" width="{viz["w"]}" height="{viz["h"]}" alt="" loading="lazy" decoding="async">'
     pl, pu = h["proof"]
-    return f'''<aside class="hop" data-hop="{a}:{b}" aria-label="{t["hop_word"]}: {esc(h["title"][lang])}"><div class="wrap">
+    return f'''<div class="hop" role="group" data-hop="{a}:{b}" aria-label="{t["hop_word"]}: {esc(h["title"][lang])}"><div class="wrap">
 <div class="from">{numerals(ST[a]["freq"], lang, label=False)}<span aria-hidden="true">→</span>{numerals(ST[b]["freq"], lang, label=False)}<span class="sr">{freq_txt(ST[a]["freq"], lang)} → {freq_txt(ST[b]["freq"], lang)} {t["mhz"]}</span></div>
 <div class="resolve viz">{vimg}</div>
 <div><span class="mono dim">{t["hop_word"]} · {esc(st_plain(a, lang))} ↔ {esc(st_plain(b, lang))}</span><h3>{esc(h["title"][lang])}</h3><p>{esc(h["text"][lang])}</p><p class="proofl"><a href="{pu}">{esc(pl)}</a></p></div>
-</div></aside>'''
+</div></div>'''
 
 def how(lang):
     t = T[lang]
@@ -598,7 +597,7 @@ def page_works(lang):
             if lang == "de":
                 for a, b in DE_META:
                     m = m.replace(a, b)
-            m = esc(m).replace("★", '<span aria-hidden="true">★</span><span class="sr"> GitHub stars</span>')
+            m = esc(m).replace("★", '<span aria-hidden="true">★</span><span class="sr">{T[lang]["stars_sr"]}</span>')
             link = f'<a href="{url}">{esc(url.split("//")[1].rstrip("/"))} →</a>' if url else ""
             cards.append(f'<article class="wcard"><span class="meta">{esc(year)} · {m}</span><h3>{esc(title)}</h3><p>{esc(de if lang == "de" else en)}</p>{link}</article>')
         groups.append(f'<section class="works-group" id="{sid}" data-st="{sid}" aria-labelledby="w-{sid}"><h2 id="w-{sid}">{s["de"] if lang == "de" else s["en"]} <small>{freq_txt(s["freq"], lang)} MHz</small></h2><div class="grid-cards">{"".join(cards)}</div></section>')

@@ -131,7 +131,7 @@ for st in json.load(open(os.path.join(ROOT, "src", "data", "band.json")))["stati
 
 # --- receiver monitors: screenshots of his own live products (Playwright, 1280x800 @1.5x, 22 Oct 2026), top 936 px ---
 # each cropped to one readable region (headline / score / about box / README top); decisions: price box excluded
-RX_CROPS = {"decisions": (60, 300, 1000, 725), "benchmarks": (0, 600, 960, 905), "networks": (60, 260, 1900, 960),
+RX_CROPS = {"decisions": (60, 300, 1000, 725), "networks": (60, 260, 1900, 960),
             "studio": (0, 0, 1257, 790)}
 for k, box in RX_CROPS.items():
     src = os.path.join(MEDIA, "rx", f"{k}.png")

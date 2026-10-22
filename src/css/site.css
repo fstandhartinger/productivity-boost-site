@@ -81,7 +81,8 @@ h1,h2,h3{margin:0;font-weight:760}
 .btn svg{width:18px;height:18px}
 .top .write{display:none}
 @media (max-width:63.99em){.brand span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
-@media (min-width:64em){.stations-nav{display:flex}.top .write{display:inline-flex;min-height:40px;font-size:.92rem}}
+@media (min-width:64em){.top .write{display:inline-flex;min-height:40px;font-size:.92rem}}
+@media (min-width:75em){.stations-nav{display:flex}}
 
 
 /* hero = the instrument: always dark, full bleed */
@@ -469,3 +470,4 @@ section.station{scroll-margin-top:-12px}
   .end .endr .links{display:flex;flex-direction:column;gap:14px;font-size:1.05rem}.end .endr .sign{margin-top:28px}}
 .end .carrier b{left:auto;right:14px}
 .ruler .st i{line-height:1.1}
+@media (min-width:900px){.end .endr{align-self:center}}
